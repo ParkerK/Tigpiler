@@ -27,7 +27,7 @@ whitespace=[\t\r\ ]+;
 %s FORMAT;
 %%
 <INITIAL,COMMENT,ESCAPE,FORMAT>\n    => (lineNum := !lineNum+1; linePos := yypos :: !linePos; continue());
-<INITIAL,COMMENT,STRING>{whitespace}  => (continue());
+<INITIAL,COMMENT>{whitespace}  => (continue());
 
 <INITIAL>"type"         => (Tokens.TYPE(yypos,yypos+4));
 <INITIAL>"var"          => (Tokens.VAR(yypos,yypos+3));
@@ -82,7 +82,7 @@ whitespace=[\t\r\ ]+;
 <STRING>"\\f"           => (stringToken := !stringToken ^ "\f"; continue());
 <STRING>"\\[a-zA-Z]+"   => (ErrorMsg.error yypos ("illegal escape character " ^ yytext); continue());
 <STRING>"\\"            => (YYBEGIN FORMAT; continue());  
-<STRING>\n|\t|\f|\r     => (ErrorMsg.error yypos ("cannot have new line in string " ^ yytext); continue());
+<STRING>\n|\r        => (ErrorMsg.error yypos ("cannot have new line in string " ^ yytext); continue());
 <STRING>.               => (stringToken := !stringToken ^ yytext; continue());
 
 <FORMAT>{formatchar}    => (continue()); 
