@@ -3,22 +3,32 @@ type lexresult = Tokens.token
 
 val lineNum = ErrorMsg.lineNum
 val linePos = ErrorMsg.linePos
-val numComment = ref 0;
+val numComment = ref 0
+val stringToken = ref ""
+
 fun err(p1,p2) = ErrorMsg.error p1
 
 fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
 
 
 %% 
-letter=[a-zA-Z]
-digit=[0-9]
-%%
-\n	=> (lineNum := !lineNum+1; linePos := yypos :: !linePos; continue());
-","	=> (Tokens.COMMA(yypos,yypos+1));
-var  	=> (Tokens.VAR(yypos,yypos+3));
-"123"	=> (Tokens.INT(123,yypos,yypos+3));
+letter=[a-zA-Z];
+digit=[0-9];
+quote=[\"];
+notquote=[^\"];
+ascii={digit}{3};
+escapechar=[nt\"\\]|{ascii};
+formatchar=[\ ftnrvboe]+;
+whitespace=[\t\r\ ]+;
 
-(* Parse Predefined Tokens *)
+%s COMMENT;
+%s STRING;
+%s ESCAPE;
+%s FORMAT;
+%%
+<INITIAL,COMMENT,STRING,ESCAPE,FORMAT>\n    => (lineNum := !lineNum+1; linePos := yypos :: !linePos; continue());
+<INITIAL,COMMENT,STRING,ESCAPE,FORMAT>{whitespace}  => (continue());
+
 <INITIAL>"type"         => (Tokens.TYPE(yypos,yypos+4));
 <INITIAL>"var"          => (Tokens.VAR(yypos,yypos+3));
 <INITIAL>"function"     => (Tokens.FUNCTION(yypos,yypos+8));
@@ -63,23 +73,33 @@ var  	=> (Tokens.VAR(yypos,yypos+3));
 <INITIAL>":"            => (Tokens.COLON(yypos,yypos+1));
 <INITIAL>","            => (Tokens.COMMA(yypos,yypos+1));
         
-<INITIAL>"string"       => (Tokens.STRING(yypos,yypos+6));
-<INITIAL>"int"          => (Tokens.INT(yypos,yypos+3));
+<INITIAL>{quote}        => (stringToken:="";YYBEGIN STRING;continue());
 
-(* Parse Identifiers *)    
-<INITIAL>{letter}({letter}|{digit}|"_")* => (Tokens.ID(yytest,yypos,yypos+size (yytext)));
+<STRING>{quote}         => (YYBEGIN INITIAL;Tokens.STRING(!stringToken,yypos,yypos+size (!stringToken)));
+<STRING>"\\"            => (YYBEGIN ESCAPE; continue()); 
+<STRING>.               => (stringToken := !stringToken ^ yytext; continue());
 
-(* Todo: EOF Handing *)
-val EOF:  linenum * linenum -> token
+<ESCAPE>{escapechar}    => (stringToken := !stringToken ^ "\\" ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>{formatchar}    => (YYBEGIN FORMAT; continue());
+<ESCAPE>.               => (ErrorMsg.error yypos ("illegal escape character " ^ yytext); continue());
 
-(* Lex comments, and allow for nested comments *)
-<INITIAL, COMMENT>"/*" => (YYBEGIN COMMENT; numComment := !numComment+1; continue());
+<FORMAT>{formatchar}    => (continue()); 
+<FORMAT>"\\"            => (YYBEGIN STRING; continue());
+<FORMAT>.               => (ErrorMsg.error yypos ("illegal format character " ^ yytext); continue());
+
+
+<INITIAL>{digit}+          => (Tokens.INT(valOf(Int.fromString yytext),yypos,yypos+size yytext));
+
+<INITIAL>{letter}({letter}|{digit}|"_")* => (Tokens.ID(yytext,yypos,yypos+size(yytext)));
+
+
+
+<INITIAL,COMMENT>"/*" => (YYBEGIN COMMENT; numComment := !numComment+1; continue());
 <COMMENT>"*/" => (numComment := !numComment-1;
                     if (!numComment=0)
-                    then (YYINITIAL; continue())
+                    then (YYBEGIN INITIAL; continue())
                     else (continue()));
                     
-<COMMENT> . (continue())
+<COMMENT>. => (continue());
 
-(* If not in any other regex *)
-<INITIAL>.       => (ErrorMsg.error yypos ("illegal character " ^ yytext); continue());
+<INITIAL>.       => (ErrorMsg.error yypos ("illegal character:" ^ "|"^yytext^"|"); continue());
