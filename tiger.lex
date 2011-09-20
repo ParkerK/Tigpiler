@@ -10,23 +10,23 @@ fun err(p1,p2) = ErrorMsg.error p1
 
 fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
 
-
-%% 
+%%
 letter=[a-zA-Z];
 digit=[0-9];
 quote=[\"];
-notquote=[^\"];
 ascii={digit}{3};
 escapechar=[nt\"\\]|{ascii};
-formatchar=[\ \f\t\n\r]+;
-whitespace=[\t\r\ ]+;
+whitespace=[\t\ ]+;
+newline=[\f\n\r]+;
+formatchar={whitespace}|{newline};
+
 
 %s COMMENT;
 %s STRING;
 %s ESCAPE;
 %s FORMAT;
 %%
-<INITIAL,COMMENT,ESCAPE,FORMAT>\n    => (lineNum := !lineNum+1; linePos := yypos :: !linePos; continue());
+<INITIAL,COMMENT>{newline}     => (lineNum := !lineNum+1; linePos := yypos :: !linePos; continue());
 <INITIAL,COMMENT>{whitespace}  => (continue());
 
 <INITIAL>"type"         => (Tokens.TYPE(yypos,yypos+4));
@@ -73,33 +73,36 @@ whitespace=[\t\r\ ]+;
 <INITIAL>":"            => (Tokens.COLON(yypos,yypos+1));
 <INITIAL>","            => (Tokens.COMMA(yypos,yypos+1));
         
-<INITIAL>{quote}        => (stringToken:="";YYBEGIN STRING;continue());
+<INITIAL>{quote}        => (stringToken:=""; YYBEGIN STRING; continue());
 
-<STRING>{quote}         => (YYBEGIN INITIAL;Tokens.STRING(!stringToken,yypos,yypos+size (!stringToken)));
-
-<STRING>"\\n"           => (stringToken := !stringToken ^ "\n"; continue());
-<STRING>"\\t"           => (stringToken := !stringToken ^ "\t"; continue());
-<STRING>"\\f"           => (stringToken := !stringToken ^ "\f"; continue());
-<STRING>"\\[a-zA-Z]+"   => (ErrorMsg.error yypos ("illegal escape character " ^ yytext); continue());
-<STRING>"\\"            => (YYBEGIN FORMAT; continue());  
-<STRING>\n|\r        => (ErrorMsg.error yypos ("cannot have new line in string " ^ yytext); continue());
+<STRING>{quote}         => (YYBEGIN INITIAL;Tokens.STRING(!stringToken, yypos, yypos + size(!stringToken)));
+<STRING>"\\"            => (YYBEGIN ESCAPE; continue());  
+<STRING>{newline}       => (ErrorMsg.error yypos ("cannot have new line in string " ^ yytext); continue());
 <STRING>.               => (stringToken := !stringToken ^ yytext; continue());
+
+<ESCAPE>"n"             => (stringToken := !stringToken ^ "\n"; YYBEGIN STRING; continue());
+<ESCAPE>"r"             => (stringToken := !stringToken ^ "\r"; YYBEGIN STRING; continue());
+<ESCAPE>"t"             => (stringToken := !stringToken ^ "\t"; YYBEGIN STRING; continue());
+<ESCAPE>"f"             => (stringToken := !stringToken ^ "\f"; YYBEGIN STRING; continue());
+<ESCAPE>{ascii}         => (stringToken := !stringToken ^ String.str(Char.chr(valOf(Int.fromString yytext))); 
+                            YYBEGIN STRING; 
+                            continue());
+<ESCAPE>{formatchar}    => (YYBEGIN FORMAT; continue());
+<ESCAPE>.               => (ErrorMsg.error yypos ("illegal escape character " ^ yytext); continue());
 
 <FORMAT>{formatchar}    => (continue()); 
 <FORMAT>"\\"            => (YYBEGIN STRING; continue());
-<FORMAT>{ascii}         => (stringToken := !stringToken ^ String.str(Char.chr(valOf(Int.fromString yytext))); YYBEGIN STRING; continue());
 <FORMAT>.               => (ErrorMsg.error yypos ("illegal format character " ^ yytext); continue());
 
-<INITIAL>{digit}+          => (Tokens.INT(valOf(Int.fromString yytext),yypos,yypos+size yytext));
+<INITIAL>{digit}+       => (Tokens.INT(valOf(Int.fromString yytext),yypos,yypos+size yytext));
 
 <INITIAL>{letter}({letter}|{digit}|"_")* => (Tokens.ID(yytext,yypos,yypos+size(yytext)));
 
-<INITIAL,COMMENT>"/*" => (YYBEGIN COMMENT; numComment := !numComment+1; continue());
-<COMMENT>"*/" => (numComment := !numComment-1;
-                    if (!numComment=0)
-                    then (YYBEGIN INITIAL; continue())
-                    else (continue()));
-                    
-<COMMENT>. => (continue());
+<INITIAL,COMMENT>"/*"   => (YYBEGIN COMMENT; numComment := !numComment+1; continue());
+<COMMENT>"*/"           => (numComment := !numComment-1;
+                            if (!numComment=0)
+                            then (YYBEGIN INITIAL; continue())
+                            else (continue()));                   
+<COMMENT>.              => (continue());
 
-<INITIAL>.       => (ErrorMsg.error yypos ("illegal character:" ^ "|"^yytext^"|"); continue());
+<INITIAL>.       => (ErrorMsg.error yypos ("illegal character:" ^ "|" ^ yytext ^ "|"); continue());
