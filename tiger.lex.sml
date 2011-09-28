@@ -60,7 +60,7 @@ val s = [
  (5, 
 "\104\104\104\104\104\104\104\104\104\104\106\104\104\105\104\104\
 \\104\104\104\104\104\104\104\104\104\104\104\104\104\104\104\104\
-\\104\104\109\104\104\104\104\104\104\104\104\104\104\104\104\104\
+\\104\104\108\104\104\104\104\104\104\104\104\104\104\104\104\104\
 \\104\104\104\104\104\104\104\104\104\104\104\104\104\104\104\104\
 \\104\104\104\104\104\104\104\104\104\104\104\104\104\104\104\104\
 \\104\104\104\104\104\104\104\104\104\104\104\104\107\104\104\104\
@@ -69,15 +69,15 @@ val s = [
 \\104"
 ),
  (7, 
-"\110\110\110\110\110\110\110\110\110\119\115\110\110\121\110\110\
-\\110\110\110\110\110\110\110\110\110\110\110\110\110\110\110\110\
-\\119\110\110\110\110\110\110\110\110\110\110\110\110\110\110\110\
-\\116\116\116\116\116\116\116\116\116\116\110\110\110\110\110\110\
-\\110\110\110\110\110\110\110\110\110\110\110\110\110\110\110\110\
-\\110\110\110\110\110\110\110\110\110\110\110\110\110\110\110\110\
-\\110\110\110\110\110\110\114\110\110\110\110\110\110\110\113\110\
-\\110\110\112\110\111\110\110\110\110\110\110\110\110\110\110\110\
-\\110"
+"\109\109\109\109\109\109\109\109\109\119\114\109\109\121\109\109\
+\\109\109\109\109\109\109\109\109\109\109\109\109\109\109\109\109\
+\\119\109\109\109\109\109\109\109\109\109\109\109\109\109\109\109\
+\\116\116\116\116\116\116\116\116\116\116\109\109\109\109\109\109\
+\\109\109\109\109\109\109\109\109\109\109\109\109\109\109\109\109\
+\\109\109\109\109\109\109\109\109\109\109\109\109\115\109\109\109\
+\\109\109\109\109\109\109\113\109\109\109\109\109\109\109\112\109\
+\\109\109\111\109\110\109\109\109\109\109\109\109\109\109\109\109\
+\\109"
 ),
  (9, 
 "\122\122\122\122\122\122\122\122\122\126\124\122\122\123\122\122\
@@ -607,25 +607,14 @@ val s = [
 \\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
 \\000"
 ),
- (107, 
-"\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\\000\000\000\000\000\000\000\000\000\000\000\000\108\000\000\000\
-\\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\\000"
-),
- (114, 
-"\000\000\000\000\000\000\000\000\000\000\115\000\000\115\000\000\
+ (113, 
+"\000\000\000\000\000\000\000\000\000\000\114\000\000\114\000\000\
 \\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
 \\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
 \\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
 \\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
 \\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\\000\000\000\000\000\000\115\000\000\000\000\000\000\000\000\000\
+\\000\000\000\000\000\000\114\000\000\000\000\000\000\000\000\000\
 \\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
 \\000"
 ),
@@ -703,123 +692,123 @@ in Vector.fromList(map g
 {fin = [], trans = 7},
 {fin = [], trans = 9},
 {fin = [], trans = 9},
-{fin = [(N 187)], trans = 0},
-{fin = [(N 113),(N 187)], trans = 0},
-{fin = [(N 82),(N 187)], trans = 0},
-{fin = [(N 111),(N 187)], trans = 0},
-{fin = [(N 177),(N 187)], trans = 15},
-{fin = [(N 177)], trans = 15},
-{fin = [(N 177),(N 187)], trans = 17},
-{fin = [(N 177)], trans = 18},
-{fin = [(N 177)], trans = 19},
-{fin = [(N 177)], trans = 20},
-{fin = [(N 63),(N 177)], trans = 15},
-{fin = [(N 177),(N 187)], trans = 22},
-{fin = [(N 177)], trans = 23},
-{fin = [(N 14),(N 177)], trans = 15},
-{fin = [(N 177),(N 187)], trans = 25},
-{fin = [(N 177)], trans = 26},
-{fin = [(N 177)], trans = 27},
-{fin = [(N 10),(N 177)], trans = 15},
-{fin = [(N 53),(N 177)], trans = 15},
-{fin = [(N 177),(N 187)], trans = 30},
-{fin = [(N 32),(N 177)], trans = 15},
-{fin = [(N 177),(N 187)], trans = 32},
-{fin = [(N 177)], trans = 33},
-{fin = [(N 43),(N 177)], trans = 15},
-{fin = [(N 177),(N 187)], trans = 35},
-{fin = [(N 177)], trans = 36},
-{fin = [(N 47),(N 177)], trans = 15},
-{fin = [(N 177),(N 187)], trans = 38},
-{fin = [(N 39),(N 177)], trans = 15},
-{fin = [(N 71),(N 177)], trans = 15},
-{fin = [(N 2),(N 177),(N 187)], trans = 41},
-{fin = [(N 177)], trans = 42},
-{fin = [(N 177)], trans = 43},
-{fin = [(N 177)], trans = 44},
-{fin = [(N 177)], trans = 45},
-{fin = [(N 177)], trans = 46},
-{fin = [(N 177)], trans = 47},
-{fin = [(N 23),(N 177)], trans = 15},
-{fin = [(N 177)], trans = 49},
-{fin = [(N 57),(N 177)], trans = 15},
-{fin = [(N 2),(N 177)], trans = 51},
+{fin = [(N 186)], trans = 0},
+{fin = [(N 113),(N 186)], trans = 0},
+{fin = [(N 82),(N 186)], trans = 0},
+{fin = [(N 111),(N 186)], trans = 0},
+{fin = [(N 176),(N 186)], trans = 15},
+{fin = [(N 176)], trans = 15},
+{fin = [(N 176),(N 186)], trans = 17},
+{fin = [(N 176)], trans = 18},
+{fin = [(N 176)], trans = 19},
+{fin = [(N 176)], trans = 20},
+{fin = [(N 63),(N 176)], trans = 15},
+{fin = [(N 176),(N 186)], trans = 22},
+{fin = [(N 176)], trans = 23},
+{fin = [(N 14),(N 176)], trans = 15},
+{fin = [(N 176),(N 186)], trans = 25},
+{fin = [(N 176)], trans = 26},
+{fin = [(N 176)], trans = 27},
+{fin = [(N 10),(N 176)], trans = 15},
+{fin = [(N 53),(N 176)], trans = 15},
+{fin = [(N 176),(N 186)], trans = 30},
+{fin = [(N 32),(N 176)], trans = 15},
+{fin = [(N 176),(N 186)], trans = 32},
+{fin = [(N 176)], trans = 33},
+{fin = [(N 43),(N 176)], trans = 15},
+{fin = [(N 176),(N 186)], trans = 35},
+{fin = [(N 176)], trans = 36},
+{fin = [(N 47),(N 176)], trans = 15},
+{fin = [(N 176),(N 186)], trans = 38},
+{fin = [(N 39),(N 176)], trans = 15},
+{fin = [(N 71),(N 176)], trans = 15},
+{fin = [(N 2),(N 176),(N 186)], trans = 41},
+{fin = [(N 176)], trans = 42},
+{fin = [(N 176)], trans = 43},
+{fin = [(N 176)], trans = 44},
+{fin = [(N 176)], trans = 45},
+{fin = [(N 176)], trans = 46},
+{fin = [(N 176)], trans = 47},
+{fin = [(N 23),(N 176)], trans = 15},
+{fin = [(N 176)], trans = 49},
+{fin = [(N 57),(N 176)], trans = 15},
+{fin = [(N 2),(N 176)], trans = 51},
 {fin = [(N 2)], trans = 52},
-{fin = [(N 177),(N 187)], trans = 53},
-{fin = [(N 177)], trans = 54},
-{fin = [(N 36),(N 177)], trans = 15},
-{fin = [(N 177)], trans = 56},
-{fin = [(N 177)], trans = 57},
-{fin = [(N 68),(N 177)], trans = 15},
-{fin = [(N 177),(N 187)], trans = 59},
-{fin = [(N 50),(N 177)], trans = 15},
-{fin = [(N 177),(N 187)], trans = 61},
-{fin = [(N 177)], trans = 62},
-{fin = [(N 177)], trans = 63},
-{fin = [(N 177)], trans = 64},
-{fin = [(N 29),(N 177)], trans = 15},
-{fin = [(N 177),(N 187)], trans = 66},
-{fin = [(N 177)], trans = 67},
-{fin = [(N 177)], trans = 68},
-{fin = [(N 177)], trans = 69},
-{fin = [(N 77),(N 177)], trans = 15},
-{fin = [(N 117),(N 187)], trans = 0},
-{fin = [(N 115),(N 187)], trans = 0},
-{fin = [(N 89),(N 187)], trans = 73},
+{fin = [(N 176),(N 186)], trans = 53},
+{fin = [(N 176)], trans = 54},
+{fin = [(N 36),(N 176)], trans = 15},
+{fin = [(N 176)], trans = 56},
+{fin = [(N 176)], trans = 57},
+{fin = [(N 68),(N 176)], trans = 15},
+{fin = [(N 176),(N 186)], trans = 59},
+{fin = [(N 50),(N 176)], trans = 15},
+{fin = [(N 176),(N 186)], trans = 61},
+{fin = [(N 176)], trans = 62},
+{fin = [(N 176)], trans = 63},
+{fin = [(N 176)], trans = 64},
+{fin = [(N 29),(N 176)], trans = 15},
+{fin = [(N 176),(N 186)], trans = 66},
+{fin = [(N 176)], trans = 67},
+{fin = [(N 176)], trans = 68},
+{fin = [(N 176)], trans = 69},
+{fin = [(N 77),(N 176)], trans = 15},
+{fin = [(N 117),(N 186)], trans = 0},
+{fin = [(N 115),(N 186)], trans = 0},
+{fin = [(N 89),(N 186)], trans = 73},
 {fin = [(N 87)], trans = 0},
-{fin = [(N 99),(N 187)], trans = 0},
-{fin = [(N 94),(N 187)], trans = 76},
+{fin = [(N 99),(N 186)], trans = 0},
+{fin = [(N 94),(N 186)], trans = 76},
 {fin = [(N 97)], trans = 0},
 {fin = [(N 92)], trans = 0},
-{fin = [(N 123),(N 187)], trans = 0},
-{fin = [(N 125),(N 187)], trans = 80},
+{fin = [(N 123),(N 186)], trans = 0},
+{fin = [(N 125),(N 186)], trans = 80},
 {fin = [(N 80)], trans = 0},
-{fin = [(N 172),(N 187)], trans = 82},
-{fin = [(N 172)], trans = 82},
-{fin = [(N 101),(N 187)], trans = 84},
-{fin = [(N 180)], trans = 0},
-{fin = [(N 109),(N 187)], trans = 0},
-{fin = [(N 107),(N 187)], trans = 0},
-{fin = [(N 127),(N 187)], trans = 0},
-{fin = [(N 105),(N 187)], trans = 0},
-{fin = [(N 103),(N 187)], trans = 0},
-{fin = [(N 121),(N 187)], trans = 0},
-{fin = [(N 119),(N 187)], trans = 0},
-{fin = [(N 84),(N 187)], trans = 0},
-{fin = [(N 129),(N 187)], trans = 0},
-{fin = [(N 5),(N 187)], trans = 95},
+{fin = [(N 171),(N 186)], trans = 82},
+{fin = [(N 171)], trans = 82},
+{fin = [(N 101),(N 186)], trans = 84},
+{fin = [(N 179)], trans = 0},
+{fin = [(N 109),(N 186)], trans = 0},
+{fin = [(N 107),(N 186)], trans = 0},
+{fin = [(N 127),(N 186)], trans = 0},
+{fin = [(N 105),(N 186)], trans = 0},
+{fin = [(N 103),(N 186)], trans = 0},
+{fin = [(N 121),(N 186)], trans = 0},
+{fin = [(N 119),(N 186)], trans = 0},
+{fin = [(N 84),(N 186)], trans = 0},
+{fin = [(N 129),(N 186)], trans = 0},
+{fin = [(N 5),(N 186)], trans = 95},
 {fin = [(N 5)], trans = 95},
-{fin = [(N 2),(N 187)], trans = 52},
-{fin = [(N 185)], trans = 0},
-{fin = [(N 2),(N 185)], trans = 52},
-{fin = [(N 185)], trans = 84},
-{fin = [(N 185)], trans = 101},
-{fin = [(N 183)], trans = 0},
-{fin = [(N 5),(N 185)], trans = 95},
-{fin = [(N 141)], trans = 0},
-{fin = [(N 139),(N 141)], trans = 105},
-{fin = [(N 139)], trans = 105},
-{fin = [(N 136),(N 141)], trans = 107},
-{fin = [(N 134)], trans = 0},
-{fin = [(N 131),(N 141)], trans = 0},
-{fin = [(N 160)], trans = 0},
-{fin = [(N 147),(N 160)], trans = 0},
-{fin = [(N 145),(N 160)], trans = 0},
-{fin = [(N 143),(N 160)], trans = 0},
-{fin = [(N 149),(N 158),(N 160)], trans = 114},
-{fin = [(N 158)], trans = 114},
-{fin = [(N 160)], trans = 116},
+{fin = [(N 2),(N 186)], trans = 52},
+{fin = [(N 184)], trans = 0},
+{fin = [(N 2),(N 184)], trans = 52},
+{fin = [(N 184)], trans = 84},
+{fin = [(N 184)], trans = 101},
+{fin = [(N 182)], trans = 0},
+{fin = [(N 5),(N 184)], trans = 95},
+{fin = [(N 138)], trans = 0},
+{fin = [(N 136),(N 138)], trans = 105},
+{fin = [(N 136)], trans = 105},
+{fin = [(N 133),(N 138)], trans = 0},
+{fin = [(N 131),(N 138)], trans = 0},
+{fin = [(N 159)], trans = 0},
+{fin = [(N 146),(N 159)], trans = 0},
+{fin = [(N 144),(N 159)], trans = 0},
+{fin = [(N 142),(N 159)], trans = 0},
+{fin = [(N 148),(N 157),(N 159)], trans = 113},
+{fin = [(N 157)], trans = 113},
+{fin = [(N 140),(N 159)], trans = 0},
+{fin = [(N 159)], trans = 116},
 {fin = [], trans = 117},
-{fin = [(N 153)], trans = 0},
-{fin = [(N 158),(N 160)], trans = 119},
-{fin = [(N 158)], trans = 119},
-{fin = [(N 158),(N 160)], trans = 114},
-{fin = [(N 169)], trans = 0},
-{fin = [(N 165),(N 169)], trans = 123},
-{fin = [(N 165)], trans = 123},
-{fin = [(N 167),(N 169)], trans = 0},
-{fin = [(N 165),(N 169)], trans = 126},
-{fin = [(N 165)], trans = 126}])
+{fin = [(N 152)], trans = 0},
+{fin = [(N 157),(N 159)], trans = 119},
+{fin = [(N 157)], trans = 119},
+{fin = [(N 157),(N 159)], trans = 113},
+{fin = [(N 168)], trans = 0},
+{fin = [(N 164),(N 168)], trans = 123},
+{fin = [(N 164)], trans = 123},
+{fin = [(N 166),(N 168)], trans = 0},
+{fin = [(N 164),(N 168)], trans = 126},
+{fin = [(N 164)], trans = 126}])
 end
 structure StartStates =
 	struct
@@ -882,32 +871,32 @@ let fun continue() = lex() in
 | 127 => (Tokens.COMMA(yypos,yypos+1))
 | 129 => (stringToken:=""; YYBEGIN STRING; continue())
 | 131 => (YYBEGIN INITIAL;Tokens.STRING(!stringToken, yypos, yypos + size(!stringToken)))
-| 134 => (stringToken := !stringToken ^ "\\"; continue())
-| 136 => (YYBEGIN ESCAPE; continue())
-| 139 => let val yytext=yymktext() in ErrorMsg.error yypos ("cannot have new line in string " ^ yytext); continue() end
+| 133 => (YYBEGIN ESCAPE; continue())
+| 136 => let val yytext=yymktext() in ErrorMsg.error yypos ("cannot have new line in string " ^ yytext); continue() end
+| 138 => let val yytext=yymktext() in stringToken := !stringToken ^ yytext; continue() end
 | 14 => (Tokens.VAR(yypos,yypos+3))
-| 141 => let val yytext=yymktext() in stringToken := !stringToken ^ yytext; continue() end
-| 143 => (stringToken := !stringToken ^ "\n"; YYBEGIN STRING; continue())
-| 145 => (stringToken := !stringToken ^ "\r"; YYBEGIN STRING; continue())
-| 147 => (stringToken := !stringToken ^ "\t"; YYBEGIN STRING; continue())
-| 149 => (stringToken := !stringToken ^ "\f"; YYBEGIN STRING; continue())
-| 153 => let val yytext=yymktext() in stringToken := !stringToken ^ String.str(Char.chr(valOf(Int.fromString yytext))); 
+| 140 => (stringToken := !stringToken ^ "\\"; YYBEGIN STRING; continue())
+| 142 => (stringToken := !stringToken ^ "\n"; YYBEGIN STRING; continue())
+| 144 => (stringToken := !stringToken ^ "\r"; YYBEGIN STRING; continue())
+| 146 => (stringToken := !stringToken ^ "\t"; YYBEGIN STRING; continue())
+| 148 => (stringToken := !stringToken ^ "\f"; YYBEGIN STRING; continue())
+| 152 => let val yytext=yymktext() in stringToken := !stringToken ^ String.str(Char.chr(valOf(Int.fromString yytext))); 
                             YYBEGIN STRING; 
                             continue() end
-| 158 => (YYBEGIN FORMAT; continue())
-| 160 => let val yytext=yymktext() in ErrorMsg.error yypos ("illegal escape character " ^ yytext); continue() end
-| 165 => (continue())
-| 167 => (YYBEGIN STRING; continue())
-| 169 => let val yytext=yymktext() in ErrorMsg.error yypos ("illegal format character " ^ yytext); continue() end
-| 172 => let val yytext=yymktext() in Tokens.INT(valOf(Int.fromString yytext),yypos,yypos+size yytext) end
-| 177 => let val yytext=yymktext() in Tokens.ID(yytext,yypos,yypos+size(yytext)) end
-| 180 => (YYBEGIN COMMENT; numComment := !numComment+1; continue())
-| 183 => (numComment := !numComment-1;
+| 157 => (YYBEGIN FORMAT; continue())
+| 159 => let val yytext=yymktext() in ErrorMsg.error yypos ("illegal escape character " ^ yytext); continue() end
+| 164 => (continue())
+| 166 => (YYBEGIN STRING; continue())
+| 168 => let val yytext=yymktext() in ErrorMsg.error yypos ("illegal format character " ^ yytext); continue() end
+| 171 => let val yytext=yymktext() in Tokens.INT(valOf(Int.fromString yytext),yypos,yypos+size yytext) end
+| 176 => let val yytext=yymktext() in Tokens.ID(yytext,yypos,yypos+size(yytext)) end
+| 179 => (YYBEGIN COMMENT; numComment := !numComment+1; continue())
+| 182 => (numComment := !numComment-1;
                             if (!numComment=0)
                             then (YYBEGIN INITIAL; continue())
                             else (continue()))
-| 185 => (continue())
-| 187 => let val yytext=yymktext() in ErrorMsg.error yypos ("illegal character:" ^ "|" ^ yytext ^ "|"); continue() end
+| 184 => (continue())
+| 186 => let val yytext=yymktext() in ErrorMsg.error yypos ("illegal character:" ^ "|" ^ yytext ^ "|"); continue() end
 | 2 => (lineNum := !lineNum+1; linePos := yypos :: !linePos; continue())
 | 23 => (Tokens.FUNCTION(yypos,yypos+8))
 | 29 => (Tokens.BREAK(yypos,yypos+5))

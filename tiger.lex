@@ -80,6 +80,7 @@ formatchar={whitespace}|{newline};
 <STRING>{newline}       => (ErrorMsg.error yypos ("cannot have new line in string " ^ yytext); continue());
 <STRING>.               => (stringToken := !stringToken ^ yytext; continue());
 
+<ESCAPE>"\\"             => (stringToken := !stringToken ^ "\\"; YYBEGIN STRING; continue());
 <ESCAPE>"n"             => (stringToken := !stringToken ^ "\n"; YYBEGIN STRING; continue());
 <ESCAPE>"r"             => (stringToken := !stringToken ^ "\r"; YYBEGIN STRING; continue());
 <ESCAPE>"t"             => (stringToken := !stringToken ^ "\t"; YYBEGIN STRING; continue());
