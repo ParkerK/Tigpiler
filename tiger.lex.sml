@@ -12,7 +12,7 @@ val stringToken = ref ""
 
 fun err(p1,p2) = ErrorMsg.error p1
 
-fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
+fun eof() = let val pos = hd(!linePos) in if !numComment <> 0 then (ErrorMsg.error pos "unclosed comment") else (); Tokens.EOF(pos,pos) end
 
 end (* end of user routines *)
 exception LexError (* raised if illegal leaf action tried *)
@@ -878,7 +878,7 @@ let fun continue() = lex() in
 | 168 => let val yytext=yymktext() in ErrorMsg.error yypos ("illegal format character " ^ yytext); continue() end
 | 171 => let val yytext=yymktext() in Tokens.INT(valOf(Int.fromString yytext),yypos,yypos+size yytext) end
 | 176 => let val yytext=yymktext() in Tokens.ID(yytext,yypos,yypos+size(yytext)) end
-| 179 => (YYBEGIN COMMENT; numComment := !numComment+1; continue())
+| 179 => ( numComment := !numComment+1; YYBEGIN COMMENT; continue())
 | 182 => (numComment := !numComment-1;
                             if (!numComment=0)
                             then (YYBEGIN INITIAL; continue())

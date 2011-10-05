@@ -8,7 +8,7 @@ val stringToken = ref ""
 
 fun err(p1,p2) = ErrorMsg.error p1
 
-fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
+fun eof() = let val pos = hd(!linePos) in if !numComment <> 0 then (ErrorMsg.error pos "unclosed comment") else (); Tokens.EOF(pos,pos) end
 
 %%
 letter=[a-zA-Z];
@@ -99,7 +99,7 @@ formatchar={whitespace}|{newline};
 
 <INITIAL>{letter}({letter}|{digit}|"_")* => (Tokens.ID(yytext,yypos,yypos+size(yytext)));
 
-<INITIAL,COMMENT>"/*"   => (YYBEGIN COMMENT; numComment := !numComment+1; continue());
+<INITIAL,COMMENT>"/*"   => ( numComment := !numComment+1; YYBEGIN COMMENT; continue());
 <COMMENT>"*/"           => (numComment := !numComment-1;
                             if (!numComment=0)
                             then (YYBEGIN INITIAL; continue())
