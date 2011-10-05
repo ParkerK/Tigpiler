@@ -17,7 +17,7 @@ quote=[\"];
 ascii={digit}{3};
 escapechar=[nt\"\\]|{ascii};
 whitespace=[\t\ ]+;
-newline=[\f\n\r]+;
+newline=[\n\r]+;
 formatchar={whitespace}|{newline};
 
 
