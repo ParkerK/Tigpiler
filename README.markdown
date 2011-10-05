@@ -10,7 +10,7 @@ Parts
 To Fix:  
 
 + <del> A little too aggressive illegal escape char checker. e.g. \\ is a regular backslash. Currently your lexer reporting error </del>  
-+ Currently you seem to be checking unclosed comments by the use of escape characters. There's a better implementation. 
++ <del> Currently you seem to be checking unclosed comments by the use of escape characters. There's a better implementation. </del>
 + Need to handle illegal integers, e.g. var a:=5a
 + <del> There is a bug in your lexer, such that strings ending with f are not being processed </del>
 
