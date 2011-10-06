@@ -17,7 +17,9 @@
   | FUNCTION | VAR | TYPE 
 
 %nonterm  exp | program | decs | dec | tydec | ty | tyfields | vardec 
-  | fundec | lvalue 
+  | fundec | lvalue | tyfieldsTail | boolexp | compexp | error | mathexp | functionCall
+  | functionParam | functionParamTail | control | assignment | sequenceTail | sequenceExp
+  | sequence
 
 %pos int
 %verbose
@@ -35,7 +37,7 @@
 %value ID ("bogus")
 %value INT (1)
 %value STRING ("")
-
+%value UMINUS ("-")
 (* Precedence Directives *)
 %nonassoc   EQ NEQ LT LE GT GE
 %left       OR                  (* Binding - Loose *)
