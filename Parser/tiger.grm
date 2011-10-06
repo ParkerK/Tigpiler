@@ -15,6 +15,7 @@
   | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF 
   | BREAK | NIL
   | FUNCTION | VAR | TYPE 
+  | UMINUS
 
 %nonterm  exp | program | decs | dec | tydec | ty | tyfields | vardec 
   | fundec | lvalue | tyfieldsTail | boolexp | compexp | error | mathexp | functionCall
@@ -37,7 +38,7 @@
 %value ID ("bogus")
 %value INT (1)
 %value STRING ("")
-%value UMINUS ("-")
+
 (* Precedence Directives *)
 %nonassoc   EQ NEQ LT LE GT GE
 %left       OR                  (* Binding - Loose *)
