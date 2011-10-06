@@ -92,8 +92,12 @@ compexp:    exp EQ exp      ()
     |       exp GT exp      ()
     |       exp GE exp      ()        
 
+boolexp:    exp AND exp ()
+    |       exp OR exp  ()
+
 (*Declarations*)
-decs:       {dec}           ()
+decs:   decs dec        ()
+    | (*empty*)         ()
 
 dec:        tydec           ()
     |       vardec          ()
