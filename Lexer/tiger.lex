@@ -1,5 +1,8 @@
 type pos = int
 type lexresult = Tokens.token
+type svalue = Tokens.svalue
+type ('a,'b) token = ('a,'b) Tokens.token
+type lexresult = (svalue,pos) token
 
 val lineNum = ErrorMsg.lineNum
 val linePos = ErrorMsg.linePos
@@ -11,6 +14,8 @@ fun err(p1,p2) = ErrorMsg.error p1
 fun eof() = let val pos = hd(!linePos) in if !numComment <> 0 then (ErrorMsg.error pos "unclosed comment") else (); Tokens.EOF(pos,pos) end
 
 %%
+%header (functor TigerLexFun(structure Tokens: Tiger_TOKENS));
+
 letter=[a-zA-Z];
 digit=[0-9];
 quote=[\"];
