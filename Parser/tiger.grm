@@ -63,21 +63,25 @@ exp:
     |   mathexp ()
     |   compexp ()
     |   control ()
+    |   sequence ()
     
-    |   LPAREN RPAREN       ()(*Do nothing*)
     |   UMINUS exp          () (*Unary Minus = Negative Sign*)
-    |   exp SEMICOLON exp   ()
-    |   LPAREN exp RPAREN   ()
     
     |   NIL     ()
     |   INT     ()
     |   STRING  ()
     
-functionCall:   ID LPAREN functionParam RPAREN      ()
-functionParam:  exp functionParamTail               ()
-    |   (*empty*)
+sequence:           LPAREN sequenceExp RPAREN       ()(*Do nothing*)
+sequenceExp:        exp sequenceTail                ()
+    |               (*empty*)
+sequenceTail:       SEMICOLON exp sequenceTail      ()
+    |               (*empty*)
+
+functionCall:       ID LPAREN functionParam RPAREN  ()
+functionParam:      exp functionParamTail           ()
+    |               (*empty*)
 functionParamTail:  COMMA exp functionParamTail     ()
-    |   (*empty*)
+    |               (*empty*)
     
 control:    assignment    () (*returns unit*)
     |       IF THEN ELSE  ()
