@@ -37,12 +37,12 @@
 %value STRING ("")
 
 (* Precedence Directives *)
-%nonassoc   EQ NEQ LT LE GT GE  (* Binding - Loose *)
+%nonassoc   EQ NEQ LT LE GT GE  
+%left       OR                  (* Binding - Loose *)
+%left       AND                         (* | *)
 %left       PLUS MINUS                  (* | *)
-%left       TIMES DIVIDE                (* | *)
-%right      UMINUS                      (* | *)
-%right      boolexp                     (* V *)
-%right      mathexp             (* Binding - Tight *)
+%left       TIMES DIVIDE                (* V *)
+%left       UMINUS              (* Binding - Tight *)
 
 %%
 (* Grammar Rules *)
@@ -51,13 +51,7 @@
  * to replace the two dummy productions below with an actual grammar. 
  *)
 
-program:    stmlist               ()
-
-stmlist:    stm                   ()
-        |   stmlist SEMICOLON stm ()
-
-stm:    decs    ()
-    |   exp     ()
+program:    exp         ()
 
 error:  ()
     
@@ -74,7 +68,7 @@ exp:    functionCall    ()
     |   INT     ()
     |   STRING  ()
     
-sequence:           LPAREN sequenceExp RPAREN       ()(* Do nothing *)
+sequence:           LPAREN sequenceExp RPAREN       ()
 sequenceExp:        exp sequenceTail                ()
     |               (* empty *)
 sequenceTail:       SEMICOLON exp sequenceTail      ()
@@ -113,8 +107,8 @@ boolexp:    exp AND exp ()
     |       exp OR exp  ()
 
 (* Declarations *)
-decs:       decs dec        ()
-    |       (* empty *)       ()
+decs:       dec decs        ()
+    |       (* empty *)     ()
 
 dec:        tydec           ()
     |       vardec          ()
@@ -128,7 +122,7 @@ ty:     type-id                                                         ()
     |   ARRAY OF type-id                                                ()
 
 tyfields:   ID COLON type-id LBRACE tyfieldsTail                        ()
-        |   (* empty *)                                                   ()
+        |   (* empty *)                                                 ()
 tyfieldsTail: COMMA ID COLON type-id RBRACE tyfieldsTail                ()
         |   (* empty *)
 
