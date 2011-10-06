@@ -1,8 +1,13 @@
+(*User Declarations*)
+
 %%
+
+(*Parser Declarations*)
 %term
     EOF 
   | ID of string
-  | INT of int | STRING of string 
+  | INT of int 
+  | STRING of string 
   | COMMA | COLON | SEMICOLON | LPAREN | RPAREN | LBRACK | RBRACK 
   | LBRACE | RBRACE | DOT 
   | PLUS | MINUS | TIMES | DIVIDE | EQ | NEQ | LT | LE | GT | GE
@@ -31,7 +36,7 @@
 %value STRING ("")
 
 %%
-
+(*Grammar Rules*)
 (* This is a skeleton grammar file, meant to illustrate what kind of
  * declarations are necessary above the %% mark.  Students are expected
  *  to replace the two dummy productions below with an actual grammar. 
@@ -40,11 +45,7 @@
 program : exp               ()
 
     
-exp:    INT             ()
-    |   exp PLUS exp    ()
-    |   exp MINUS exp   ()
-    |   exp TIMES exp   ()
-    |   exp DIVIDE exp  ()
+exp:   ()
 
 (* Declarations *)
 
@@ -65,3 +66,17 @@ ty:     type-id         ()
     
 tyfields:   (*empty*) ()
         |   id : type-id {, id : type-id}
+
+
+(*Variables*)
+vardec :    var id := exp                               ()
+        |   var id : type-id := exp                     ()
+
+(*Functions*)
+fundec :    function id (tyfields) = exp                ()
+        |   function id (tyfields) : type-id = exp      ()
+
+(*L-Values*)
+lvalue :    id                                          ()
+        |   lvalue . id                                 ()
+        |   lvalue [ exp ]                              ()
