@@ -42,11 +42,16 @@
  *  to replace the two dummy productions below with an actual grammar. 
  *)
 
-program : exp               ()
+program:    stmlist               ()
 
+stm:    ()
+
+stmlist:    stm                   ()
+        |   stmlist SEMICOLON stm ()
     
-exp:   ()
+exp:    ()
 
+error:  ()
 (*Declarations*)
 decs:   {dec}           ()
 
@@ -60,21 +65,21 @@ tydec:  TYPE type-id = ty   ()
 
 ty:     type-id         ()
     |   { tyfields }    ()
-    | ARRAY OF type-id  ()
+    |   ARRAY OF type-id  ()
     
 tyfields:   (*empty*) ()
         |   id : type-id {, id : type-id}
 
 
 (*Variables*)
-vardec :    var id := exp                               ()
+vardec:     var id := exp                               ()
         |   var id : type-id := exp                     ()
 
 (*Functions*)
-fundec :    function id (tyfields) = exp                ()
+fundec:     function id (tyfields) = exp                ()
         |   function id (tyfields) : type-id = exp      ()
 
 (*L-Values*)
-lvalue :    id                                          ()
+lvalue:     id                                          ()
         |   lvalue . id                                 ()
         |   lvalue [ exp ]                              ()
