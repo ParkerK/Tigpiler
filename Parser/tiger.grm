@@ -53,11 +53,12 @@ stmlist:    stm                   ()
 error:  ()
     
 exp:
-    |   function call   ()
+
     |   record creation   ()
     |   array creation    ()
     |   array and record assignment   ()
-    
+
+    |   functionCall ()
     |   lvalue  ()
     |   mathexp ()
     |   compexp ()
@@ -71,7 +72,13 @@ exp:
     |   NIL     ()
     |   INT     ()
     |   STRING  ()
-
+    
+functionCall:   ID LPAREN functionParam RPAREN      ()
+functionParam:  exp functionParamTail               ()
+    |   (*empty*)
+functionParamTail:  COMMA exp functionParamTail     ()
+    |   (*empty*)
+    
 control:    assignment    () (*returns unit*)
     |       IF THEN ELSE  ()
     |       IF THEN ()
@@ -110,8 +117,10 @@ ty:     type-id                                                         ()
     |   LBRACE tyfields RBRACE                                          ()
     |   ARRAY OF type-id                                                ()
 
-tyfields:   (*empty*)                                                   ()
-        |   ID COLON type-id LBRACE COMMA ID COLON type-id RBRACE       ()
+tyfields:   ID COLON type-id LBRACE tyfieldsTail                        ()
+        |   (*empty*)                                                   ()
+tyfieldsTail: COMMA ID COLON type-id RBRACE tyfieldsTail                ()
+        |   (*empty*)
 
 (*Variables*)
 vardec :    VAR ID ASSIGN exp                                           ()
