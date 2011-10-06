@@ -1,8 +1,8 @@
-(*User Declarations*)
+(* User Declarations *)
 
 %%
 
-(*Parser Declarations*)
+(* Parser Declarations *)
 %term
     EOF 
   | ID of string
@@ -36,19 +36,19 @@
 %value INT (1)
 %value STRING ("")
 
-(*Precedence Directives*)
-%nonassoc   EQ NEQ LT LE GT GE  (*Binding - Loose*)
-%left       PLUS MINUS                  (*|*)
-%left       TIMES DIVIDE                (*|*)
-%right      UMINUS                      (*|*)
-%right      boolexp                     (*V*)
-%right      mathexp             (*Binding - Tight*)
+(* Precedence Directives *)
+%nonassoc   EQ NEQ LT LE GT GE  (* Binding - Loose *)
+%left       PLUS MINUS                  (* | *)
+%left       TIMES DIVIDE                (* | *)
+%right      UMINUS                      (* | *)
+%right      boolexp                     (* V *)
+%right      mathexp             (* Binding - Tight *)
 
 %%
-(*Grammar Rules*)
+(* Grammar Rules *)
 (* This is a skeleton grammar file, meant to illustrate what kind of
  * declarations are necessary above the %% mark.  Students are expected
- *  to replace the two dummy productions below with an actual grammar. 
+ * to replace the two dummy productions below with an actual grammar. 
  *)
 
 program:    stmlist               ()
@@ -57,42 +57,38 @@ stmlist:    stm                   ()
         |   stmlist SEMICOLON stm ()
 
 stm:    decs    ()
+    |   exp     ()
 
 error:  ()
     
-exp:
-
-    |   record creation   ()
-    |   array creation    ()
-    |   array and record assignment   ()
-
-    |   functionCall ()
-    |   lvalue  ()
-    |   mathexp ()
-    |   compexp ()
-    |   control ()
-    |   sequence ()
+exp:    functionCall    ()
+    |   lvalue          ()
+    |   mathexp         ()
+    |   compexp         ()
+    |   control         ()
+    |   sequence        ()
     
-    |   MINUS exp   %prec   UMINUS  () (*Unary Minus = Negative Sign*)
+    |   MINUS exp   %prec   UMINUS  () (* Unary Minus = Negative Sign *)
     
     |   NIL     ()
     |   INT     ()
     |   STRING  ()
     
-sequence:           LPAREN sequenceExp RPAREN       ()(*Do nothing*)
+sequence:           LPAREN sequenceExp RPAREN       ()(* Do nothing *)
 sequenceExp:        exp sequenceTail                ()
-    |               (*empty*)
+    |               (* empty *)
 sequenceTail:       SEMICOLON exp sequenceTail      ()
-    |               (*empty*)
+    |               (* empty *)
 
 functionCall:       ID LPAREN functionParam RPAREN  ()
 functionParam:      exp functionParamTail           ()
-    |               (*empty*)
+    |               (* empty *)
 functionParamTail:  COMMA exp functionParamTail     ()
-    |               (*empty*)
+    |               (* empty *)
 
-(*Procedure calls, assignment, if-then, while, break, and sometimes if-then-else
-returns unit*)
+(* Procedure calls, assignment, if-then, while, break, and sometimes 
+ * if-then-else returns unit *)
+ 
 control:    assignment                      () 
     |       IF exp THEN exp ELSE exp        ()
     |       IF exp THEN exp                 ()
@@ -116,15 +112,15 @@ compexp:    exp EQ exp      ()
 boolexp:    exp AND exp ()
     |       exp OR exp  ()
 
-(*Declarations*)
+(* Declarations *)
 decs:       decs dec        ()
-    |       (*empty*)       ()
+    |       (* empty *)       ()
 
 dec:        tydec           ()
     |       vardec          ()
     |       fundec          ()
     
-(*Data Types*)
+(* Data Types *)
 tydec:  TYPE type-id EQ ty                                              ()
 
 ty:     type-id                                                         ()
@@ -132,19 +128,19 @@ ty:     type-id                                                         ()
     |   ARRAY OF type-id                                                ()
 
 tyfields:   ID COLON type-id LBRACE tyfieldsTail                        ()
-        |   (*empty*)                                                   ()
+        |   (* empty *)                                                   ()
 tyfieldsTail: COMMA ID COLON type-id RBRACE tyfieldsTail                ()
-        |   (*empty*)
+        |   (* empty *)
 
-(*Variables*)
+(* Variables *)
 vardec :    VAR ID ASSIGN exp                                           ()
         |   VAR ID COLON type-id ASSIGN exp                             ()
 
-(*Functions*)
+(* Functions *)
 fundec :    FUNCTION ID LPAREN tyfields RPAREN EQ exp                   ()
         |   FUNCTION ID LPAREN tyfields RPAREN COLON type-id EQ exp     ()
 
-(*L-Values*)
+(* L-Values *)
 lvalue :    ID                                                          ()
         |   lvalue DOT ID                                               ()
         |   lvalue LBRACK exp RBRACK                                    ()
