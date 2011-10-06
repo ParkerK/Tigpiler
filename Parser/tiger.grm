@@ -16,7 +16,8 @@
   | BREAK | NIL
   | FUNCTION | VAR | TYPE 
 
-%nonterm  exp | program
+%nonterm  exp | program | decs | dec | tydec | ty | tyfields | vardec 
+  | fundec | lvalue 
 
 %pos int
 %verbose
