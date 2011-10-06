@@ -37,7 +37,7 @@
 %value STRING ("")
 
 (* Precedence Directives *)
-%nonassoc   EQ NEQ LT LE GT GE  
+%nonassoc   EQ NEQ LT LE GT GE
 %left       OR                  (* Binding - Loose *)
 %left       AND                         (* | *)
 %left       PLUS MINUS                  (* | *)
@@ -121,20 +121,20 @@ ty:     type-id                                                         ()
     |   LBRACE tyfields RBRACE                                          ()
     |   ARRAY OF type-id                                                ()
 
-tyfields:   ID COLON type-id LBRACE tyfieldsTail                        ()
-        |   (* empty *)                                                 ()
-tyfieldsTail: COMMA ID COLON type-id RBRACE tyfieldsTail                ()
-        |   (* empty *)
+tyfields:       ID COLON type-id LBRACE tyfieldsTail                    ()
+    |           (* empty *)                                             ()
+tyfieldsTail:   COMMA ID COLON type-id RBRACE tyfieldsTail              ()
+    |           (* empty *)
 
 (* Variables *)
-vardec :    VAR ID ASSIGN exp                                           ()
-        |   VAR ID COLON type-id ASSIGN exp                             ()
+vardec:     VAR ID ASSIGN exp                                           ()
+    |       VAR ID COLON type-id ASSIGN exp                             ()
 
 (* Functions *)
-fundec :    FUNCTION ID LPAREN tyfields RPAREN EQ exp                   ()
-        |   FUNCTION ID LPAREN tyfields RPAREN COLON type-id EQ exp     ()
+fundec:     FUNCTION ID LPAREN tyfields RPAREN EQ exp                   ()
+    |       FUNCTION ID LPAREN tyfields RPAREN COLON type-id EQ exp     ()
 
 (* L-Values *)
-lvalue :    ID                                                          ()
-        |   lvalue DOT ID                                               ()
-        |   lvalue LBRACK exp RBRACK                                    ()
+lvalue:     ID                                                          ()
+    |       lvalue DOT ID                                               ()
+    |       lvalue LBRACK exp RBRACK                                    ()
