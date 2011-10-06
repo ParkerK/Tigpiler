@@ -70,15 +70,15 @@ exp:    functionCall    ()
     
 sequence:           LPAREN sequenceExp RPAREN       ()
 sequenceExp:        exp sequenceTail                ()
-    |               (* empty *)
+    |               (* empty *)                     ()
 sequenceTail:       SEMICOLON exp sequenceTail      ()
-    |               (* empty *)
+    |               (* empty *)                     ()
 
 functionCall:       ID LPAREN functionParam RPAREN  ()
 functionParam:      exp functionParamTail           ()
-    |               (* empty *)
+    |               (* empty *)                     ()
 functionParamTail:  COMMA exp functionParamTail     ()
-    |               (* empty *)
+    |               (* empty *)                     ()
 
 (* Procedure calls, assignment, if-then, while, break, and sometimes 
  * if-then-else returns unit *)
