@@ -63,18 +63,18 @@ ty:     type-id         ()
     | ARRAY OF type-id  ()
     
 tyfields:   (*empty*) ()
-        |   id : type-id {, id : type-id}
+        |   ID : type-id {, ID : type-id}
 
 
 (*Variables*)
-vardec :    VAR id := exp                               ()
-        |   VAR id : type-id := exp                     ()
+vardec :    VAR ID := exp                               ()
+        |   VAR ID : type-id := exp                     ()
 
 (*Functions*)
-fundec :    FUNCTION id (tyfields) = exp                ()
-        |   FUNCTION id (tyfields) : type-id = exp      ()
+fundec :    FUNCTION ID (tyfields) = exp                ()
+        |   FUNCTION ID (tyfields) : type-id = exp      ()
 
 (*L-Values*)
-lvalue :    id                                          ()
-        |   lvalue . id                                 ()
+lvalue :    ID                                          ()
+        |   lvalue . ID                                 ()
         |   lvalue [ exp ]                              ()
