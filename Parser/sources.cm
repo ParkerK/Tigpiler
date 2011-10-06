@@ -3,7 +3,7 @@ Group is
 tiger.lex
 errormsg.sml
 parsetest.sml
-tiger.grm
+tiger.grm : shell (target: tiger.grm.sml ml-yacc %s)
 smlnj-lib.cm
 ml-yacc-lib.cm
 

@@ -16,7 +16,8 @@
   | BREAK | NIL
   | FUNCTION | VAR | TYPE 
 
-%nonterm  exp | program
+%nonterm  exp | program | decs | dec | tydec | ty | tyfields | vardec 
+  | fundec | lvalue 
 
 %pos int
 %verbose
@@ -48,10 +49,50 @@ stm:    ()
 
 stmlist:    stm                   ()
         |   stmlist SEMICOLON stm ()
-    
-exp:    ()
 
 error:  ()
+    
+exp:                    ()
+    |   lvalue          ()
+    |   valueless expression ()
+    |   NIL             ()
+    |   exp SEMICOLON exp ()
+    |   no value        ()
+    |   INT             ()
+    |   STRING          ()
+    |   negation        ()
+    |   function call   ()
+    |   mathexp         ()
+    |   compex      ()
+    | string comparison ()
+    |   boolean operator ()
+    | precedence of operators ()
+    | associativity of operatrs ()
+    | record creation   ()
+    | array creation    ()
+    | array and record assignment   ()
+    | extent    ()
+    | assignment    ()
+    | if then else  ()
+    | if then ()
+    | while ()
+    | for ()
+    | break ()
+    | let ()
+    | paren
+    
+mathexp:    exp PLUS exp    ()
+    |       exp MINUS exp   ()
+    |       exp TIMES exp   ()
+    |       exp DIVIDE exp  ()
+
+compexp:    exp EQ exp      ()
+    |       exp NEQ exp     ()
+    |       exp LT exp      ()
+    |       exp LE exp      ()
+    |       exp GT exp      ()
+    |       exp GE exp      ()        
+    
 (*Declarations*)
 decs:   {dec}           ()
 
@@ -68,18 +109,18 @@ ty:     type-id         ()
     |   ARRAY OF type-id  ()
     
 tyfields:   (*empty*) ()
-        |   id : type-id {, id : type-id}
+        |   ID : type-id {, ID : type-id}
 
 
 (*Variables*)
-vardec:     var id := exp                               ()
-        |   var id : type-id := exp                     ()
+vardec :    VAR ID := exp                               ()
+        |   VAR ID : type-id := exp                     ()
 
 (*Functions*)
-fundec:     function id (tyfields) = exp                ()
-        |   function id (tyfields) : type-id = exp      ()
+fundec :    FUNCTION ID (tyfields) = exp                ()
+        |   FUNCTION ID (tyfields) : type-id = exp      ()
 
 (*L-Values*)
-lvalue:     id                                          ()
-        |   lvalue . id                                 ()
+lvalue :    ID                                          ()
+        |   lvalue . ID                                 ()
         |   lvalue [ exp ]                              ()
