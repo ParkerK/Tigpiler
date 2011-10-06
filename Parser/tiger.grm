@@ -45,9 +45,39 @@
 
 program : exp               ()
 
-    
-exp:   ()
 
+    
+exp:                    ()
+    |   lvalue          ()
+    |   valueless expression ()
+    |   NIL             ()
+    |   exp SEMICOLON exp ()
+    |   no value        ()
+    |   int literal ()
+    |   string literal ()
+    |   negation        ()
+    |   function call   ()
+    |   arithmatic      ()
+    |   comparison      ()
+    | string comparison ()
+    |   boolean operator ()
+    | precedence of operators ()
+    | associativity of operatrs ()
+    | record creation   ()
+    | array creation    ()
+    | array and record assignment   ()
+    | extent    ()
+    | assignment    ()
+    | if then else  ()
+    | if then ()
+    | while ()
+    | for ()
+    | break ()
+    | let ()
+    | paren
+    
+    
+    
 (*Declarations*)
 decs:   {dec}           ()
 
