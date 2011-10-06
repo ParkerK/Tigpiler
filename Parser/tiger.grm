@@ -62,6 +62,7 @@ exp:    functionCall    ()
     |   lvalue          ()
     |   mathexp         ()
     |   compexp         ()
+    |   boolexp         ()
     |   control         ()
     |   sequence        ()
     
