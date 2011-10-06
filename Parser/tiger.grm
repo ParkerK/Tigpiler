@@ -67,12 +67,12 @@ tyfields:   (*empty*) ()
 
 
 (*Variables*)
-vardec :    var id := exp                               ()
-        |   var id : type-id := exp                     ()
+vardec :    VAR id := exp                               ()
+        |   VAR id : type-id := exp                     ()
 
 (*Functions*)
-fundec :    function id (tyfields) = exp                ()
-        |   function id (tyfields) : type-id = exp      ()
+fundec :    FUNCTION id (tyfields) = exp                ()
+        |   FUNCTION id (tyfields) : type-id = exp      ()
 
 (*L-Values*)
 lvalue :    id                                          ()
