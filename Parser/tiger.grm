@@ -53,10 +53,10 @@
 
 program:    stmlist               ()
 
-stm:    ()
-
 stmlist:    stm                   ()
         |   stmlist SEMICOLON stm ()
+
+stm:    decs    ()
 
 error:  ()
     
@@ -90,14 +90,16 @@ functionParam:      exp functionParamTail           ()
     |               (*empty*)
 functionParamTail:  COMMA exp functionParamTail     ()
     |               (*empty*)
-    
-control:    assignment    () (*returns unit*)
-    |       IF THEN ELSE  ()
-    |       IF THEN ()
-    |       WHILE ()
-    |       FOR ()
-    |       BREAK ()
-    |       LET ()
+
+(*Procedure calls, assignment, if-then, while, break, and sometimes if-then-else
+returns unit*)
+control:    assignment                      () 
+    |       IF exp THEN exp ELSE exp        ()
+    |       IF exp THEN exp                 ()
+    |       WHILE exp DO exp                ()
+    |       FOR ID EQ exp TO exp DO exp     ()
+    |       BREAK                           ()
+    |       LET decs IN sequenceExp END     ()
 
 mathexp:    exp PLUS exp    ()
     |       exp MINUS exp   ()
