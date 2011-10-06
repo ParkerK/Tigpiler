@@ -47,8 +47,7 @@ program : exp               ()
     
 exp:   ()
 
-(* Declarations *)
-
+(*Declarations*)
 decs:   {dec}           ()
 
 dec:    tydec           ()
@@ -56,8 +55,7 @@ dec:    tydec           ()
     |   fundec          ()
     
     
-(*  Data Types  *)
-
+(*Data Types*)
 tydec:  TYPE type-id = ty   ()
 
 ty:     type-id         ()
