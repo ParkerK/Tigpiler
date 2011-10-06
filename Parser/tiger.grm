@@ -36,6 +36,14 @@
 %value INT (1)
 %value STRING ("")
 
+(*Precedence Directives*)
+%nonassoc   EQ NEQ LT LE GT GE  (*Binding - Loose*)
+%left       PLUS MINUS                  (*|*)
+%left       TIMES DIVIDE                (*|*)
+%right      UMINUS                      (*|*)
+%right      boolexp                     (*V*)
+%right      mathexp             (*Binding - Tight*)
+
 %%
 (*Grammar Rules*)
 (* This is a skeleton grammar file, meant to illustrate what kind of
@@ -65,7 +73,7 @@ exp:
     |   control ()
     |   sequence ()
     
-    |   UMINUS exp          () (*Unary Minus = Negative Sign*)
+    |   MINUS exp   %prec   UMINUS  () (*Unary Minus = Negative Sign*)
     
     |   NIL     ()
     |   INT     ()
@@ -107,8 +115,8 @@ boolexp:    exp AND exp ()
     |       exp OR exp  ()
 
 (*Declarations*)
-decs:   decs dec        ()
-    | (*empty*)         ()
+decs:       decs dec        ()
+    |       (*empty*)       ()
 
 dec:        tydec           ()
     |       vardec          ()
