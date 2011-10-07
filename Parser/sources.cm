@@ -1,6 +1,7 @@
 Group is
 
 ../Lexer/tiger.lex
+tiger.grm.sig
 errormsg.sml
 parsetest.sml
 tiger.grm : shell (target: tiger.grm.sml ml-yacc %s)
