@@ -17,10 +17,10 @@
   | FUNCTION | VAR | TYPE 
   | UMINUS
 
-%nonterm  exp | program | decs | dec | tydec | ty | tyfields | vardec 
-  | fundec | lvalue | tyfieldsTail | boolexp | compexp | error | mathexp | functionCall
-  | functionParam | functionParamTail | control | assignment | sequenceTail | sequenceExp
-  | sequence
+%nonterm  exp | program | decs | dec | vardec | fundec | lvalue | error
+  | tydec | ty | tyfields | tyfieldsTail | boolexp | compexp | mathexp 
+  | functionCall | functionParam | functionParamTail | control | assignment 
+  | ifTail | sequenceTail | sequenceExp | sequence
 
 %pos int
 %verbose
@@ -39,10 +39,13 @@
 %value INT (1)
 %value STRING ("")
 
+%right OF
+%right THEN ELSE
+
 (* Precedence Directives *)
-%nonassoc   EQ NEQ LT LE GT GE
 %left       OR                  (* Binding - Loose *)
 %left       AND                         (* | *)
+%nonassoc   EQ NEQ LT LE GT GE          (* | *)
 %left       PLUS MINUS                  (* | *)
 %left       TIMES DIVIDE                (* V *)
 %left       UMINUS              (* Binding - Tight *)
@@ -63,6 +66,7 @@ exp:    functionCall    ()
     |   mathexp         ()
     |   compexp         ()
     |   boolexp         ()
+    |   assignment      ()
     |   control         ()
     |   sequence        ()
     
@@ -86,15 +90,15 @@ functionParamTail:  COMMA exp functionParamTail     ()
 
 (* Procedure calls, assignment, if-then, while, break, and sometimes 
  * if-then-else returns unit *)
- 
-control:    assignment                      () 
-    |       IF exp THEN exp ELSE exp        ()
-    |       IF exp THEN exp                 ()
+assignment: lvalue ASSIGN exp               ()
+control:    IF exp THEN exp ifTail          ()
     |       WHILE exp DO exp                ()
     |       FOR ID EQ exp TO exp DO exp     ()
     |       BREAK                           ()
     |       LET decs IN sequenceExp END     ()
-
+ifTail:     ELSE exp        ()
+    |       (* empty *)     ()
+    
 mathexp:    exp PLUS exp    ()
     |       exp MINUS exp   ()
     |       exp TIMES exp   ()
