@@ -43,6 +43,8 @@
 %right THEN ELSE
 
 (* Precedence Directives *)
+%nonassoc   THEN DO TYPE FUNCTION ID          (* | *)
+%nonassoc   ASSIGN LBRACK ELSE OF          (* | *)
 %left       OR                  (* Binding - Loose *)
 %left       AND                         (* | *)
 %nonassoc   EQ NEQ LT LE GT GE          (* | *)
