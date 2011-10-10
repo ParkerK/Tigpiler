@@ -39,16 +39,15 @@
 %value INT (1)
 %value STRING ("")
 
-%right OF
-%right THEN ELSE
-
 (* Precedence Directives *)
-%left       OR                  (* Binding - Loose *)
-%left       AND                         (* | *)
-%nonassoc   EQ NEQ LT LE GT GE          (* | *)
-%left       PLUS MINUS                  (* | *)
-%left       TIMES DIVIDE                (* V *)
-%left       UMINUS              (* Binding - Tight *)
+%nonassoc   THEN DO TYPE FUNCTION ID    (* Binding - Loose *)
+%nonassoc   ASSIGN LBRACK ELSE OF               (* | *)
+%left       OR                                  (* | *)
+%left       AND                                 (* | *)
+%nonassoc   EQ NEQ LT LE GT GE                  (* | *)
+%left       PLUS MINUS                          (* | *)
+%left       TIMES DIVIDE                        (* V *)
+%left       UMINUS                      (* Binding - Tight *)
 
 %%
 (* Grammar Rules *)
