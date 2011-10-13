@@ -20,7 +20,7 @@
 %nonterm  exp | program | decs | dec | vardec | fundec | lvalue | error
   | tydec | ty | tyfields | tyfieldsTail | boolexp | compexp | mathexp 
   | functionCall | functionParam | functionParamTail | control | assignment 
-  | ifTail | sequenceTail | sequenceExp | sequence
+  | ifTail | sequenceTail | sequenceExp | sequence | array
 
 %pos int
 %verbose
@@ -68,6 +68,7 @@ exp:    functionCall    ()
     |   assignment      ()
     |   control         ()
     |   sequence        ()
+    |   array           ()
     
     |   MINUS exp   %prec   UMINUS  () (* Unary Minus = Negative Sign *)
     
@@ -75,6 +76,7 @@ exp:    functionCall    ()
     |   INT     ()
     |   STRING  ()
     
+array:              ID LBRACK exp RBRACK OF exp     ()
 sequence:           LPAREN sequenceExp RPAREN       ()
 sequenceExp:        exp sequenceTail                ()
     |               (* empty *)                     ()
