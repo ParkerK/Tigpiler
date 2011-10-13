@@ -1,6 +1,11 @@
 Group is
 
 ../Lexer/tiger.lex
+absyn.sml
+table.sig
+table.sml
+symbol.sml
+parse.sml
 tiger.grm.sig
 errormsg.sml
 parsetest.sml
