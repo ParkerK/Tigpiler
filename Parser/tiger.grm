@@ -95,7 +95,7 @@ assignment: lvalue ASSIGN exp               ()
 control:    IF exp THEN exp                 ()
     |       IF exp THEN exp ELSE exp        ()
     |       WHILE exp DO exp                ()
-    |       FOR ID EQ exp TO exp DO exp     ()
+    |       FOR ID ASSIGN exp TO exp DO exp ()
     |       BREAK                           ()
     |       LET decs IN sequenceExp END     ()
     
