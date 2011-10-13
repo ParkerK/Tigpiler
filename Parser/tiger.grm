@@ -129,9 +129,9 @@ ty:     ID                                                         ()
     |   LBRACE tyfields RBRACE                                     ()
     |   ARRAY OF ID                                                ()
 
-tyfields:       ID COLON ID LBRACE tyfieldsTail                    ()
+tyfields:       ID COLON ID tyfieldsTail                           ()
     |           (* empty *)                                        ()
-tyfieldsTail:   COMMA ID COLON ID RBRACE tyfieldsTail              ()
+tyfieldsTail:   COMMA ID COLON ID tyfieldsTail                     ()
     |           (* empty *)                                        ()
 
 (* Variables *)
