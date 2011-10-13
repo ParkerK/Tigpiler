@@ -148,5 +148,5 @@ fundec:     FUNCTION ID LPAREN tyfields RPAREN EQ exp              ()
 
 (* L-Values *)
 lvalue:     ID                                                          ()
-    |       lvalue DOT ID                                               ()
+    |       lvalue DOT lvalue                                           ()
     |       lvalue LBRACK exp RBRACK                                    ()
