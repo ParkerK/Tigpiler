@@ -1,9 +1,7 @@
 let
 	type  arrtype = array of int
-	val myint := 5a
+	val myint := 5
 	var arr1:arrtype := arrtype [10] of 0
 in
 	arr1
 end
-
-/* dsksdhflsdkfhsdflkj dgfdgdfg d /* dgdffgdf */  /*unfinished comment */
