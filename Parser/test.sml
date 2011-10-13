@@ -17,14 +17,14 @@ Parse.parse "../TestPrograms/test20.tig";
 Parse.parse "../TestPrograms/test21.tig";
 Parse.parse "../TestPrograms/test22.tig";
 Parse.parse "../TestPrograms/test23.tig";
-Parse.parse "../TestPrograms/test24.tig";
+(*Parse.parse "../TestPrograms/test24.tig";*)
 Parse.parse "../TestPrograms/test25.tig";
 Parse.parse "../TestPrograms/test26.tig";
 Parse.parse "../TestPrograms/test27.tig";
 Parse.parse "../TestPrograms/test28.tig";
 Parse.parse "../TestPrograms/test29.tig";
 Parse.parse "../TestPrograms/test3.tig";
-Parse.parse "../TestPrograms/test30.tig";
+(*Parse.parse "../TestPrograms/test30.tig";*)
 Parse.parse "../TestPrograms/test31.tig";
 Parse.parse "../TestPrograms/test32.tig";
 Parse.parse "../TestPrograms/test33.tig";
@@ -49,4 +49,4 @@ Parse.parse "../TestPrograms/test5.tig";
 Parse.parse "../TestPrograms/test6.tig";
 Parse.parse "../TestPrograms/test7.tig";
 Parse.parse "../TestPrograms/test8.tig";
-Parse.parse "../TestPrograms/test9.tiga";
+Parse.parse "../TestPrograms/test9.tig";
