@@ -20,7 +20,7 @@
 %nonterm  exp | program | decs | dec | vardec | fundec | lvalue | error
   | tydec | ty | tyfields | tyfieldsTail | boolexp | compexp | mathexp 
   | functionCall | functionParam | functionParamTail | control | assignment 
-  | ifTail | sequenceTail | sequenceExp | sequence | array
+  | ifTail | sequenceTail | sequenceExp | sequence | array | record | recordTail
 
 %pos int
 %verbose
@@ -69,6 +69,7 @@ exp:    functionCall    ()
     |   control         ()
     |   sequence        ()
     |   array           ()
+    |   record          ()
     
     |   MINUS exp   %prec   UMINUS  () (* Unary Minus = Negative Sign *)
     
@@ -76,18 +77,21 @@ exp:    functionCall    ()
     |   INT     ()
     |   STRING  ()
     
-array:              ID LBRACK exp RBRACK OF exp     ()
-sequence:           LPAREN sequenceExp RPAREN       ()
-sequenceExp:        exp sequenceTail                ()
-    |               (* empty *)                     ()
-sequenceTail:       SEMICOLON exp sequenceTail      ()
-    |               (* empty *)                     ()
+array:              ID LBRACK exp RBRACK OF exp             ()
+record:             ID LBRACE ID EQ exp recordTail RBRACE   ()
+recordTail:         COMMA ID EQ exp recordTail              ()
+    |               (* empty *)                             ()
+sequence:           LPAREN sequenceExp RPAREN               ()
+sequenceExp:        exp sequenceTail                        ()
+    |               (* empty *)                             ()
+sequenceTail:       SEMICOLON exp sequenceTail              ()
+    |               (* empty *)                             ()
 
-functionCall:       ID LPAREN functionParam RPAREN  ()
-functionParam:      exp functionParamTail           ()
-    |               (* empty *)                     ()
-functionParamTail:  COMMA exp functionParamTail     ()
-    |               (* empty *)                     ()
+functionCall:       ID LPAREN functionParam RPAREN          ()
+functionParam:      exp functionParamTail                   ()
+    |               (* empty *)                             ()
+functionParamTail:  COMMA exp functionParamTail             ()
+    |               (* empty *)                             ()
 
 (* Procedure calls, assignment, if-then, while, break, and sometimes 
  * if-then-else returns unit *)
