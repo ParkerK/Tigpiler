@@ -41,6 +41,7 @@ formatchar={whitespace}|{newline};
 <INITIAL>"while"        => (Tokens.WHILE(yypos,yypos+5));
 <INITIAL>"else"         => (Tokens.ELSE(yypos,yypos+4));
 <INITIAL>"if"           => (Tokens.IF(yypos,yypos+2));
+<INITIAL>"then"         => (Tokens.THEN(yypos,yypos+4));
 <INITIAL>"array"        => (Tokens.ARRAY(yypos,yypos+5));
 
 <INITIAL>":="           => (Tokens.ASSIGN(yypos,yypos+2));
