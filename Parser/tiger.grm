@@ -40,8 +40,10 @@
 %value STRING ("")
 
 (* Precedence Directives *)
-%nonassoc   THEN DO TYPE FUNCTION ID    (* Binding - Loose *)
-%nonassoc   ASSIGN LBRACK ELSE OF               (* | *)
+(*%nonassoc   THEN DO TYPE FUNCTION ID    (* Binding - Loose *)
+%nonassoc   ASSIGN LBRACK ELSE OF               (* | *)*)
+%nonassoc   ASSIGN
+%right      ELSE
 %left       OR                                  (* | *)
 %left       AND                                 (* | *)
 %nonassoc   EQ NEQ LT LE GT GE                  (* | *)
@@ -51,10 +53,6 @@
 
 %%
 (* Grammar Rules *)
-(* This is a skeleton grammar file, meant to illustrate what kind of
- * declarations are necessary above the %% mark.  Students are expected
- * to replace the two dummy productions below with an actual grammar. 
- *)
 
 program:    exp         ()
 
@@ -148,5 +146,5 @@ fundec:     FUNCTION ID LPAREN tyfields RPAREN EQ exp              ()
 
 (* L-Values *)
 lvalue:     ID                                                          ()
-    |       lvalue DOT lvalue                                           ()
+    |       lvalue DOT ID                                               ()
     |       lvalue LBRACK exp RBRACK                                    ()
