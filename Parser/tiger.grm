@@ -43,7 +43,7 @@ structure A = Absyn
     | functionParam of A.exp list
     | functionParamTail of A.exp list
     | recordField of (symbol * A.exp * pos)
-    | recordTail of (symbol * exp * pos) list
+    | recordTail of (symbol * A.exp * pos) list
     | sequenceExp of (A.exp * pos) list
     | sequenceTail of (A.exp * pos) list
     | tyfields of {name: symbol, escape: bool ref, typ: A.ty, pos: pos} list
