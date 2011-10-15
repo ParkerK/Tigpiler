@@ -40,10 +40,10 @@
 %value STRING ("")
 
 (* Precedence Directives *)
-%nonassoc   THEN DO TYPE FUNCTION   (* Binding - Loose *)
-%nonassoc   ASSIGN LBRACK ELSE OF               (* | *)
-%nonassoc   ASSIGN
-%right      ELSE
+%nonassoc   THEN DO                     (* Binding - Loose *)
+%nonassoc   OF                                  (* | *)
+%nonassoc   ASSIGN                              (* | *)
+%right      ELSE                                (* | *)
 %left       OR                                  (* | *)
 %left       AND                                 (* | *)
 %nonassoc   EQ NEQ LT LE GT GE                  (* | *)
