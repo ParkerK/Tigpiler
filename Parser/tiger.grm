@@ -37,7 +37,7 @@ structure A = Absyn
     | dec of A.dec
     | decs of A.dec list
     | vardec of A.dec
-    | fundec of A.dec
+    | fundec of A.fundec
     | fundecs of A.fundec list
     | tydec of A.dec
     | tydecs of {name: symbol, ty: A.ty, pos: pos} list
