@@ -1,6 +1,6 @@
 CM.make "sources.cm";
-(*Parse.parse "../TestPrograms/merge.tig";*)
-(*Parse.parse "../TestPrograms/queens.tig";*)
+Parse.parse "../TestPrograms/merge.tig";
+Parse.parse "../TestPrograms/queens.tig";
 Parse.parse "../TestPrograms/test1.tig";
 Parse.parse "../TestPrograms/test2.tig";
 Parse.parse "../TestPrograms/test3.tig";
