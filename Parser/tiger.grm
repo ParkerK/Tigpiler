@@ -129,7 +129,7 @@ control:    IF exp THEN exp                 (A.IfExp {test=exp1,then'=exp2,else'
     |       WHILE exp DO exp                (A.WhileExp {test=exp1,body=exp2,pos=WHILEleft})
     |       FOR ID ASSIGN exp TO exp DO exp (A.ForExp {var=symbol ID,escape=ref false,lo=exp1,hi=exp2,body=exp3,pos=FORleft})
     |       BREAK                           (A.BreakExp(BREAKleft))
-    |       LET decs IN sequenceExp END     (A.LetExp {decs=decs,body=A.SeqExp(sequenceExp,sequenceExpleft),pos=LETleft})
+    |       LET decs IN sequenceExp END     (A.LetExp {decs=decs,body=A.SeqExp(sequenceExp),pos=LETleft})
     
 mathexp:    exp PLUS exp    (A.OpExp {left=exp1,oper=A.PlusOp,right=exp2,pos=exp1left})
     |       exp MINUS exp   (A.OpExp {left=exp1,oper=A.MinusOp,right=exp2,pos=exp1left})
