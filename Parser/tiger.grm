@@ -22,7 +22,7 @@ structure A = Absyn
       program of A.exp
     | exp of A.exp
     | functionCall  of A.exp
-    | lvalue of A.exp
+
     | mathexp  of A.exp
     | boolexp of A.exp
     | compexp of A.exp
@@ -31,6 +31,8 @@ structure A = Absyn
     | sequence of A.exp
     | array of A.exp
     | record of A.exp
+
+    | lvalue of A.var
 
     | dec of A.dec
     | decs of A.dec list
@@ -84,7 +86,7 @@ structure A = Absyn
 program:    exp         (exp)
     
 exp:    functionCall    (functionCall)
-    |   lvalue          (lvalue)
+    |   lvalue          (A.VarExp lvalue)
     |   mathexp         (mathexp)
     |   compexp         (compexp)
     |   boolexp         (boolexp)
