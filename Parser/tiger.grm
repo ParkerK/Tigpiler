@@ -102,7 +102,7 @@ exp:    functionCall    (functionCall)
     
 array:              ID LBRACK exp RBRACK OF exp             (A.ArrayExp(typ=symbol ID, exp1,exp2,IDleft))
 recordField:        ID EQ exp                               ((symbol ID,exp,IDleft))
-record:             ID LBRACE recordField recordTail RBRACE   (A.RecordExp(fields=[recordField] @ recordTail,symbol ID1,ID1left))
+record:             ID LBRACE recordField recordTail RBRACE   (A.RecordExp {fields=[recordField] @ recordTail,typ=symbol ID1,pos=ID1left})
 recordTail:         COMMA recordField recordTail              ([recordField] @ recordTail)
     |               (* empty *)                             (nil)
 sequence:           LPAREN sequenceExp RPAREN               (A.SeqExp sequenceExp)
