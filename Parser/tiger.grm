@@ -17,10 +17,35 @@ structure A = Absyn
   | FUNCTION | VAR | TYPE 
   | UMINUS
 
-%nonterm  exp | program | decs | dec | vardec | fundec | lvalue | error
-  | tydec | ty | tyfields | tyfieldsTail | boolexp | compexp | mathexp 
-  | functionCall | functionParam | functionParamTail | control | assignment 
-  | ifTail | sequenceTail | sequenceExp | sequence | array | record | recordTail
+%nonterm
+    exp
+    | program
+    | decs
+    | dec
+    | vardec
+    | fundec
+    | lvalue
+    | error
+    | tydec
+    | ty
+    | tyfields
+    | tyfieldsTail
+    | boolexp
+    | compexp
+    | mathexp 
+    | functionCall 
+    | functionParam
+    | functionParamTail
+    | control
+    | assignment 
+    | ifTail
+    | sequenceTail
+    | sequenceExp
+    | sequence
+    | array
+    | record
+    | recordTail
+    
 
 %pos int
 %verbose
