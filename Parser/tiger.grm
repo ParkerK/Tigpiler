@@ -151,7 +151,7 @@ decs:       dec decs        ([dec] @ decs)
     |       (* empty *)     (nil)
 
 dec:        tydecs           (A.TypeDec tydecs)
-    |       vardec           (A.VarDec vardec)
+    |       vardec           (vardec)
     |       fundecs          (A.FunctionDec fundecs)
     
 (* Data Types *)
@@ -168,8 +168,8 @@ tyfieldsTail:   COMMA ID COLON ID tyfieldsTail ([{name=symbol ID1,escape=ref fal
     |           (* empty *)                    (nil)
 
 (* Variables *)
-vardec:     VAR ID ASSIGN exp          ({name=symbol ID,escape=ref false,typ=NONE,init=exp,pos=VARleft})
-    |       VAR ID COLON ID ASSIGN exp ({name=symbol ID1,escape=ref false,typ=SOME(symbol ID2,ID2left),init=exp,pos=VARleft})
+vardec:     VAR ID ASSIGN exp          (A.VarDec {name=symbol ID,escape=ref false,typ=NONE,init=exp,pos=VARleft})
+    |       VAR ID COLON ID ASSIGN exp (A.VarDec {name=symbol ID1,escape=ref false,typ=SOME(symbol ID2,ID2left),init=exp,pos=VARleft})
 
 (* Functions *)
 fundecs:    fundecs fundec  (fundecs @ [fundec])
