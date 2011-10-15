@@ -18,7 +18,7 @@ structure A = Absyn
   | UMINUS
 
 %nonterm
-    exp
+      exp
     | program
     | decs
     | dec
