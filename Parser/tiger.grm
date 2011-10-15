@@ -119,7 +119,7 @@ functionParamTail:  COMMA exp functionParamTail             ([exp] @ functionPar
 
 (* Procedure calls, assignment, if-then, while, break, and sometimes 
  * if-then-else returns unit *)
-assignment: lvalue ASSIGN exp               (A.AssignExp {var=lvalue,exp,lvalueleft})
+assignment: lvalue ASSIGN exp               (A.AssignExp {var=lvalue,exp=exp,pos=lvalueleft})
 control:    IF exp THEN exp                 (A.IfExp {test=exp1,then'=exp2,else'=NONE,pos=IFleft})
     |       IF exp THEN exp ELSE exp        (A.IfExp {test=exp1,then'=exp2,else'=SOME exp3,pos=IFleft})
     |       WHILE exp DO exp                (A.WhileExp {test=exp1,body:exp2,pos:WHILEleft})
