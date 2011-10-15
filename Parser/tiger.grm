@@ -156,6 +156,7 @@ dec:        tydecs           (A.TypeDec tydecs)
     
 (* Data Types *)
 tydecs: tydecs tydec        (tydecs @ [tydec])
+    |   (* empty *)         (nil)
 tydec:  TYPE ID EQ ty       ({name=symbol ID,ty=ty,pos=TYPEleft})
 
 ty:     ID                      (A.NameTy(symbol ID,IDleft))
@@ -173,6 +174,7 @@ vardec:     VAR ID ASSIGN exp          (A.VarDec {name=symbol ID,escape=ref fals
 
 (* Functions *)
 fundecs:    fundecs fundec  (fundecs @ [fundec])
+    |       (* empty *)     (nil)
 fundec:     FUNCTION ID LPAREN tyfields RPAREN EQ exp              ({name=symbol ID,params=tyfields,result=NONE,body=exp,pos=FUNCTIONleft})
     |       FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp     ({name=symbol ID1,params=tyfields,result=SOME(symbol ID2, ID2left),body=exp,pos=FUNCTIONleft})
 
