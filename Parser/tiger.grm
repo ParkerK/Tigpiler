@@ -100,7 +100,7 @@ exp:    functionCall    (functionCall)
     |   INT     (A.IntExp(INT))
     |   STRING  (A.StringExp(STRING, STRINGleft))
     
-array:              ID LBRACK exp RBRACK OF exp             (A.ArrayExp(typ=symbol ID, exp1,exp2,IDleft))
+array:              ID LBRACK exp RBRACK OF exp             (A.ArrayExp{typ=symbol ID,size=exp1,init=exp2,pos=IDleft})
 recordField:        ID EQ exp                               ((symbol ID,exp,IDleft))
 record:             ID LBRACE recordField recordTail RBRACE   (A.RecordExp(fields=[recordField] @ recordTail,symbol ID1,ID1left))
 recordTail:         COMMA recordField recordTail              ([recordField] @ recordTail)
