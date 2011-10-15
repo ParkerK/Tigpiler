@@ -40,8 +40,8 @@
 %value STRING ("")
 
 (* Precedence Directives *)
-(*%nonassoc   THEN DO TYPE FUNCTION ID    (* Binding - Loose *)
-%nonassoc   ASSIGN LBRACK ELSE OF               (* | *)*)
+%nonassoc   THEN DO TYPE FUNCTION   (* Binding - Loose *)
+%nonassoc   ASSIGN LBRACK ELSE OF               (* | *)
 %nonassoc   ASSIGN
 %right      ELSE
 %left       OR                                  (* | *)
@@ -148,3 +148,4 @@ fundec:     FUNCTION ID LPAREN tyfields RPAREN EQ exp              ()
 lvalue:     ID                                                          ()
     |       lvalue DOT ID                                               ()
     |       lvalue LBRACK exp RBRACK                                    ()
+    |       ID LBRACK exp RBRACK                                        ()

@@ -1,6 +1,6 @@
 Group is
 
-../Lexer/tiger.lex
+tiger.lex
 absyn.sml
 table.sig
 table.sml

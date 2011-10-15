@@ -4,7 +4,7 @@ CM.make "sources.cm";
 Parse.parse "../TestPrograms/test1.tig";
 Parse.parse "../TestPrograms/test2.tig";
 Parse.parse "../TestPrograms/test3.tig";
-(*Parse.parse "../TestPrograms/test4.tig";*)(*Problem*)
+Parse.parse "../TestPrograms/test4.tig";(*Problem*)
 Parse.parse "../TestPrograms/test5.tig";
 Parse.parse "../TestPrograms/test6.tig";
 Parse.parse "../TestPrograms/test7.tig";
@@ -30,10 +30,10 @@ Parse.parse "../TestPrograms/test26.tig";
 Parse.parse "../TestPrograms/test27.tig";
 Parse.parse "../TestPrograms/test28.tig";
 Parse.parse "../TestPrograms/test29.tig";
-(*Parse.parse "../TestPrograms/test30.tig";*)(*Problem*)
+Parse.parse "../TestPrograms/test30.tig";(*Problem*)
 Parse.parse "../TestPrograms/test31.tig";
 Parse.parse "../TestPrograms/test32.tig";
-(*Parse.parse "../TestPrograms/test33.tig";(*error*)*)
+Parse.parse "../TestPrograms/test33.tig";(*error*)
 Parse.parse "../TestPrograms/test34.tig";
 Parse.parse "../TestPrograms/test35.tig";
 Parse.parse "../TestPrograms/test36.tig";
@@ -42,7 +42,7 @@ Parse.parse "../TestPrograms/test38.tig";
 Parse.parse "../TestPrograms/test39.tig";
 Parse.parse "../TestPrograms/test40.tig";
 Parse.parse "../TestPrograms/test41.tig";
-(*Parse.parse "../TestPrograms/test42.tig";*)(*Problem*)
+Parse.parse "../TestPrograms/test42.tig";(*Problem*)
 Parse.parse "../TestPrograms/test43.tig";
 Parse.parse "../TestPrograms/test44.tig";
 Parse.parse "../TestPrograms/test45.tig";
