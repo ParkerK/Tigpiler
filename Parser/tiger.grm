@@ -81,7 +81,7 @@ structure A = Absyn
 %%
 (* Grammar Rules *)
 
-program:    exp         ()
+program:    exp         (exp)
     
 exp:    functionCall    (functionCall)
     |   lvalue          (lvalue)
