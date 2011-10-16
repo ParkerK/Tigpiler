@@ -61,8 +61,7 @@ structure A = Absyn
 
 %name Tiger
 
-%keyword WHILE FOR TO BREAK LET IN END FUNCTION VAR TYPE ARRAY IF THEN ELSE 
-    DO OF NIL
+%keyword WHILE FOR TO BREAK LET IN END FUNCTION VAR TYPE ARRAY IF THEN ELSE DO OF NIL
 
 %prefer THEN ELSE LPAREN
 
@@ -100,26 +99,26 @@ exp:    functionCall    (functionCall)
     
     |   MINUS exp   %prec   UMINUS  (A.OpExp {left=A.IntExp(0),oper=A.MinusOp,right=exp,pos=MINUSleft})
     
-    |   NIL     (A.NilExp)
-    |   INT     (A.IntExp(INT))
-    |   STRING  (A.StringExp(STRING, STRINGleft))
+    |   NIL             (A.NilExp)
+    |   INT             (A.IntExp(INT))
+    |   STRING          (A.StringExp(STRING, STRINGleft))
     
-array:              ID LBRACK exp RBRACK OF exp             (A.ArrayExp{typ=symbol ID,size=exp1,init=exp2,pos=IDleft})
-recordField:        ID EQ exp                               ((symbol ID,exp,IDleft))
-record:             ID LBRACE recordField recordTail RBRACE   (A.RecordExp {fields=[recordField] @ recordTail,typ=symbol ID1,pos=ID1left})
-recordTail:         COMMA recordField recordTail              ([recordField] @ recordTail)
-    |               (* empty *)                             (nil)
-sequence:           LPAREN sequenceExp RPAREN               (A.SeqExp sequenceExp)
-sequenceExp:        exp sequenceTail                        ([(exp,expleft)] @ sequenceTail)
-    |               (* empty *)                             (nil)
-sequenceTail:       SEMICOLON exp sequenceTail              ([(exp,expleft)] @ sequenceTail)
-    |               (* empty *)                             (nil)
+array:              ID LBRACK exp RBRACK OF exp                 (A.ArrayExp{typ=symbol ID,size=exp1,init=exp2,pos=IDleft})
+recordField:        ID EQ exp                                   ((symbol ID,exp,IDleft))
+record:             ID LBRACE recordField recordTail RBRACE     (A.RecordExp {fields=[recordField] @ recordTail,typ=symbol ID1,pos=ID1left})
+recordTail:         COMMA recordField recordTail                ([recordField] @ recordTail)
+    |               (* empty *)                                 (nil)
+sequence:           LPAREN sequenceExp RPAREN                   (A.SeqExp sequenceExp)
+sequenceExp:        exp sequenceTail                            ([(exp,expleft)] @ sequenceTail)
+    |               (* empty *)                                 (nil)
+sequenceTail:       SEMICOLON exp sequenceTail                  ([(exp,expleft)] @ sequenceTail)
+    |               (* empty *)                                 (nil)
 
-functionCall:       ID LPAREN functionParam RPAREN          (A.CallExp {func=symbol ID,args=functionParam,pos=IDleft})
-functionParam:      exp functionParamTail                   ([exp] @ functionParamTail)
-    |               (* empty *)                             (nil)
-functionParamTail:  COMMA exp functionParamTail             ([exp] @ functionParamTail)
-    |               (* empty *)                             (nil)
+functionCall:       ID LPAREN functionParam RPAREN              (A.CallExp {func=symbol ID,args=functionParam,pos=IDleft})
+functionParam:      exp functionParamTail                       ([exp] @ functionParamTail)
+    |               (* empty *)                                 (nil)
+functionParamTail:  COMMA exp functionParamTail                 ([exp] @ functionParamTail)
+    |               (* empty *)                                 (nil)
 
 (* Procedure calls, assignment, if-then, while, break, and sometimes 
  * if-then-else returns unit *)
@@ -143,26 +142,26 @@ compexp:    exp EQ exp      (A.OpExp {left=exp1,oper=A.EqOp,right=exp2,pos=exp1l
     |       exp GT exp      (A.OpExp {left=exp1,oper=A.GtOp,right=exp2,pos=exp1left})
     |       exp GE exp      (A.OpExp {left=exp1,oper=A.GeOp,right=exp2,pos=exp1left})        
 
-boolexp:    exp AND exp (A.IfExp {test=exp1,then'=exp2,else'=SOME(A.IntExp(0)),pos=exp1left})
-    |       exp OR exp  (A.IfExp {test=exp1,then'=A.IntExp(1),else'=SOME exp2,pos=exp1left})
+boolexp:    exp AND exp     (A.IfExp {test=exp1,then'=exp2,else'=SOME(A.IntExp(0)),pos=exp1left})
+    |       exp OR exp      (A.IfExp {test=exp1,then'=A.IntExp(1),else'=SOME exp2,pos=exp1left})
 
 (* Declarations *)
 decs:       dec decs        ([dec] @ decs)
     |       (* empty *)     (nil)
 
-dec:        tydecs           (A.TypeDec tydecs)
-    |       vardec           (vardec)
-    |       fundecs          (A.FunctionDec fundecs)
+dec:        tydecs          (A.TypeDec tydecs)
+    |       vardec          (vardec)
+    |       fundecs         (A.FunctionDec fundecs)
     
 (* Data Types *)
-tydecs: tydec        ([tydec])
-    |   tydecs tydec        (tydecs @ [tydec])
+tydecs:     tydec           ([tydec])
+    |       tydecs tydec    (tydecs @ [tydec])
     
-tydec:  TYPE ID EQ ty       ({name=symbol ID,ty=ty,pos=TYPEleft})
+tydec:      TYPE ID EQ ty   ({name=symbol ID,ty=ty,pos=TYPEleft})
 
-ty:     ID                      (A.NameTy(symbol ID,IDleft))
-    |   LBRACE tyfields RBRACE  (A.RecordTy(tyfields))
-    |   ARRAY OF ID             (A.ArrayTy(symbol ID,ARRAYleft))
+ty:         ID                      (A.NameTy(symbol ID,IDleft))
+    |       LBRACE tyfields RBRACE  (A.RecordTy(tyfields))
+    |       ARRAY OF ID             (A.ArrayTy(symbol ID,ARRAYleft))
 
 tyfields:       ID COLON ID tyfieldsTail       ([{name=symbol ID1,escape=ref false,typ=symbol ID2,pos=ID1left}] @ tyfieldsTail)
     |           (* empty *)                    (nil)
@@ -174,7 +173,7 @@ vardec:     VAR ID ASSIGN exp          (A.VarDec {name=symbol ID,escape=ref fals
     |       VAR ID COLON ID ASSIGN exp (A.VarDec {name=symbol ID1,escape=ref false,typ=SOME(symbol ID2,ID2left),init=exp,pos=VARleft})
 
 (* Functions *)
-fundecs:    fundec  ([fundec])
+fundecs:    fundec          ([fundec])
     |       fundecs fundec  (fundecs @ [fundec])
     
 fundec:     FUNCTION ID LPAREN tyfields RPAREN EQ exp              ({name=symbol ID,params=tyfields,result=NONE,body=exp,pos=FUNCTIONleft})
