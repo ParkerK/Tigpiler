@@ -16,6 +16,7 @@ structure A = Absyn
   | BREAK | NIL
   | FUNCTION | VAR | TYPE 
   | UMINUS
+  | LOWPREC
 
 %nonterm
       program of A.exp
@@ -66,16 +67,15 @@ structure A = Absyn
 %value STRING ("")
 
 (* Precedence Directives *)
-%nonassoc   THEN DO                     (* Binding - Loose *)
-%nonassoc   OF                                  (* | *)
-%nonassoc   ASSIGN                              (* | *)
-%right      ELSE                                (* | *)
-%left       OR                                  (* | *)
-%left       AND                                 (* | *)
-%nonassoc   EQ NEQ LT LE GT GE                  (* | *)
-%left       PLUS MINUS                          (* | *)
-%left       TIMES DIVIDE                        (* V *)
-%left       UMINUS                      (* Binding - Tight *)
+%nonassoc   LOWPREC                             (* Binding - Loose *)
+%nonassoc   FUNCTION VAR TYPE THEN DO OF ASSIGN         (* | *)
+%right      ELSE                                        (* | *)
+%left       OR                                          (* | *)
+%left       AND                                         (* | *)
+%nonassoc   EQ NEQ LT LE GT GE                          (* | *)
+%left       PLUS MINUS                                  (* | *)
+%left       TIMES DIVIDE                                (* V *)
+%left       UMINUS                              (* Binding - Tight *)
 
 %%
 (* Grammar Rules *)
@@ -138,12 +138,12 @@ boolexp:    exp AND exp     (A.IfExp {test = exp1, then' = exp2, else' = SOME(A.
     |       exp OR exp      (A.IfExp {test = exp1, then' = A.IntExp(1), else' = SOME exp2, pos = exp1left})
 
 (* Declarations *)
-decs:       dec decs        ([dec] @ decs)
-    |       (* empty *)     (nil)
+decs:   (* empty *)     (nil)
+    |   dec decs        ([dec] @ decs)
 
-dec:        tydecs          (A.TypeDec tydecs)
-    |       vardec          (vardec)
-    |       fundecs         (A.FunctionDec fundecs)
+dec:    vardec                      (vardec)
+    |   tydecs  %prec LOWPREC (A.TypeDec tydecs)
+    |   fundecs %prec LOWPREC (A.FunctionDec fundecs)
 
 (* Data Types *)
 tydecs: tydec               ([tydec])
