@@ -1,52 +1,40 @@
 CM.make "sources.cm";
-Parse.parse "../TestPrograms/merge.tig";
-Parse.parse "../TestPrograms/queens.tig";
-Parse.parse "../TestPrograms/test1.tig";
-Parse.parse "../TestPrograms/test2.tig";
-Parse.parse "../TestPrograms/test3.tig";
-Parse.parse "../TestPrograms/test4.tig";
-Parse.parse "../TestPrograms/test5.tig";
-Parse.parse "../TestPrograms/test6.tig";
-Parse.parse "../TestPrograms/test7.tig";
-Parse.parse "../TestPrograms/test8.tig";
-Parse.parse "../TestPrograms/test9.tig";
-Parse.parse "../TestPrograms/test10.tig";
-Parse.parse "../TestPrograms/test11.tig";
-Parse.parse "../TestPrograms/test12.tig";
-(*Parse.parse "../TestPrograms/test13.tig";(*error*)*)
-(*Parse.parse "../TestPrograms/test14.tig";(*error*)*)
-Parse.parse "../TestPrograms/test15.tig";
-Parse.parse "../TestPrograms/test16.tig";
-Parse.parse "../TestPrograms/test17.tig";
-Parse.parse "../TestPrograms/test18.tig";
-Parse.parse "../TestPrograms/test19.tig";
-Parse.parse "../TestPrograms/test20.tig";
-(*Parse.parse "../TestPrograms/test21.tig";(*error*)*)
-Parse.parse "../TestPrograms/test22.tig";
-Parse.parse "../TestPrograms/test23.tig";
-(*Parse.parse "../TestPrograms/test24.tig";(*error*)*)
-Parse.parse "../TestPrograms/test25.tig";
-Parse.parse "../TestPrograms/test26.tig";
-Parse.parse "../TestPrograms/test27.tig";
-Parse.parse "../TestPrograms/test28.tig";
-Parse.parse "../TestPrograms/test29.tig";
-Parse.parse "../TestPrograms/test30.tig";
-Parse.parse "../TestPrograms/test31.tig";
-Parse.parse "../TestPrograms/test32.tig";
-(*Parse.parse "../TestPrograms/test33.tig";(*error*)*)
-Parse.parse "../TestPrograms/test34.tig";
-Parse.parse "../TestPrograms/test35.tig";
-Parse.parse "../TestPrograms/test36.tig";
-Parse.parse "../TestPrograms/test37.tig";
-Parse.parse "../TestPrograms/test38.tig";
-Parse.parse "../TestPrograms/test39.tig";
-Parse.parse "../TestPrograms/test40.tig";
-Parse.parse "../TestPrograms/test41.tig";
-Parse.parse "../TestPrograms/test42.tig";
-Parse.parse "../TestPrograms/test43.tig";
-Parse.parse "../TestPrograms/test44.tig";
-Parse.parse "../TestPrograms/test45.tig";
-Parse.parse "../TestPrograms/test46.tig";
-Parse.parse "../TestPrograms/test47.tig";
-Parse.parse "../TestPrograms/test48.tig";
-(*Parse.parse "../TestPrograms/test49.tig";(*error*)*)
+fun test (dir,outdir) = 
+    let
+        fun listDir (s) = 
+            let
+                val ds = OS.FileSys.openDir (s)
+                fun loop (ds) = (
+                    case OS.FileSys.readDir (ds) of 
+                        NONE => [] before OS.FileSys.closeDir (ds)
+                        | file => file::loop (ds)
+                    )
+            in
+                loop (ds) handle e => (OS.FileSys.closeDir (ds); raise (e))
+            end
+        fun testDir (path) =
+            OS.FileSys.openDir path handle e => (
+                OS.FileSys.mkDir (path);
+                OS.FileSys.openDir (path)
+            )
+        fun printTree ([]) = print "\n"
+        |   printTree (a::l) = 
+            let 
+                val indir = dir ^ "/" ^ (valOf(a))
+                val out = outdir ^ "/" ^ (valOf(a)) ^ ".out"
+                val outfile = TextIO.openOut out
+            in
+                (
+                    print (indir ^ "\n");
+                    PrintAbsyn.print(outfile, Parse.parse indir);
+                    printTree(l)
+                )
+            end
+    in
+        (
+        testDir(outdir);
+        printTree(listDir(dir))
+        )
+    end
+;
+test ("../TestPrograms","../out");

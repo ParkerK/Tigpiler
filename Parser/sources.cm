@@ -5,7 +5,8 @@ absyn.sml
 table.sig
 table.sml
 symbol.sml
-parsetest.sml
+parse.sml
+prabsyn.sml
 tiger.grm.sig
 errormsg.sml
 tiger.grm : shell (target: tiger.grm.sml ml-yacc %s)
