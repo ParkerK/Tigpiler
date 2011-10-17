@@ -28,6 +28,7 @@ structure A = Absyn
     | control of A.exp
     | functionCall  of A.exp
     | lvalue of A.var
+    | lvalueTail of A.var
     | mathexp  of A.exp
     | record of A.exp
     | sequence of A.exp
@@ -173,7 +174,10 @@ fundec:     FUNCTION ID LPAREN tyfields RPAREN EQ exp           ({name = symbol 
     |       FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp  ({name = symbol ID1, params = tyfields, result = SOME(symbol ID2,  ID2left), body = exp, pos = FUNCTIONleft})
 
 (* L-Values *)
-lvalue:     ID                         (A.SimpleVar(symbol ID, IDleft))
-    |       lvalue DOT ID              (A.FieldVar(lvalue, symbol ID, lvalueleft))
-    |       lvalue LBRACK exp RBRACK   (A.SubscriptVar(lvalue, exp, lvalueleft))
-    |       ID LBRACK exp RBRACK       (A.SubscriptVar(A.SimpleVar(symbol ID,IDleft), exp, IDleft))
+lvalue :        ID                              (A.SimpleVar(Symbol.symbol ID,IDleft))
+     |          lvalueTail                      (lvalueTail)
+
+lvalueTail :    ID LBRACK exp RBRACK            (A.SubscriptVar(A.SimpleVar(Symbol.symbol ID,IDleft), exp, IDleft))
+     |          ID DOT ID                       (A.FieldVar(A.SimpleVar(Symbol.symbol ID1,ID1left),Symbol.symbol ID2, ID1left))
+     |          lvalueTail DOT ID               (A.FieldVar(lvalueTail,Symbol.symbol ID, lvalueTailleft))
+     |          lvalueTail LBRACK exp RBRACK    (A.SubscriptVar(lvalueTail,exp,lvalueTailleft))
