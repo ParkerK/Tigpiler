@@ -10,8 +10,11 @@ fun makeVar(v, pos, l::r) =
     |   Subscript(exp) => makeVar(A.SubscriptVar(v, exp, pos), pos,r))
 |   makeVar(v, _, nil) = v
 
-fun makeBinop(e1, bop, e2, p) = A.OpExp({left = e1, oper = bop, right = e2, pos = p})
+fun makeBinop(e1, bop, e2, p) = 
+    A.OpExp({left = e1, oper = bop, right = e2, pos = p})
 
+fun makeIf(e1, e2, el, p) = 
+    A.IfExp {test = e1, then' = e2, else' = el, pos = p}
 %%
 (* Parser Declarations *)
 %term
@@ -125,8 +128,8 @@ functionParamTail:  (* empty *)                             (nil)
     |               COMMA exp functionParamTail             ([exp] @ functionParamTail)
 
 assignment: lvalue ASSIGN exp               (A.AssignExp {var = lvalue, exp = exp, pos = lvalueleft})
-control:    IF exp THEN exp                 (A.IfExp {test = exp1, then' = exp2, else' = NONE, pos = IFleft})
-    |       IF exp THEN exp ELSE exp        (A.IfExp {test = exp1, then' = exp2, else' = SOME exp3, pos = IFleft})
+control:    IF exp THEN exp                 (makeIf(exp1, exp2, NONE, IFleft))
+    |       IF exp THEN exp ELSE exp        (makeIf(exp1, exp2, SOME exp3, IFleft))
     |       WHILE exp DO exp                (A.WhileExp {test = exp1, body = exp2, pos = WHILEleft})
     |       FOR ID ASSIGN exp TO exp DO exp (A.ForExp {var = symbol ID, escape = ref false, lo = exp1, hi = exp2, body = exp3, pos = FORleft})
     |       BREAK                           (A.BreakExp(BREAKleft))
@@ -145,8 +148,8 @@ compexp:    exp EQ exp      (makeBinop(exp1, A.EqOp, exp2, exp1left))
     |       exp GT exp      (makeBinop(exp1, A.GtOp, exp2, exp1left))
     |       exp GE exp      (makeBinop(exp1, A.GeOp, exp2, exp1left))
 
-boolexp:    exp AND exp     (A.IfExp {test = exp1, then' = exp2, else' = SOME(A.IntExp(0)), pos = exp1left})
-    |       exp OR exp      (A.IfExp {test = exp1, then' = A.IntExp(1), else' = SOME exp2, pos = exp1left})
+boolexp:    exp AND exp     (makeIf(exp1, exp2, SOME(A.IntExp(0)), exp1left))
+    |       exp OR exp      (makeIf(exp1, A.IntExp(1), SOME exp2, exp1left))
 
 (* Declarations *)
 decs:   (* empty *)     (nil)
