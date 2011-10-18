@@ -10,6 +10,8 @@ fun makeVar(v, pos, l::r) =
     |   Subscript(exp) => makeVar(A.SubscriptVar(v, exp, pos), pos,r))
 |   makeVar(v, _, nil) = v
 
+fun makeBinop(e1, bop, e2, p) = A.OpExp({left = e1, oper = bop, right = e2, pos = p})
+
 %%
 (* Parser Declarations *)
 %term
@@ -131,17 +133,17 @@ control:    IF exp THEN exp                 (A.IfExp {test = exp1, then' = exp2,
     |       LET decs IN sequenceExp END     (A.LetExp {decs = decs, body = A.SeqExp(sequenceExp), pos = LETleft})
 
 mathexp:    MINUS exp %prec UMINUS  (A.OpExp {left = A.IntExp(0) , oper = A.MinusOp, right = exp, pos = MINUSleft})
-    |       exp PLUS exp    (A.OpExp {left = exp1, oper = A.PlusOp, right = exp2, pos = exp1left})
-    |       exp MINUS exp   (A.OpExp {left = exp1, oper = A.MinusOp, right = exp2, pos = exp1left})
-    |       exp TIMES exp   (A.OpExp {left = exp1, oper = A.TimesOp, right = exp2, pos = exp1left})
-    |       exp DIVIDE exp  (A.OpExp {left = exp1, oper = A.DivideOp, right = exp2, pos = exp1left})
+    |       exp PLUS exp    (makeBinop(exp1, A.PlusOp, exp2, exp1left))
+    |       exp MINUS exp   (makeBinop(exp1, A.MinusOp, exp2, exp1left))
+    |       exp TIMES exp   (makeBinop(exp1, A.TimesOp, exp2, exp1left))
+    |       exp DIVIDE exp  (makeBinop(exp1, A.DivideOp, exp2, exp1left))
 
-compexp:    exp EQ exp      (A.OpExp {left = exp1, oper = A.EqOp, right = exp2, pos = exp1left})
-    |       exp NEQ exp     (A.OpExp {left = exp1, oper = A.NeqOp, right = exp2, pos = exp1left})
-    |       exp LT exp      (A.OpExp {left = exp1, oper = A.LtOp, right = exp2, pos = exp1left})
-    |       exp LE exp      (A.OpExp {left = exp1, oper = A.LeOp, right = exp2, pos = exp1left})
-    |       exp GT exp      (A.OpExp {left = exp1, oper = A.GtOp, right = exp2, pos = exp1left})
-    |       exp GE exp      (A.OpExp {left = exp1, oper = A.GeOp, right = exp2, pos = exp1left})        
+compexp:    exp EQ exp      (makeBinop(exp1, A.EqOp, exp2, exp1left))
+    |       exp NEQ exp     (makeBinop(exp1, A.NeqOp, exp2, exp1left))
+    |       exp LT exp      (makeBinop(exp1, A.LtOp, exp2, exp1left))
+    |       exp LE exp      (makeBinop(exp1, A.LeOp, exp2, exp1left))
+    |       exp GT exp      (makeBinop(exp1, A.GtOp, exp2, exp1left))
+    |       exp GE exp      (makeBinop(exp1, A.GeOp, exp2, exp1left))
 
 boolexp:    exp AND exp     (A.IfExp {test = exp1, then' = exp2, else' = SOME(A.IntExp(0)), pos = exp1left})
     |       exp OR exp      (A.IfExp {test = exp1, then' = A.IntExp(1), else' = SOME exp2, pos = exp1left})
