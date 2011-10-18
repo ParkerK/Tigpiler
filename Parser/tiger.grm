@@ -4,17 +4,20 @@ structure A = Absyn
 
 datatype lvalueVar = Field of Symbol.symbol
                    | Subscript of A.exp
-fun makeVar(v, pos, l::r) = 
+fun makeLvalueVar(v, pos, l::r) = 
     (case l of 
-        Field(id) => makeVar(A.FieldVar(v, id, pos), pos, r)
-    |   Subscript(exp) => makeVar(A.SubscriptVar(v, exp, pos), pos,r))
-|   makeVar(v, _, nil) = v
+        Field(id) => makeLvalueVar(A.FieldVar(v, id, pos), pos, r)
+    |   Subscript(exp) => makeLvalueVar(A.SubscriptVar(v, exp, pos), pos,r))
+|   makeLvalueVar(v, _, nil) = v
 
 fun makeBinop(e1, bop, e2, p) = 
     A.OpExp({left = e1, oper = bop, right = e2, pos = p})
 
 fun makeIf(e1, e2, el, p) = 
     A.IfExp {test = e1, then' = e2, else' = el, pos = p}
+    
+fun makeLvalueVarDec(id,ty,e,p) = 
+    A.VarDec {name = id, escape = ref false, typ = ty, init = e, pos = p}
 %%
 (* Parser Declarations *)
 %term
@@ -135,7 +138,7 @@ control:    IF exp THEN exp                 (makeIf(exp1, exp2, NONE, IFleft))
     |       BREAK                           (A.BreakExp(BREAKleft))
     |       LET decs IN sequenceExp END     (A.LetExp {decs = decs, body = A.SeqExp(sequenceExp), pos = LETleft})
 
-mathexp:    MINUS exp %prec UMINUS  (makeBinop(A.IntExp(0), A.MinusOp, exp, MINUSleft})
+mathexp:    MINUS exp %prec UMINUS  (makeBinop(A.IntExp(0), A.MinusOp, exp, MINUSleft))
     |       exp PLUS exp            (makeBinop(exp1, A.PlusOp, exp2, exp1left))
     |       exp MINUS exp           (makeBinop(exp1, A.MinusOp, exp2, exp1left))
     |       exp TIMES exp           (makeBinop(exp1, A.TimesOp, exp2, exp1left))
@@ -176,8 +179,8 @@ tyfieldsTail:   (* empty *)                 (nil)
     |           COMMA tyfield tyfieldsTail  ([tyfield] @ tyfieldsTail)
 
 (* Variables *)
-vardec:     VAR ID ASSIGN exp          (A.VarDec {name = symbol ID, escape = ref false, typ = NONE, init = exp, pos = VARleft})
-    |       VAR ID COLON ID ASSIGN exp (A.VarDec {name = symbol ID1, escape = ref false, typ = SOME(symbol ID2, ID2left), init = exp, pos = VARleft})
+vardec:     VAR ID ASSIGN exp          (makeLvalueVarDec(symbol ID, NONE, exp, VARleft))
+    |       VAR ID COLON ID ASSIGN exp (makeLvalueVarDec(symbol ID1, SOME(symbol ID2, ID2left), exp, VARleft))
 
 (* Functions *)
 fundecs:    fundec          ([fundec])
@@ -187,7 +190,7 @@ fundec:     FUNCTION ID LPAREN tyfields RPAREN EQ exp           ({name = symbol 
     |       FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp  ({name = symbol ID1, params = tyfields, result = SOME(symbol ID2,  ID2left), body = exp, pos = FUNCTIONleft})
 
 (* L-Values *)
-lvalue :    ID lvalueTail                   (makeVar(A.SimpleVar(symbol ID, IDleft), IDleft, lvalueTail))
+lvalue :    ID lvalueTail                   (makeLvalueVar(A.SimpleVar(symbol ID, IDleft), IDleft, lvalueTail))
 lvalueTail: DOT ID lvalueTail               (Field(symbol ID)::lvalueTail)
     |       LBRACK exp RBRACK lvalueTail    (Subscript(exp)::lvalueTail)
     |       (* empty *)                     (nil)
