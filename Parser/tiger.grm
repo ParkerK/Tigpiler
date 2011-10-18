@@ -6,7 +6,7 @@ datatype lvalueVar = Field of Symbol.symbol
                    | Subscript of A.exp
 fun makeLvalueVar(v, pos, l::r) = 
     (case l of 
-        Field(id) => makeLvalueVar(A.FieldVar(v, id, pos), pos, r)
+        Field(idsym) => makeLvalueVar(A.FieldVar(v, idsym, pos), pos, r)
     |   Subscript(exp) => makeLvalueVar(A.SubscriptVar(v, exp, pos), pos,r))
 |   makeLvalueVar(v, _, nil) = v
 
@@ -16,8 +16,11 @@ fun makeBinop(e1, bop, e2, p) =
 fun makeIf(e1, e2, el, p) = 
     A.IfExp {test = e1, then' = e2, else' = el, pos = p}
     
-fun makeLvalueVarDec(id,ty,e,p) = 
-    A.VarDec {name = id, escape = ref false, typ = ty, init = e, pos = p}
+fun makeLvalueVarDec(idsym, ty, e, p) = 
+    A.VarDec {name = idsym, escape = ref false, typ = ty, init = e, pos = p}
+    
+fun makeFundec(idsym, ps, r, e, p) =
+    {name = idsym, params = ps, result = r, body = e, pos = p} : A.fundec
 %%
 (* Parser Declarations *)
 %term
@@ -186,8 +189,8 @@ vardec:     VAR ID ASSIGN exp          (makeLvalueVarDec(symbol ID, NONE, exp, V
 fundecs:    fundec          ([fundec])
     |       fundecs fundec  (fundecs @ [fundec])
 
-fundec:     FUNCTION ID LPAREN tyfields RPAREN EQ exp           ({name = symbol ID, params = tyfields, result = NONE, body = exp, pos = FUNCTIONleft})
-    |       FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp  ({name = symbol ID1, params = tyfields, result = SOME(symbol ID2,  ID2left), body = exp, pos = FUNCTIONleft})
+fundec:     FUNCTION ID LPAREN tyfields RPAREN EQ exp           (makeFundec(symbol ID, tyfields, NONE, exp, FUNCTIONleft))
+    |       FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp  (makeFundec(symbol ID1, tyfields, SOME(symbol ID2, ID2left), exp, FUNCTIONleft))
 
 (* L-Values *)
 lvalue :    ID lvalueTail                   (makeLvalueVar(A.SimpleVar(symbol ID, IDleft), IDleft, lvalueTail))
