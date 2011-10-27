@@ -68,6 +68,10 @@ struct
         | trexp   (A.ForExp {var, escape, lo, hi, body, pos}) =
         | trexp   (A.BreakExp pos) =
         | trexp   (A.LetExp {decs, body, pos}) =
+            let val {venv=venv', tenv=tenv'} = transDecs(venv, tenv, decs)
+                in transExp(venv', tenv') body
+            end
+        
         | trexp   (A.ArrayExp {typ, size, init, pos}) =
         
        and trvar (A.SimpleVar(id,pos)) = 
@@ -75,6 +79,33 @@ struct
         | (A.SubscriptVar(var, exp,pos))
         
         
+    fun transDec (venv, tenv, A.VarDec{name, typ=NONE, init, escape, pos}) = 
+        let val {exp,ty} = transExp(venv, temv, init)
+            in {tenv = tenv,
+                venv=S.enter(venv, name, E.VarEntry{ty=ty})}
+            end
+        
+        | transDec (venv, tenv, A.TypeDec[{name, ty}]) = 
+            {venv = venv,
+            tenv=S.enter(tenv, name, transTy(tenv, ty))}
+            
+        | transDec(venv, tenv, A.FunctionDec[{name, params, body,
+                                            pos, result=SOME(rt,pos)}]) =
+            let val SOME(result_ty) = S.look(tenv, rt)
+                fun transparam{name, typ, pos} = 
+                    case S.look(tenv, typ)
+                        of SOME t => {name=namem ty=t}
+                val params' = map transparam params
+                val venv' = S.enter(venv, name, 
+                            E.FunEntry{formals = map #ty params', result = result_ty})
+                fun enterparam ({name, ty}, venv) = 
+                    S.enter (venv, name,
+                            E.VarEntry{access=(), ty=ty})
+                val venv'' = fold enterparam params' venv'
+            in transExp(venv'', tenv) body;
+                {venv=venv', tenv=tenv}
+            end
+                                              
   
 
 end
