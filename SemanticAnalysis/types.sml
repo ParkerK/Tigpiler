@@ -33,7 +33,7 @@ struct
   *)
   fun checkInt ({exp, ty}, pos) =
     ((case ty of
-        T.INT => ()
+        Types.INT => ()
         | _ => err pos "integer required");
      exp)
   
@@ -45,11 +45,14 @@ struct
         
         | trexp   (A.OpExp {left, oper, right, pos}) = 
             if     oper = A.PlusOp orelse oper = A.MinusOp orelse oper = A.TimesOp orelse oper = A.DivideOp
+                   orelse oper = A.EqOp orelse oper = A.NeqOp orelse oper = A.LtOp orelse oper = A.LeOp
+                   orelse oper = A.GtOp orelse oper = A.GeOp
+                  
                   (checkInt(trexp left, pos);
                    checkInt(trexp right, pos);
                    {exp=()}, ty=Types.INT})
-            
-            else if oper = A.EqOp orelse oper = A.NeqOp orelse oper = A.LtOp orelse oper = A.LeOp orelse oper = A.GtOp orelse oper = A.GeOp
+
+       
         | trexp   (A.RecordExp {fields, typ, pos}) =
         | trexp   (A.SeqExp var) =
         | trexp   (A.AssignExp {var, exp, pos}) =
