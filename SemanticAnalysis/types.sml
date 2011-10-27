@@ -36,12 +36,19 @@ struct
         Types.INT => ()
         | _ => err pos "integer required");
      exp)
+     
+  fun checkUntil ({exp, ty}, pos) =
+    ((case s of
+        Types.UNIT => ()
+        | _ => err pos "unit required");
+     exp)
   
-  fun transExp(venv, temv)  =
-    let fun trexp (A.NilExp) = 
-        | trexp   (A.IntExp i) = 
-        | trexp   (A.StringExp (str, pos) = 
-        | trexp   (A.CallExp {func, args, pos}) =
+  fun transExp(venv, temv)  =      
+    let fun trexp (A.NilExp)    =    {exp=(), ty=Types.NIL}
+        | trexp   (A.IntExp i)  =    {exp=(), ty=Types.INT}
+        | trexp   (A.StringExp (str, pos) = {exp=(), ty=Types.STRING}
+        
+        | trexp   (A.CallExp {func, args, pos}) = 
         
         | trexp   (A.OpExp {left, oper, right, pos}) = 
             if     oper = A.PlusOp orelse oper = A.MinusOp orelse oper = A.TimesOp orelse oper = A.DivideOp
