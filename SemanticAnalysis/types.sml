@@ -13,7 +13,7 @@ struct
       | UNIT
       
       
-      
+  structure A = Absyn      
   (* Takes venv, tenv, exp *)
   (*= VarExp of var
           | NilExp
@@ -31,12 +31,25 @@ struct
           | LetExp of {decs: dec list, body: exp, pos: pos}
           | ArrayExp of {typ: symbol, size: exp, init: exp, pos: pos}
   *)
+  fun checkInt ({exp, ty}, pos) =
+    ((case ty of
+        T.INT => ()
+        | _ => err pos "integer required");
+     exp)
+  
   fun transExp(venv, temv)  =
     let fun trexp (A.NilExp) = 
         | trexp   (A.IntExp i) = 
         | trexp   (A.StringExp (str, pos) = 
         | trexp   (A.CallExp {func, args, pos}) =
+        
         | trexp   (A.OpExp {left, oper, right, pos}) = 
+            if     oper = A.PlusOp orelse oper = A.MinusOp orelse oper = A.TimesOp orelse oper = A.DivideOp
+                  (checkInt(trexp left, pos);
+                   checkInt(trexp right, pos);
+                   {exp=()}, ty=Types.INT})
+            
+            else if oper = A.EqOp orelse oper = A.NeqOp orelse oper = A.LtOp orelse oper = A.LeOp orelse oper = A.GtOp orelse oper = A.GeOp
         | trexp   (A.RecordExp {fields, typ, pos}) =
         | trexp   (A.SeqExp var) =
         | trexp   (A.AssignExp {var, exp, pos}) =
