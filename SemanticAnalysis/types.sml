@@ -126,6 +126,12 @@ struct
             
         | trexp   (A.ForExp {var, escape, lo, hi, body, pos}) =
         | trexp   (A.BreakExp pos) =
+            if !nestLevel > 0 
+            then
+                {exp=Translate.breakExp(break), ty=Types.UNIT}
+            else
+                (err pos "Break not nested correctly";
+                    {exp=(), ty=Types.UNIT})
             
         
         
