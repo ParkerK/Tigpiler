@@ -14,7 +14,17 @@ struct
       
       
   structure A = Absyn      
-  fun checkInt ({exp, ty}, pos) =
+  
+  val nestLevel = ref 0
+  
+  fun actual_ty (T.NAME(var, ty) , pos)=
+    ( case !ty of 
+        NONE => (E.error pos "Undefined type"; Types.INT)
+        | SOME t => actualTy (t, pos))
+        | actual_ty (t,pos)= t 
+    )
+    
+    fun checkInt ({exp, ty}, pos) =
     ((case ty of
         Types.INT => ()
         | _ => err pos "integer required");
@@ -34,7 +44,8 @@ struct
         
         | trexp   (A.CallExp {func, args, pos}) = 
             (case Symbol.look (venv, func) of
-                SOME (Env.)
+                NONE => (error)
+                | SOME (Env.FunEntry {label, level=})
                 let
                     
                 in
@@ -54,16 +65,32 @@ struct
 
        
         | trexp   (A.RecordExp {fields, typ, pos}) =
-        | trexp   (A.SeqExp var) =
-            if null var
-                
+        | trexp   (A.SeqExp exps) =
+            let
+                val (exps', ty) =
+                    foldl (fn ((exp, _), (exps', _)) =>
+                        let
+                            val {exp=exp'', ty} =
+                                transExp (venv, tenv, level, bp, exp)
+                            in
+                                (exps' @ [exp''], ty)
+                            end
+                        )
+                        ([], Types.UNIT)
+                        exps
+                in
+                    {exp=Translate.sequence exps', ty=ty}
+                end
+                                
         
         | trexp   (A.AssignExp {var, exp, pos}) =
             let
-                val()
+                val  {exp=left,  ty=expect} = transVar (var)
+                val  {exp=right, ty=actual} = transExp (venv, tenv, level, bp, exp)
+            in
+                ()
             
         | trexp   (A.IfExp {test, then', else', pos}) =
-            
             (case else' of
                 NONE =>
                 let
@@ -72,27 +99,31 @@ struct
                 in
                     checkInt(test', pos)
                     checkUnit(then'', pos)
-                    {exp=Translate.IfExp(test', then''), ty=Type.UNIT}
+                    {exp=(), ty=Types.UNIT}
                 end
                 | SOME else' =>
                 let
                     val test' = trexp (test)
-                    val else'' = trexp (else')
-                    val {exp, ty} = trexp (then')
-                    
+                    val else'' = trexp (else')                    
                 in
                     checkInt(test', pos)
                     checkUnit(else'', pos)
-                    {exp=Tr.IfElseExp(#exp test', exp, #exp else''),
-                    ty=Type.UNIT}
+                    {exp=(), ty=Types.UNIT}
                 end
-                
-            )
+             )
                 
         | trexp   (A.WhileExp {test, body, pos}) =
-            let 
-        
-        
+            let
+                val test' = checkInt (test, pos)
+                val break = Translate (*set new break*)
+                nestLevel := !nestLevel + 1
+                val body' = transExp (tenv,venv,lev,break) body
+                nestLevel := !nestLevel - 1
+                val bodyexp = checkUnit (body', pos)
+            in
+                {exp=Translate.whileExp(test',body',break), ty=Types.UNIT}
+            end
+            
         | trexp   (A.ForExp {var, escape, lo, hi, body, pos}) =
         | trexp   (A.BreakExp pos) =
             
