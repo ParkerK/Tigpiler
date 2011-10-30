@@ -55,7 +55,7 @@ struct
    exp)
   
    (* Takes venv, tenv, exp *)
-  fun transExp(venv, temv)  =      
+  fun transExp(venv, tenv, exp)  =      
 
     let fun trexp (A.NilExp)    =    {exp=Translate.Nil(), ty=Types.NIL}
         | trexp   (A.IntExp i)  =    {exp=Translate.Int(int), ty=Types.INT}
@@ -191,7 +191,7 @@ struct
                         | NONE => (err pos ("undefined variable: " ^ S.name id)
                             exp(), ty=Types.INT))
                             
-        | (A.FieldVar(var,id,pos)) =
+        | trvar (A.FieldVar(var,id,pos)) =
             let
                 var' = transExp (var)
             in
@@ -202,9 +202,11 @@ struct
                     )
             end
                     
-        | (A.SubscriptVar(var, exp,pos)) =
+        | trvar (A.SubscriptVar(var, exp,pos)) =
         
-        
+    in
+      trexp(exp)
+    end
     fun transDec (venv, tenv, A.VarDec{name, typ=NONE, init, escape, pos}) = 
         let val {exp,ty} = transExp(venv, temv, init)
             in {tenv = tenv,
