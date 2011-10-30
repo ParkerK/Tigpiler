@@ -89,7 +89,8 @@ structure Semant :> SEMANT = struct
 
                         | _ => err pos "cannot peform comparisons on type" #ty left' )
                  end
-             
+             else
+                err pos "error"
 
         | trexp   (A.CallExp {func, args, pos}) = 
             (case Symbol.look (venv, func) of
@@ -98,7 +99,7 @@ structure Semant :> SEMANT = struct
 
                 if length(formals) <> length(args) then err pos "wrong amount of arguments"
                 (* Should check to make sure return types match, as do argtypes *)
-                {exp=()}, ty=result}
+                {exp=(), ty=result}
 
         | trexp   (A.IfExp {test, then', else', pos}) =
              (case else' of
