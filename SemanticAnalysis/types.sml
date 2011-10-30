@@ -19,6 +19,10 @@ struct
 
   val nestLevel = ref 0
 
+  fun compare_ty (ty1, ty2, pos)=
+    (case !ty1 = !ty2 of
+        true => ()
+        | false => err pos "type mismatch")
   fun actual_ty (T.NAME(var, ty) , pos)=
     ( case !ty of 
         NONE => (E.error pos "Undefined type"; Types.INT)
@@ -57,17 +61,6 @@ struct
         | trexp   (A.IntExp i)  =    {exp=Translate.Int(int), ty=Types.INT}
         | trexp   (A.StringExp (str, pos) = {exp=Translate.String(str), ty=Types.STRING}
         
-        | trexp   (A.CallExp {func, args, pos}) = 
-            (case Symbol.look (venv, func) of
-                NONE => (error)
-                | SOME (Env.FunEntry {label, level=})
-                let
-                    
-                in
-                    (if length(form))
-                end
-                )
-        
         | trexp   (A.OpExp {left, oper, right, pos}) = 
             if oper = A.PlusOp orelse oper = A.MinusOp
                orelse oper = A.TimesOp orelse oper = A.DivideOp                  
@@ -100,15 +93,58 @@ struct
                end
 
       | trexp   (A.CallExp {func, args, pos}) = 
-          (case Symbol.look (venv, func) of
-              NONE => (error)
-              | SOME (E.FunEntry {label, level})
-              let
-
-              in
-                  (if length(form))
-
+          (case S.look (venv, func) of
+              NONE => (err pos "can't call nonexistant functions")
+              | SOME (E.FunEntry {formals, result})
+              
+              if length(formals) <> length(args) then err pos "wrong amount of arguments"
+              (* Should check to make sure return types match, as do argtypes *)
+              {exp=()}, ty=result}
+        
+      | trexp   (A.IfExp {test, then', else', pos}) =
+           (case else' of
+               NONE =>
+               let
+                   val test' = trexp (test)
+                   val then'' = trexp (then')
+               in
+                   checkInt(test', pos)
+                   checkUnit(then'', pos)
+                   {exp=(), ty=Types.UNIT}
+               end
+               | SOME else' =>
+               let
+                   val test' = trexp (test)
+                   val then'' = trexp (then')
+                   val else'' = trexp (else')                    
+               in
+                   checkInt(test', pos)
+                   checkUnit(then'', pos)
+                   checkUnit(else'', pos)
+                   {exp=(), ty=Types.UNIT}
+               end
+            )
+            
+        | trexp   (A.WhileExp {test, body, pos}) =
+            let
+                val break = Translate (*set new break*)
+                nestLevel := !nestLevel + 1
+                val body' = transExp (tenv,venv,lev,break) body
+                nestLevel := !nestLevel - 1
+            in
+                checkInt (test, pos)
+                checkUnit (body', pos)
+                {exp=(), ty=Types.UNIT}
+            end   
+                   
         | trexp   (A.RecordExp {fields, typ, pos}) =
+            (case S.look (tenv, typ) of
+               SOME (record as Types.RECORD (fields, _)) => 
+               {exp=(), ty=typ}
+               (* Should check types *)
+               | NONE = > (err pos "no record found")
+               end     
+        
         | trexp   (A.SeqExp exps) =
             let
                 val (exps', ty) =
@@ -123,7 +159,7 @@ struct
                         ([], Types.UNIT)
                         exps
                 in
-                    {exp=Translate.sequence exps', ty=ty}
+                    {exp=(), ty=ty}
                 end
                                 
         
@@ -134,41 +170,9 @@ struct
             in
                 ()
             end
-        | trexp   (A.IfExp {test, then', else', pos}) =
-            (case else' of
-                NONE =>
-                let
-                    val test' = trexp (test)
-                    val then'' = trexp (then')
-                in
-                    checkInt(test', pos)
-                    checkUnit(then'', pos)
-                    {exp=(), ty=Types.UNIT}
-                end
-                | SOME else' =>
-                let
-                    val test' = trexp (test)
-                    val then'' = trexp (then')
-                    val else'' = trexp (else')                    
-                in
-                    checkInt(test', pos)
-                    checkUnit(then'', pos)
-                    checkUnit(else'', pos)
-                    {exp=(), ty=Types.UNIT}
-                end
-             )
+ 
                 
-        | trexp   (A.WhileExp {test, body, pos}) =
-            let
-                val test' = checkInt (test, pos)
-                val break = Translate (*set new break*)
-                nestLevel := !nestLevel + 1
-                val body' = transExp (tenv,venv,lev,break) body
-                nestLevel := !nestLevel - 1
-                val bodyexp = checkUnit (body', pos)
-            in
-                {exp=Translate.whileExp(test',body',break), ty=Types.UNIT}
-            end
+
             
         | trexp   (A.ForExp {var, escape, lo, hi, body, pos}) =
             let
@@ -199,6 +203,12 @@ struct
         | trexp   (A.ArrayExp {typ, size, init, pos}) =
         
        and trvar (A.SimpleVar(id,pos)) = 
+                    (case S.look(venv, id) of
+                        SOME (E.VarEntry{ty}) =>
+                            {exp=(), ty=actual_ty ty}
+                        | NONE => (err pos ("undefined variable: " ^ S.name id)
+                            exp(), ty=Types.INT))
+                            
         | (A.FieldVar(var,id,pos))=
         | (A.SubscriptVar(var, exp,pos))
         
