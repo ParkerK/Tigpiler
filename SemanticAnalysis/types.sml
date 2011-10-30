@@ -4,40 +4,55 @@ struct
   type unique = unit ref
 
   datatype ty = 
-            RECORD of (Symbol.symbol * ty) list * unique
+          RECORD of (Symbol.symbol * ty) list * unique
           | NIL
           | INT
           | STRING
           | ARRAY of ty * unique
       | NAME of Symbol.symbol * ty option ref
       | UNIT
-      
-      
-  structure A = Absyn      
-  
+
+
+  structure A = Absyn
+  structure S = Symbol
+  structure E = Env
+
   val nestLevel = ref 0
-  
+
   fun actual_ty (T.NAME(var, ty) , pos)=
     ( case !ty of 
         NONE => (E.error pos "Undefined type"; Types.INT)
-        | SOME t => actualTy (t, pos))
+        | SOME t => actual_ty (t, pos))
         | actual_ty (t,pos)= t 
     )
     
-    fun checkInt ({exp, ty}, pos) =
+  fun checkInt ({exp, ty}, pos) =
     ((case ty of
         Types.INT => ()
         | _ => err pos "integer required");
      exp)
      
   fun checkUnit ({exp, ty}, pos) =
-    ((case s of
+    ((case ty of
         Types.UNIT => ()
         | _ => err pos "unit required");
      exp)
+     
+  fun checkString ({exp, ty}, pos) =
+       ((case ty of
+           Types.STRING => ()
+           | _ => err pos "string required");
+        exp)
+        
+  fun checkType ({exp, ty}, pos, type) =
+    ((case ty of
+      type => ()
+      | _ => err pos "unit required");
+   exp)
   
    (* Takes venv, tenv, exp *)
   fun transExp(venv, temv)  =      
+
     let fun trexp (A.NilExp)    =    {exp=Translate.Nil(), ty=Types.NIL}
         | trexp   (A.IntExp i)  =    {exp=Translate.Int(int), ty=Types.INT}
         | trexp   (A.StringExp (str, pos) = {exp=Translate.String(str), ty=Types.STRING}
@@ -53,15 +68,45 @@ struct
                 end
                 )
         
-        
         | trexp   (A.OpExp {left, oper, right, pos}) = 
-            if     oper = A.PlusOp orelse oper = A.MinusOp orelse oper = A.TimesOp orelse oper = A.DivideOp
-                   orelse oper = A.EqOp orelse oper = A.NeqOp orelse oper = A.LtOp orelse oper = A.LeOp
-                   orelse oper = A.GtOp orelse oper = A.GeOp
-                  
-                  (checkInt(trexp left, pos);
-                   checkInt(trexp right, pos);
-                   {exp=()}, ty=Types.INT})
+            if oper = A.PlusOp orelse oper = A.MinusOp
+               orelse oper = A.TimesOp orelse oper = A.DivideOp                  
+            
+              (
+               checkInt(trexp left, pos);
+               checkInt(trexp right, pos);
+               {exp=()}, ty=Types.INT}
+              )
+            
+            else if oper = A.EqOp orelse oper = A.NeqOp orelse oper = A.LtOp
+                    orelse oper = A.LeOp orelse oper = A.GtOp orelse oper = A.GeOp
+            
+              let
+                  left' = trexp left
+                  right' = trexp right
+              in
+                  (case left' of
+                      Types.INT =>
+                        (checkInt(left', pos);
+                        checkInt(right', pos);
+                        {exp=()}, ty=Types.INT})
+                        
+                      | Types.STRING = >
+                        (checkString(left', pos);
+                        checkString(right', pos);
+                        {exp=()}, ty=Types.INT})
+                        
+                      | _ => err pos "cannot peform comparisons on type" #ty left' )
+               end
+
+      | trexp   (A.CallExp {func, args, pos}) = 
+          (case Symbol.look (venv, func) of
+              NONE => (error)
+              | SOME (E.FunEntry {label, level})
+              let
+
+              in
+                  (if length(form))
 
         | trexp   (A.RecordExp {fields, typ, pos}) =
         | trexp   (A.SeqExp exps) =
@@ -103,9 +148,11 @@ struct
                 | SOME else' =>
                 let
                     val test' = trexp (test)
+                    val then'' = trexp (then')
                     val else'' = trexp (else')                    
                 in
                     checkInt(test', pos)
+                    checkUnit(then'', pos)
                     checkUnit(else'', pos)
                     {exp=(), ty=Types.UNIT}
                 end
@@ -124,6 +171,16 @@ struct
             end
             
         | trexp   (A.ForExp {var, escape, lo, hi, body, pos}) =
+            let
+                val lo' = checkInt(transExp (lo), pos)
+                val hi' = checkInt(transExp (hi), pos)
+                (* Add Stuff Here *)
+                
+            in
+                {exp=Translate.forExp(lo', hi', body', ___, level, break),
+                ty=Types.UNIT}
+            end
+            
         | trexp   (A.BreakExp pos) =
             if !nestLevel > 0 
             then
