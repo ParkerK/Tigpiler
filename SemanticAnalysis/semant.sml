@@ -26,12 +26,12 @@ structure Semant :> SEMANT = struct
       (case !ty1 = !ty2 of
           true => ()
           | false => err pos "type mismatch")
-    fun actual_ty (T.NAME(var, ty) , pos)=
-      ( case !ty of 
-          NONE => (E.error pos "Undefined type"; Types.INT)
-          | SOME t => actual_ty (t, pos))
-          | actual_ty (t,pos)= t 
-      )
+    
+    fun actual_ty (T.NAME (s,ty)) = 
+        (case !ty of
+            NONE => raise ErrorReport.Error
+            | SOME t => actual_ty t)
+            | actual_ty t = t 
 
     fun checkInt ({exp, ty}, pos) =
       ((case ty of
@@ -51,11 +51,6 @@ structure Semant :> SEMANT = struct
              | _ => err pos "string required");
           exp)
 
-    fun checkType ({exp, ty}, pos, type) =
-      ((case ty of
-        type => ()
-        | _ => err pos "unit required");
-     exp)
 
      (* Takes venv, tenv, exp *)
     fun transExp(venv, tenv, exp)  =      
