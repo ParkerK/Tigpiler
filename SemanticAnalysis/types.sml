@@ -146,43 +146,25 @@ struct
                end     
         
         | trexp   (A.SeqExp exps) =
-            let
-                val (exps', ty) =
-                    foldl (fn ((exp, _), (exps', _)) =>
-                        let
-                            val {exp=exp'', ty} =
-                                transExp (venv, tenv, level, bp, exp)
-                            in
-                                (exps' @ [exp''], ty)
-                            end
-                        )
-                        ([], Types.UNIT)
-                        exps
-                in
-                    {exp=(), ty=ty}
-                end
-                                
+            {exp=(), ty=Types.UNIT}
         
         | trexp   (A.AssignExp {var, exp, pos}) =
             let
                 val  {exp=left,  ty=expect} = transVar (var)
-                val  {exp=right, ty=actual} = transExp (venv, tenv, level, bp, exp)
+                val  {exp=right, ty=actual} = transExp (venv, tenv, exp)
             in
-                ()
+                if expect <> actual then err pos "assignment mismatch"
+                {exp=(), ty=Types.UNIT}
             end
- 
-                
 
-            
         | trexp   (A.ForExp {var, escape, lo, hi, body, pos}) =
             let
-                val lo' = checkInt(transExp (lo), pos)
-                val hi' = checkInt(transExp (hi), pos)
+                checkInt(transExp (lo), pos)
+                checkInt(transExp (hi), pos)
                 (* Add Stuff Here *)
                 
             in
-                {exp=Translate.forExp(lo', hi', body', ___, level, break),
-                ty=Types.UNIT}
+                {exp=(),ty=Types.UNIT}
             end
             
         | trexp   (A.BreakExp pos) =
@@ -209,8 +191,18 @@ struct
                         | NONE => (err pos ("undefined variable: " ^ S.name id)
                             exp(), ty=Types.INT))
                             
-        | (A.FieldVar(var,id,pos))=
-        | (A.SubscriptVar(var, exp,pos))
+        | (A.FieldVar(var,id,pos)) =
+            let
+                var' = transExp (var)
+            in
+                (case var' of
+                    {exp, ty=record as Types.RECORD (fields, _)} =>
+                    {exp=(), ty=record}
+                    | _ => err pos "no var found"
+                    )
+            end
+                    
+        | (A.SubscriptVar(var, exp,pos)) =
         
         
     fun transDec (venv, tenv, A.VarDec{name, typ=NONE, init, escape, pos}) = 
