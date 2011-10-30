@@ -170,7 +170,7 @@ struct
         | trexp   (A.BreakExp pos) =
             if !nestLevel > 0 
             then
-                {exp=Translate.breakExp(break), ty=Types.UNIT}
+                {exp=(), ty=Types.UNIT}
             else
                 (err pos "Break not nested correctly";
                     {exp=(), ty=Types.UNIT})
@@ -183,7 +183,8 @@ struct
             end
         
         | trexp   (A.ArrayExp {typ, size, init, pos}) =
-        
+            {exp=(), ty=Types.UNIT}
+            
        and trvar (A.SimpleVar(id,pos)) = 
                     (case S.look(venv, id) of
                         SOME (E.VarEntry{ty}) =>
