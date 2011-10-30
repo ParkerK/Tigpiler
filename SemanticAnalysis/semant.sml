@@ -95,11 +95,15 @@ structure Semant :> SEMANT = struct
         | trexp   (A.CallExp {func, args, pos}) = 
             (case Symbol.look (venv, func) of
                 NONE => (err pos "can't call nonexistant functions")
-                | SOME (E.FunEntry {formals, result})
-
-                if length(formals) <> length(args) then err pos "wrong amount of arguments"
-                (* Should check to make sure return types match, as do argtypes *)
+                | SOME (E.FunEntry {formals=args, result}) =>
+                if
+                    length(formals) <> length(args)
+                then err pos "wrong amount of arguments"
+                else
                 {exp=(), ty=result}
+                )
+
+                (* Should check to make sure return types match, as do argtypes *)
 
         | trexp   (A.IfExp {test, then', else', pos}) =
              (case else' of
