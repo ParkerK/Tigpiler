@@ -8,14 +8,14 @@ sig
   val base_venv : enventry Symbol.table
 end
 
-structure Env :> ENV = 
+structure Env :> ENV = struct
   type access = unit ref
   type ty = Type.ty
-  base_tenv = foldr Symbol.enter Symbol.empty [
+  val base_tenv = foldr Symbol.enter Symbol.empty [
     (base_tenv, Symbol.symbol("int"), Ty.INT),
     (base_tenv, Symbol.symbol("string"), Ty.STRING)
   ]
-  base_venv = foldr Symbol.enter Symbol.empty [
+  val base_venv = foldr Symbol.enter Symbol.empty [
     (base_venv, Symbol.symbol("print"), FunEntry {formals=[ty.STRING], result=ty.UNIT}),
     (base_venv, Symbol.symbol("flush"), FunEntry {formals=[], result=ty.UNIT}),
     (base_venv, Symbol.symbol("getchar"), FunEntry {formals=[], result=ty.STRING}),

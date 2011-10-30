@@ -1,4 +1,5 @@
-structure Main : sig val main : () -> unit end =
+structure Main =
+struct
 	fun main() =
 		let
 			fun test (dir) = 
@@ -33,3 +34,5 @@ structure Main : sig val main : () -> unit end =
 			(CM.make "sources.cm"; test ("../TestPrograms"))
 		end
 end
+
+Main.main();

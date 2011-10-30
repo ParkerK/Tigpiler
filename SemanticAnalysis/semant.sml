@@ -12,7 +12,7 @@ sig
   val transTy :         tenv * Absyn.ty  -> ty
 end
 
-structure Semant :> SEMANT =
+structure Semant :> SEMANT = struct
   type ty = Type.ty
   structure A = Absyn
   structure E = Env
