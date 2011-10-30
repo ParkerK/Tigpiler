@@ -57,35 +57,35 @@ structure Semant :> SEMANT = struct
 
       let fun trexp (A.NilExp)    =    {exp=Translate.Nil(), ty=Types.NIL}
           | trexp   (A.IntExp i)  =    {exp=Translate.Int(int), ty=Types.INT}
-          | trexp   (A.StringExp (str, pos) = {exp=Translate.String(str), ty=Types.STRING}
+          | trexp   (A.StringExp (str, pos)) = {exp=Translate.String(str), ty=Types.STRING}
 
           | trexp   (A.OpExp {left, oper, right, pos}) = 
               if oper = A.PlusOp orelse oper = A.MinusOp
-                 orelse oper = A.TimesOp orelse oper = A.DivideOp                  
+                 orelse oper = A.TimesOp orelse oper = A.DivideOp then               
 
                 (
                  checkInt(trexp left, pos);
                  checkInt(trexp right, pos);
-                 {exp=()}, ty=Types.INT}
+                 {exp=(), ty=Types.INT}
                 )
 
               else if oper = A.EqOp orelse oper = A.NeqOp orelse oper = A.LtOp
                       orelse oper = A.LeOp orelse oper = A.GtOp orelse oper = A.GeOp
 
                 let
-                    left' = trexp left
-                    right' = trexp right
+                    val left' = trexp left
+                    val right' = trexp right
                 in
                     (case left' of
                         Types.INT =>
                           (checkInt(left', pos);
                           checkInt(right', pos);
-                          {exp=()}, ty=Types.INT})
+                          {exp=(), ty=Types.INT})
 
-                        | Types.STRING = >
+                        | Types.STRING =>
                           (checkString(left', pos);
                           checkString(right', pos);
-                          {exp=()}, ty=Types.INT})
+                          {exp=(), ty=Types.INT})
 
                         | _ => err pos "cannot peform comparisons on type" #ty left' )
                  end
