@@ -15,7 +15,6 @@ end
 structure Semant :> SEMANT =
   type ty = Type.ty
   structure A = Absyn
-  structure S = Symbol
   structure E = Env
   
  fun transProg(absyn) = 
@@ -97,7 +96,7 @@ structure Semant :> SEMANT =
                  end
 
         | trexp   (A.CallExp {func, args, pos}) = 
-            (case S.look (venv, func) of
+            (case Symbol.look (venv, func) of
                 NONE => (err pos "can't call nonexistant functions")
                 | SOME (E.FunEntry {formals, result})
 
@@ -142,7 +141,7 @@ structure Semant :> SEMANT =
               end   
 
           | trexp   (A.RecordExp {fields, typ, pos}) =
-              (case S.look (tenv, typ) of
+              (case Symbol.look (tenv, typ) of
                  SOME (record as Types.RECORD (fields, _)) => 
                  {exp=(), ty=typ}
                  (* Should check types *)
@@ -190,10 +189,10 @@ structure Semant :> SEMANT =
               {exp=(), ty=Types.UNIT}
 
          and trvar (A.SimpleVar(id,pos)) = 
-                      (case S.look(venv, id) of
+                      (case Symbol.look(venv, id) of
                           SOME (E.VarEntry{ty}) =>
                               {exp=(), ty=actual_ty ty}
-                          | NONE => (err pos ("undefined variable: " ^ S.name id)
+                          | NONE => (err pos ("undefined variable: ")
                               exp(), ty=Types.INT))
 
           | trvar (A.FieldVar(var,id,pos)) =
@@ -218,24 +217,24 @@ structure Semant :> SEMANT =
       fun transDec (venv, tenv, A.VarDec{name, typ=NONE, init, escape, pos}) = 
           let val {exp,ty} = transExp(venv, temv, init)
               in {tenv = tenv,
-                  venv=S.enter(venv, name, E.VarEntry{ty=ty})}
+                  venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}
               end
 
           | transDec (venv, tenv, A.TypeDec[{name, ty}]) = 
               {venv = venv,
-              tenv=S.enter(tenv, name, transTy(tenv, ty))}
+              tenv=Symbol.enter(tenv, name, transTy(tenv, ty))}
 
           | transDec(venv, tenv, A.FunctionDec[{name, params, body,
                                               pos, result=SOME(rt,pos)}]) =
-              let val SOME(result_ty) = S.look(tenv, rt)
+              let val SOME(result_ty) = Symbol.look(tenv, rt)
                   fun transparam {name, typ, pos} = 
-                      case S.look(tenv, typ)
+                      case Symbol.look(tenv, typ)
                           of SOME t => {name=namem ty=t}
                   val params' = map transparam params
-                  val venv' = S.enter(venv, name, 
+                  val venv' = Symbol.enter(venv, name, 
                               E.FunEntry{formals = map #ty params', result = result_ty})
                   fun enterparam ({name, ty}, venv) = 
-                      S.enter (venv, name,
+                      Symbol.enter (venv, name,
                               E.VarEntry{access=(), ty=ty})
                   val venv'' = fold enterparam params' venv'
               in transExp(venv'', tenv) body;
