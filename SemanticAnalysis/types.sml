@@ -50,7 +50,7 @@ struct
                     
                 in
                     (if length(form))
-                
+                end
                 )
         
         
@@ -63,7 +63,6 @@ struct
                    checkInt(trexp right, pos);
                    {exp=()}, ty=Types.INT})
 
-       
         | trexp   (A.RecordExp {fields, typ, pos}) =
         | trexp   (A.SeqExp exps) =
             let
@@ -89,7 +88,7 @@ struct
                 val  {exp=right, ty=actual} = transExp (venv, tenv, level, bp, exp)
             in
                 ()
-            
+            end
         | trexp   (A.IfExp {test, then', else', pos}) =
             (case else' of
                 NONE =>
