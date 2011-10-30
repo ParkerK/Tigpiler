@@ -70,8 +70,8 @@ structure Semant :> SEMANT = struct
                 )
 
               else if oper = A.EqOp orelse oper = A.NeqOp orelse oper = A.LtOp
-                      orelse oper = A.LeOp orelse oper = A.GtOp orelse oper = A.GeOp
-
+                      orelse oper = A.LeOp orelse oper = A.GtOp orelse oper = A.GeOp then
+                      
                 let
                     val left' = trexp left
                     val right' = trexp right
@@ -89,6 +89,7 @@ structure Semant :> SEMANT = struct
 
                         | _ => err pos "cannot peform comparisons on type" #ty left' )
                  end
+             
 
         | trexp   (A.CallExp {func, args, pos}) = 
             (case Symbol.look (venv, func) of
