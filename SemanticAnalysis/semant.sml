@@ -146,8 +146,7 @@ structure Semant :> SEMANT = struct
                  SOME (record as Types.RECORD (fields, _)) => 
                  {exp=(), ty=typ}
                  (* Should check types *)
-                 | NONE = > (err pos "no record found")
-                 end     
+                 | NONE => (err pos "no record found"))
 
           | trexp   (A.SeqExp exps) =
               {exp=(), ty=Types.UNIT}
@@ -157,19 +156,21 @@ structure Semant :> SEMANT = struct
                   val  {exp=left,  ty=expect} = transVar (var)
                   val  {exp=right, ty=actual} = transExp (venv, tenv, exp)
               in
-                  if expect <> actual then err pos "assignment mismatch"
-                  {exp=(), ty=Types.UNIT}
+                  if
+                    expect <> actual
+                  then
+                    err pos "assignment mismatch"
+                  else
+                    {exp=(), ty=Types.UNIT}
               end
 
           | trexp   (A.ForExp {var, escape, lo, hi, body, pos}) =
-              let
-                  checkInt(transExp (lo), pos)
-                  checkInt(transExp (hi), pos)
-                  (* Add Stuff Here *)
-
-              in
-                  {exp=(),ty=Types.UNIT}
-              end
+                
+                checkInt(transExp (lo), pos)
+                checkInt(transExp (hi), pos)
+                (* Add Stuff Here *)
+                {exp=(),ty=Types.UNIT}
+            
 
           | trexp   (A.BreakExp pos) =
               if !nestLevel > 0 
@@ -198,7 +199,7 @@ structure Semant :> SEMANT = struct
 
           | trvar (A.FieldVar(var,id,pos)) =
               let
-                  var' = transExp (var)
+                  val var' = transExp (var)
               in
                   (case var' of
                       {exp, ty=record as Types.RECORD (fields, _)} =>
