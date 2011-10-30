@@ -9,7 +9,7 @@ sig
 end
 
 structure Env :> ENV = 
-  type access = 
-  type ty =
+  type access = unit ref
+  type ty = Type.ty
   
 end

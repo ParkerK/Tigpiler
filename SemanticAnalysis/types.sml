@@ -52,10 +52,22 @@ struct
   
    (* Takes venv, tenv, exp *)
   fun transExp(venv, temv)  =      
-    let fun trexp (A.NilExp)    =    {exp=(), ty=Types.NIL}
-        | trexp   (A.IntExp i)  =    {exp=(), ty=Types.INT}
-        | trexp   (A.StringExp (str, pos) = {exp=(), ty=Types.STRING}
-            
+
+    let fun trexp (A.NilExp)    =    {exp=Translate.Nil(), ty=Types.NIL}
+        | trexp   (A.IntExp i)  =    {exp=Translate.Int(int), ty=Types.INT}
+        | trexp   (A.StringExp (str, pos) = {exp=Translate.String(str), ty=Types.STRING}
+        
+        | trexp   (A.CallExp {func, args, pos}) = 
+            (case Symbol.look (venv, func) of
+                NONE => (error)
+                | SOME (Env.FunEntry {label, level=})
+                let
+                    
+                in
+                    (if length(form))
+                end
+                )
+        
         | trexp   (A.OpExp {left, oper, right, pos}) = 
             if oper = A.PlusOp orelse oper = A.MinusOp
                orelse oper = A.TimesOp orelse oper = A.DivideOp                  
@@ -96,7 +108,6 @@ struct
               in
                   (if length(form))
 
-              )
         | trexp   (A.RecordExp {fields, typ, pos}) =
         | trexp   (A.SeqExp exps) =
             let
@@ -122,7 +133,7 @@ struct
                 val  {exp=right, ty=actual} = transExp (venv, tenv, level, bp, exp)
             in
                 ()
-            
+            end
         | trexp   (A.IfExp {test, then', else', pos}) =
             (case else' of
                 NONE =>
