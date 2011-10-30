@@ -4,7 +4,7 @@ sig
   type S
   val tenv : ty S.table
   val venv : enventry S.table
-  val expty = {exp: Translate.exp, ty: ty}
+  val expty : {exp: Translate.exp, ty: ty}
   val transProg : Absyn.exp -> unit
   val transVar : venv * tenv * Absyn.var -> expty
   val transExp : venv * tenv * Absyn.exp -> expty
