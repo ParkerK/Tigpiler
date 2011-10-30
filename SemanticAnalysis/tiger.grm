@@ -1,0 +1,199 @@
+(* User Declarations *)
+open Symbol
+structure A = Absyn
+
+datatype lvalueVar = Field of Symbol.symbol
+                   | Subscript of A.exp
+fun makeLvalueVar(v, pos, l::r) = 
+    (case l of 
+        Field(idsym) => makeLvalueVar(A.FieldVar(v, idsym, pos), pos, r)
+    |   Subscript(exp) => makeLvalueVar(A.SubscriptVar(v, exp, pos), pos,r))
+|   makeLvalueVar(v, _, nil) = v
+
+fun makeBinop(e1, bop, e2, p) = 
+    A.OpExp({left = e1, oper = bop, right = e2, pos = p})
+
+fun makeIf(e1, e2, el, p) = 
+    A.IfExp {test = e1, then' = e2, else' = el, pos = p}
+    
+fun makeLvalueVarDec(idsym, ty, e, p) = 
+    A.VarDec {name = idsym, escape = ref false, typ = ty, init = e, pos = p}
+    
+fun makeFundec(idsym, ps, r, e, p) =
+    {name = idsym, params = ps, result = r, body = e, pos = p} : A.fundec
+%%
+(* Parser Declarations *)
+%term
+    EOF 
+  | ID of string
+  | INT of int 
+  | STRING of string 
+  | COMMA | COLON | SEMICOLON | LPAREN | RPAREN | LBRACK | RBRACK 
+  | LBRACE | RBRACE | DOT 
+  | PLUS | MINUS | TIMES | DIVIDE | EQ | NEQ | LT | LE | GT | GE
+  | AND | OR | ASSIGN
+  | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF 
+  | BREAK | NIL
+  | FUNCTION | VAR | TYPE 
+  | UMINUS
+  | LOWPREC
+
+%nonterm
+      program of A.exp
+    | exp of A.exp
+    | array of A.exp
+    | assignment  of A.exp
+    | boolexp of A.exp
+    | compexp of A.exp
+    | control of A.exp
+    | functionCall  of A.exp
+    | lvalue of A.var
+    | lvalueTail of lvalueVar list
+    | mathexp  of A.exp
+    | record of A.exp
+    | sequence of A.exp
+    | dec of A.dec
+    | decs of A.dec list
+    | functionParam of A.exp list
+    | functionParamTail of A.exp list
+    | fundec of A.fundec
+    | fundecs of A.fundec list
+    | recordField of (symbol * A.exp * pos)
+    | recordTail of (symbol * A.exp * pos) list
+    | sequenceExp of (A.exp * pos) list
+    | sequenceTail of (A.exp * pos) list
+    | ty of A.ty
+    | tydec of {name: Symbol.symbol, ty: A.ty, pos: pos}
+    | tydecs of {name: Symbol.symbol, ty: A.ty, pos: pos} list
+    | tyfield of A.field
+    | tyfields of A.field list
+    | tyfieldsTail of A.field list
+    | vardec of A.dec
+
+%pos int
+%verbose
+%start program
+%eop EOF
+%noshift EOF
+
+%name Tiger
+
+%keyword WHILE FOR TO BREAK LET IN END FUNCTION VAR TYPE ARRAY IF THEN ELSE DO OF NIL
+
+%prefer THEN ELSE LPAREN
+
+%value ID ("bogus")
+%value INT (1)
+%value STRING ("")
+
+(* Precedence Directives *)
+%nonassoc   LOWPREC                             (* Binding - Loose *)
+%nonassoc   FUNCTION VAR TYPE THEN DO OF ASSIGN       (* | *)
+%right      ELSE                                      (* | *)
+%left       OR                                        (* | *)
+%left       AND                                       (* | *)
+%nonassoc   EQ NEQ LT LE GT GE                        (* | *)
+%left       PLUS MINUS                                (* | *)
+%left       TIMES DIVIDE                              (* V *)
+%left       UMINUS                              (* Binding - Tight *)
+
+%%
+(* Grammar Rules *)
+
+program:    exp         (exp)
+
+exp:    array           (array)
+    |   assignment      (assignment)
+    |   boolexp         (boolexp)
+    |   compexp         (compexp)
+    |   control         (control)
+    |   functionCall    (functionCall)
+    |   lvalue          (A.VarExp lvalue)
+    |   mathexp         (mathexp)
+    |   record          (record)
+    |   sequence        (sequence)
+    |   NIL             (A.NilExp)
+    |   INT             (A.IntExp(INT))
+    |   STRING          (A.StringExp(STRING, STRINGleft))
+
+array:              ID LBRACK exp RBRACK OF exp             (A.ArrayExp{typ = symbol ID, size = exp1, init = exp2, pos = IDleft})
+recordField:        ID EQ exp                               ((symbol ID, exp, IDleft))
+record:             ID LBRACE recordField recordTail RBRACE (A.RecordExp {fields = [recordField] @ recordTail, typ = symbol ID1, pos = ID1left})
+recordTail:         (* empty *)                             (nil)
+    |               COMMA recordField recordTail            ([recordField] @ recordTail)
+sequence:           LPAREN sequenceExp RPAREN               (A.SeqExp sequenceExp)
+sequenceExp:        (* empty *)                             (nil)
+    |               exp sequenceTail                        ([(exp, expleft)] @ sequenceTail)
+sequenceTail:       (* empty *)                             (nil)
+    |               SEMICOLON exp sequenceTail              ([(exp, expleft)] @ sequenceTail)
+
+functionCall:       ID LPAREN functionParam RPAREN          (A.CallExp {func = symbol ID, args = functionParam, pos = IDleft})
+functionParam:      (* empty *)                             (nil)
+    |               exp functionParamTail                   ([exp] @ functionParamTail)
+functionParamTail:  (* empty *)                             (nil)
+    |               COMMA exp functionParamTail             ([exp] @ functionParamTail)
+
+assignment: lvalue ASSIGN exp               (A.AssignExp {var = lvalue, exp = exp, pos = lvalueleft})
+control:    IF exp THEN exp                 (makeIf(exp1, exp2, NONE, IFleft))
+    |       IF exp THEN exp ELSE exp        (makeIf(exp1, exp2, SOME exp3, IFleft))
+    |       WHILE exp DO exp                (A.WhileExp {test = exp1, body = exp2, pos = WHILEleft})
+    |       FOR ID ASSIGN exp TO exp DO exp (A.ForExp {var = symbol ID, escape = ref false, lo = exp1, hi = exp2, body = exp3, pos = FORleft})
+    |       BREAK                           (A.BreakExp(BREAKleft))
+    |       LET decs IN sequenceExp END     (A.LetExp {decs = decs, body = A.SeqExp(sequenceExp), pos = LETleft})
+
+mathexp:    MINUS exp %prec UMINUS  (makeBinop(A.IntExp(0), A.MinusOp, exp, MINUSleft))
+    |       exp PLUS exp            (makeBinop(exp1, A.PlusOp, exp2, exp1left))
+    |       exp MINUS exp           (makeBinop(exp1, A.MinusOp, exp2, exp1left))
+    |       exp TIMES exp           (makeBinop(exp1, A.TimesOp, exp2, exp1left))
+    |       exp DIVIDE exp          (makeBinop(exp1, A.DivideOp, exp2, exp1left))
+
+compexp:    exp EQ exp              (makeBinop(exp1, A.EqOp, exp2, exp1left))
+    |       exp NEQ exp             (makeBinop(exp1, A.NeqOp, exp2, exp1left))
+    |       exp LT exp              (makeBinop(exp1, A.LtOp, exp2, exp1left))
+    |       exp LE exp              (makeBinop(exp1, A.LeOp, exp2, exp1left))
+    |       exp GT exp              (makeBinop(exp1, A.GtOp, exp2, exp1left))
+    |       exp GE exp              (makeBinop(exp1, A.GeOp, exp2, exp1left))
+
+boolexp:    exp AND exp             (makeIf(exp1, exp2, SOME(A.IntExp(0)), exp1left))
+    |       exp OR exp              (makeIf(exp1, A.IntExp(1), SOME exp2, exp1left))
+
+(* Declarations *)
+decs:   (* empty *)     (nil)
+    |   dec decs        ([dec] @ decs)
+
+dec:    vardec                (vardec)
+    |   tydecs  %prec LOWPREC (A.TypeDec tydecs)
+    |   fundecs %prec LOWPREC (A.FunctionDec fundecs)
+
+(* Data Types *)
+tydecs: tydec               ([tydec])
+    |   tydecs tydec        (tydecs @ [tydec])
+
+tydec:  TYPE ID EQ ty       ({name = symbol ID, ty = ty, pos = TYPEleft})
+
+ty:     ID                      (A.NameTy(symbol ID, IDleft))
+    |   LBRACE tyfields RBRACE  (A.RecordTy(tyfields))
+    |   ARRAY OF ID             (A.ArrayTy(symbol ID, ARRAYleft))
+
+tyfield:        ID COLON ID                 ({name = symbol ID1, escape = ref false, typ = symbol ID2, pos = ID1left})
+tyfields:       (* empty *)                 (nil)
+    |           tyfield tyfieldsTail        ([tyfield] @ tyfieldsTail)
+tyfieldsTail:   (* empty *)                 (nil)
+    |           COMMA tyfield tyfieldsTail  ([tyfield] @ tyfieldsTail)
+
+(* Variables *)
+vardec:     VAR ID ASSIGN exp          (makeLvalueVarDec(symbol ID, NONE, exp, VARleft))
+    |       VAR ID COLON ID ASSIGN exp (makeLvalueVarDec(symbol ID1, SOME(symbol ID2, ID2left), exp, VARleft))
+
+(* Functions *)
+fundecs:    fundec          ([fundec])
+    |       fundecs fundec  (fundecs @ [fundec])
+
+fundec:     FUNCTION ID LPAREN tyfields RPAREN EQ exp           (makeFundec(symbol ID, tyfields, NONE, exp, FUNCTIONleft))
+    |       FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp  (makeFundec(symbol ID1, tyfields, SOME(symbol ID2, ID2left), exp, FUNCTIONleft))
+
+(* L-Values *)
+lvalue :    ID lvalueTail                   (makeLvalueVar(A.SimpleVar(symbol ID, IDleft), IDleft, lvalueTail))
+lvalueTail: DOT ID lvalueTail               (Field(symbol ID)::lvalueTail)
+    |       LBRACK exp RBRACK lvalueTail    (Subscript(exp)::lvalueTail)
+    |       (* empty *)                     (nil)
