@@ -10,22 +10,33 @@ end
 
 structure Env :> ENV = struct
   type access = unit ref
-  type ty = Type.ty
-  val base_tenv = foldr Symbol.enter Symbol.empty [
-    (base_tenv, Symbol.symbol("int"), Ty.INT),
-    (base_tenv, Symbol.symbol("string"), Ty.STRING)
+  type ty = Types.ty
+  val base_tenv = 
+  let
+      val base_tenv = Symbol.empty
+  in
+      foldr Symbol.enter Symbol.empty [
+    (base_tenv, Symbol.symbol("int"), Types.INT),
+    (base_tenv, Symbol.symbol("string"), Types.STRING)
   ]
-  val base_venv = foldr Symbol.enter Symbol.empty [
-    (base_venv, Symbol.symbol("print"), FunEntry {formals=[ty.STRING], result=ty.UNIT}),
-    (base_venv, Symbol.symbol("flush"), FunEntry {formals=[], result=ty.UNIT}),
-    (base_venv, Symbol.symbol("getchar"), FunEntry {formals=[], result=ty.STRING}),
-    (base_venv, Symbol.symbol("ord"), FunEntry {formals=[ty.STRING], result=ty.INT}),
-    (base_venv, Symbol.symbol("chr"), FunEntry {formals=[ty.INT], result=ty.STRING}),
-    (base_venv, Symbol.symbol("size"), FunEntry {formals=[ty.STRING], result=ty.INT}),
-    (base_venv, Symbol.symbol("substring"), FunEntry {formals=[ty.STRING,ty.INT,ty.INT], result=ty.STRING}),
-    (base_venv, Symbol.symbol("concat"), FunEntry {formals=[ty.STRING,ty.STRING], result=ty.STRING}),
-    (base_venv, Symbol.symbol("not"), FunEntry {formals=[ty.INT], result=ty.INT}),
-    (base_venv, Symbol.symbol("exit"), FunEntry {formals=[ty.INT], result=ty.UNIT})
+  end
+  
+  val base_venv =
+  let
+      val base_venv = Symbol.empty
+  in
+    foldr Symbol.enter Symbol.empty [
+    (base_venv, Symbol.symbol("print"), FunEntry {formals=[Types.STRING], result=Types.UNIT}),
+    (base_venv, Symbol.symbol("flush"), FunEntry {formals=[], result=Types.UNIT}),
+    (base_venv, Symbol.symbol("getchar"), FunEntry {formals=[], result=Types.STRING}),
+    (base_venv, Symbol.symbol("ord"), FunEntry {formals=[Types.STRING], result=Types.INT}),
+    (base_venv, Symbol.symbol("chr"), FunEntry {formals=[Types.INT], result=Types.STRING}),
+    (base_venv, Symbol.symbol("size"), FunEntry {formals=[Types.STRING], result=Types.INT}),
+    (base_venv, Symbol.symbol("substring"), FunEntry {formals=[Types.STRING,Types.INT,Types.INT], result=Types.STRING}),
+    (base_venv, Symbol.symbol("concat"), FunEntry {formals=[Types.STRING,Types.STRING], result=Types.STRING}),
+    (base_venv, Symbol.symbol("not"), FunEntry {formals=[Types.INT], result=Types.INT}),
+    (base_venv, Symbol.symbol("exit"), FunEntry {formals=[Types.INT], result=Types.UNIT})
   ]
+  end
 
 end
