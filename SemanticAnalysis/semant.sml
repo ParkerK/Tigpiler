@@ -164,7 +164,7 @@ structure Semant :> SEMANT = struct
                   if
                     expect <> actual
                   then
-                    err pos "assignment mismatch"
+                    (err pos "assignment mismatch";{exp=(), ty=Types.UNIT})
                   else
                     {exp=(), ty=Types.UNIT}
               end
