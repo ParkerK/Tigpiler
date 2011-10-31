@@ -15,8 +15,8 @@ structure Semant :> SEMANT = struct
   structure E = Env
   val err = ErrorMsg.error
   exception ErrMsg
-  type tenv = Env.ty Symbol.table
-  type venv = Env.enventry Symbol.table
+  type tenv = E.ty Symbol.table
+  type venv = E.enventry Symbol.table
   type expty = {exp: Translate.exp, ty: Types.ty}
 
   val nestLevel = ref 0
@@ -153,8 +153,8 @@ structure Semant :> SEMANT = struct
           | trexp   (A.WhileExp {test, body, pos}) =
               let
                   (*nestLevel := !nestLevel + 1*)
-                  val body' = transExp (tenv,venv) body
-                  val test' = transExp (tenv,venv) body
+                  val body' = transExp (venv,tenv) body
+                  val test' = transExp (venv,tenv) body
                   (*nestLevel := !nestLevel - 1*)
               
                   val test'' = checkInt (test', pos);
