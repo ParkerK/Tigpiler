@@ -104,9 +104,9 @@ structure Semant :> SEMANT = struct
                      val test' = trexp (test)
                      val then'' = trexp (then')
                  in
-                     checkInt(test', pos)
-                     checkUnit(then'', pos)
-                     {exp=(), ty=Types.UNIT}
+                     (checkInt (test', pos);
+                     checkUnit (then'', pos);
+                     {exp=(), ty=Types.UNIT})
                  end
                  | SOME else' =>
                  let
@@ -174,7 +174,7 @@ structure Semant :> SEMANT = struct
 
 
           | trexp   (A.LetExp {decs, body, pos}) =
-              let val {venv=venv', tenv=tenv'} = transDecs(venv, tenv, decs)
+              let val {venv=venv', tenv=tenv'} = transDec(venv, tenv, decs)
                   in transExp(venv', tenv') body
               end
 
@@ -208,8 +208,9 @@ structure Semant :> SEMANT = struct
       in
         trexp
       end
-      fun transDec (venv, tenv, A.VarDec{name, typ=NONE, init, escape, pos}) = 
-          let val {exp,ty} = transExp(venv, temv, init)
+      
+      and transDec (venv, tenv, A.VarDec{name, typ=NONE, init, escape, pos}) = 
+          let val {exp,ty} = transExp(venv, tenv, init)
               in {tenv = tenv,
                   venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}
               end
