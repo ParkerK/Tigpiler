@@ -200,7 +200,7 @@ structure Semant :> SEMANT = struct
 
 
           | trexp   (A.LetExp {decs, body, pos}) =
-              let val {venv=venv', tenv=tenv'} = transDec(venv, tenv, decs)
+              let val {venv=venv', tenv=tenv'} = transDecs(venv, tenv, decs)
                   in transExp(venv', tenv') body
               end
 
@@ -259,7 +259,14 @@ structure Semant :> SEMANT = struct
             in transExp(venv'', tenv) body;
                 {venv=venv', tenv=tenv}
             end
-    
+
+      and transDecs (venv, tenv, decs) =
+        (case decs
+          of [] => {venv=venv, tenv=tenv}
+          | (d::ds) => let val {venv=venv', tenv=tenv'} = transDec(venv, tenv, d)
+        in
+          transDecs(venv', tenv', ds)
+        end)
     fun transProg(absyn) = 
         let in transExp(E.base_venv, E.base_tenv) end
 end
