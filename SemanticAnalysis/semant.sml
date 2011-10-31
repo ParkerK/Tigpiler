@@ -246,7 +246,7 @@ structure Semant :> SEMANT = struct
         | transDec(venv, tenv, A.FunctionDec[{name, params, body,
                                             pos, result=SOME(rt,pos)}]) =
             let val SOME(result_ty) = Symbol.look(tenv, rt)
-                fun transparam {name, typ, pos} = 
+                fun transparam {name, escape, typ, pos} = 
                     case Symbol.look(tenv, typ)
                         of SOME t => {name=name typ=t}
                 val params' = map transparam params
