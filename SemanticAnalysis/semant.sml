@@ -219,9 +219,8 @@ structure Semant :> SEMANT = struct
                   val var' = transExp (var)
               in
                   (case var' of
-                      {exp, ty=record as Types.RECORD (fields, _)} =>
-                      {exp=(), ty=record}
-                      | _ => err pos "no var found"
+                      {exp, ty=record as Types.RECORD (fields, _)} => {exp=(), ty=record}
+                      | _ => (err pos "no var found"; {exp=(), ty=Types.UNIT})
                       )
               end
 
