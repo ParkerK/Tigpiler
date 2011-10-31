@@ -215,9 +215,8 @@ structure Semant :> SEMANT = struct
               end
 
           | trvar (A.SubscriptVar(var, exp,pos)) =
-
-              checkInt(trexp exp, pos)
-              {exp=(), ty=Types.UNIT}
+              (checkInt(trexp exp, pos);
+              {exp=(), ty=Types.UNIT})
 
       in
         trexp
