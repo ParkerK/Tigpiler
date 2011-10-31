@@ -20,21 +20,27 @@ structure Semant :> SEMANT = struct
   type expty = {exp: Translate.exp, ty: Types.ty}
 
   val nestLevel = ref 0
-  fun tlookup tenv name pos = 
-    (case Symbol.look(tenv,name) of
-	 NONE => (err pos ("unbound type name "); Types.UNIT)
-       | SOME t => t)
-       
-  fun transTy tenv t = 
-    let fun ttyl [] = []
-	  | ttyl ({name,escape,typ,pos} :: fl) = 
-	    (name,tlookup tenv typ pos) :: ttyl fl
-    in (case t of
-	    A.NameTy (n,pos) => tlookup tenv n pos
-          | A.RecordTy fl => Types.RECORD (ttyl fl,ref())
-          | A.ArrayTy (n,pos) => Types.ARRAY (tlookup tenv n pos, ref()))
-    end
-    
+
+  fun typelookup tenv n  pos= 
+  	let val tyoption=Symbol.look (tenv, n)
+	in  
+			 ( case tyoption of
+	     	  	   	 NONE => (err pos "type is not defined"; Types.INT)
+	    	  		 |SOME ty2=> ty2 )
+	 end
+	 
+  fun transTy (tenv, t)=
+  	let fun recordtys []=[]
+	    	|recordtys ({name=n,escape,typ,pos}:: fields)=
+		(n,typelookup tenv n pos ):: recordtys  fields 
+	in	
+		case t of
+		A.NameTy (n, pos)=> typelookup tenv n pos			 
+		|A.RecordTy fields=> Types.RECORD (recordtys fields, ref())
+		|A.ArrayTy (n,pos)=>Types.ARRAY(typelookup tenv n pos, ref())
+	end
+	
+	    
     fun compare_ty (ty1, ty2, pos)=
       (case !ty1 = !ty2 of
           true => ()
@@ -268,6 +274,7 @@ structure Semant :> SEMANT = struct
         in
           transDecs(venv', tenv', ds)
         end)
+        
     fun transProg(absyn) = 
         let in transExp(E.base_venv, E.base_tenv) end
 end
