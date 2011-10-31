@@ -12,6 +12,21 @@ structure Semant :> SEMANT = struct
 
   val nestLevel = ref 0
 
+  fun tlookup tenv name pos = 
+    (case Symbol.look(tenv,name) of
+	 NONE => (err pos ("unbound type name "); Types.UNIT)
+       | SOME t => t)
+       
+  fun transTy tenv t = 
+    let fun ttyl [] = []
+	  | ttyl ({name,typ,pos} :: fl) = 
+	    (name,tlookup tenv typ pos) :: ttyl fl
+    in (case t of
+	    A.NameTy (n,pos) => tlookup tenv n pos
+          | A.RecordTy fl => Types.RECORD (ttyl fl,ref())
+          | A.ArrayTy (n,pos) => Types.ARRAY (tlookup tenv n pos, ref()))
+    end
+    
     fun compare_ty (ty1, ty2, pos)=
       (case !ty1 = !ty2 of
           true => ()
@@ -217,7 +232,7 @@ structure Semant :> SEMANT = struct
 
           | transDec (venv, tenv, A.TypeDec[{name, ty}]) = 
               {venv = venv,
-              tenv=Symbol.enter(tenv, name, transTy(tenv, ty))}
+                tenv=Symbol.enter(tenv, name, transTy(tenv, ty))}
 
           | transDec(venv, tenv, A.FunctionDec[{name, params, body,
                                               pos, result=SOME(rt,pos)}]) =
