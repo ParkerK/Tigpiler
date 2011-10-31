@@ -66,7 +66,7 @@ structure Semant :> SEMANT = struct
                     val left' = trexp left
                     val right' = trexp right
                 in
-                    (case left' of
+                    (case #ty left' of
                         Types.INT =>
                           (checkInt(left', pos);
                           checkInt(right', pos);
@@ -76,21 +76,23 @@ structure Semant :> SEMANT = struct
                           (checkString(left', pos);
                           checkString(right', pos);
                           {exp=(), ty=Types.INT})
-
-                        | _ => err pos "cannot peform comparisons on type" #ty left' )
+                         
+                         | _ => (err pos "can't perform comparisons on this type";
+                                {exp=(), ty=Types.INT}))
+                        (*| _ => err pos ("cannot peform comparisons on type"^#ty left') )*)
                  end
              else
-                err pos "error"
+                (err pos "error";{exp=(), ty=Types.INT})
 
         | trexp   (A.CallExp {func, args, pos}) = 
             (case Symbol.look (venv, func) of
-                NONE => (err pos "can't call nonexistant functions")
-                | SOME (E.FunEntry {formals=args, result}) =>
-                if
-                    length(#formals) <> length(args)
-                then err pos "wrong amount of arguments"
-                else
-                {exp=(), ty=result}
+                NONE => (err pos "can't call nonexistant functions"; {exp=(), ty=Types.UNIT})
+                | SOME (E.FunEntry {formals, result}) =>
+                (*if
+                    length(args') <> length(args)
+                then (err pos "wrong amount of arguments";    {exp=(), ty=result})
+                else*)
+                {exp=(), ty=Types.UNIT}
                 )
 
                 (* Should check to make sure return types match, as do argtypes *)
