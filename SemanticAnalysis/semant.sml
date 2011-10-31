@@ -171,7 +171,7 @@ structure Semant :> SEMANT = struct
                   if
                     expect <> actual
                   then
-                    err pos "assignment mismatch"
+                    (err pos "assignment mismatch";{exp=(), ty=Types.UNIT})
                   else
                     {exp=(), ty=Types.UNIT}
               end
@@ -207,8 +207,7 @@ structure Semant :> SEMANT = struct
                           SOME (E.VarEntry{ty}) =>
                               {exp=(), ty=actual_ty ty}
                           | NONE => (err pos "undefined variable: ";
-                              {exp=(), ty=Types.INT})
-                             )
+                              {exp=(), ty=Types.INT}))
 
           | trvar (A.FieldVar(var,id,pos)) =
               let
@@ -236,7 +235,7 @@ structure Semant :> SEMANT = struct
             {tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}
           end
 
-        | transDec (venv, tenv, A.TypeDec[{name, ty}]) = 
+        | transDec (venv, tenv, A.TypeDec[{name, ty, pos}]) = 
             {venv = venv,
               tenv=Symbol.enter(tenv, name, transTy(tenv, ty))}
 
@@ -256,7 +255,6 @@ structure Semant :> SEMANT = struct
             in transExp(venv'', tenv) body;
                 {venv=venv', tenv=tenv}
             end
-    
     
     fun transProg(absyn) = 
         let in transExp(E.base_venv, E.base_tenv) end
