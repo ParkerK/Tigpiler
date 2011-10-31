@@ -8,7 +8,7 @@ structure Semant :> SEMANT = struct
   structure E = Env
   val err = ErrorMsg.error
   exception ErrMsg
-
+  
 
   val nestLevel = ref 0
 
@@ -149,7 +149,7 @@ structure Semant :> SEMANT = struct
 
           | trexp   (A.RecordExp {fields, typ, pos}) =
               (case Symbol.look (tenv, typ) of
-                 SOME (record as Types.RECORD (fields, _)) => {exp=(), ty=typ}
+                 SOME (record as Types.RECORD (fields, _)) => {exp=(), ty=record}
                  (* Should check types *)
                  | NONE => (err pos "no record found";{exp=(), ty=Types.UNIT}))
 
@@ -252,5 +252,5 @@ structure Semant :> SEMANT = struct
     
     
     fun transProg(absyn) = 
-        let in transExp(venv, tenv) end
+        let in transExp(E.base_venv, E.base_tenv) end
 end
