@@ -253,10 +253,10 @@ structure Semant :> SEMANT = struct
                 val params' = map transparam params
                 val venv' = Symbol.enter(venv, name, 
                             E.FunEntry{formals = map #typ params', result = result_ty})
-                fun enterparam ({name, ty}, venv) = 
+                fun enterparam ({name, typ}, venv) = 
                     Symbol.enter (venv, name,
                             E.VarEntry{ty=ty})
-                val venv'' = foldr enterparam params' venv'
+                val venv'' = foldr enterparam venv' params'
             in transExp(venv'', tenv) body;
                 {venv=venv', tenv=tenv}
             end
