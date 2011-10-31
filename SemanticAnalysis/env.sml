@@ -11,11 +11,13 @@ end
 structure Env :> ENV = struct
   type access = unit ref
   type ty = Types.ty
+  datatype enventry = VarEntry of {ty: ty}
+                    | FunEntry of {formals: ty list, result: ty}
   val base_tenv = 
   let
       val base_tenv = Symbol.empty
   in
-      foldr Symbol.enter Symbol.empty [
+    foldr Symbol.enter Symbol.empty [
     (base_tenv, Symbol.symbol("int"), Types.INT),
     (base_tenv, Symbol.symbol("string"), Types.STRING)
   ]
