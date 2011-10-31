@@ -223,31 +223,32 @@ structure Semant :> SEMANT = struct
       end
       
       and transDec (venv, tenv, A.VarDec{name, typ=NONE, init,... }) = 
-          let val {exp,ty} = transExp(venv, tenv, init)
-              in {tenv = tenv,
-                  venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}
-              end
+          let 
+            val {exp,ty} = transExp(venv, tenv) (*(venv, tenv, init)*)
+          in 
+            {tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}
+          end
 
-          | transDec (venv, tenv, A.TypeDec[{name, ty}]) = 
-              {venv = venv,
-                tenv=Symbol.enter(tenv, name, transTy(tenv, ty))}
+        | transDec (venv, tenv, A.TypeDec[{name, ty}]) = 
+            {venv = venv,
+              tenv=Symbol.enter(tenv, name, transTy(tenv, ty))}
 
-          | transDec(venv, tenv, A.FunctionDec[{name, params, body,
-                                              pos, result=SOME(rt,pos)}]) =
-              let val SOME(result_ty) = Symbol.look(tenv, rt)
-                  fun transparam {name, typ, pos} = 
-                      case Symbol.look(tenv, typ)
-                          of SOME t => {name=name typ=t}
-                  val params' = map transparam params
-                  val venv' = Symbol.enter(venv, name, 
-                              E.FunEntry{formals = map #ty params', result = result_ty})
-                  fun enterparam ({name, ty}, venv) = 
-                      Symbol.enter (venv, name,
-                              E.VarEntry{access=(), ty=ty})
-                  val venv'' = foldr enterparam params' venv'
-              in transExp(venv'', tenv) body;
-                  {venv=venv', tenv=tenv}
-              end
+        | transDec(venv, tenv, A.FunctionDec[{name, params, body,
+                                            pos, result=SOME(rt,pos)}]) =
+            let val SOME(result_ty) = Symbol.look(tenv, rt)
+                fun transparam {name, typ, pos} = 
+                    case Symbol.look(tenv, typ)
+                        of SOME t => {name=name typ=t}
+                val params' = map transparam params
+                val venv' = Symbol.enter(venv, name, 
+                            E.FunEntry{formals = map #ty params', result = result_ty})
+                fun enterparam ({name, ty}, venv) = 
+                    Symbol.enter (venv, name,
+                            E.VarEntry{access=(), ty=ty})
+                val venv'' = foldr enterparam params' venv'
+            in transExp(venv'', tenv) body;
+                {venv=venv', tenv=tenv}
+            end
     
     
     fun transProg(absyn) = 
