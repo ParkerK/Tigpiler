@@ -15,7 +15,7 @@ structure Semant :> SEMANT = struct
   structure E = Env
   val err = ErrorMsg.error
   exception ErrMsg
-  type tenv = Types.ty Symbol.table
+  type tenv = Env.ty Symbol.table
   type venv = Env.enventry Symbol.table
   type expty = {exp: Translate.exp, ty: Types.ty}
 
@@ -50,7 +50,7 @@ structure Semant :> SEMANT = struct
         (case !ty of
             NONE => raise ErrMsg
             | SOME t => actual_ty t)
-            | actual_ty t = t 
+        | actual_ty t = t 
 
     fun checkInt ({exp, ty}, pos) =
       ((case ty of
@@ -260,8 +260,7 @@ structure Semant :> SEMANT = struct
                 val venv' = Symbol.enter(venv, name, 
                             E.FunEntry{formals = map #typ params', result = result_ty})
                 fun enterparam ({name, typ}, venv) = 
-                    Symbol.enter (venv, name,
-                            E.VarEntry{ty=ty})
+                    Symbol.enter (venv, name, E.VarEntry{ty=typ})
                 val venv'' = foldr enterparam venv' params'
             in transExp(venv'', tenv) body;
                 {venv=venv', tenv=tenv}
