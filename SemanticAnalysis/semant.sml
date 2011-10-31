@@ -1,6 +1,13 @@
 signature SEMANT =
 sig
-    val transProg : Absyn.exp -> unit
+  val tenv : ty S.table
+  val venv : enventry S.table
+  val expty : {exp: Translate.exp, ty: ty}
+  val transProg : Absyn.exp -> unit
+  val transVar : venv * tenv * Absyn.var -> expty
+  val transExp : venv * tenv * Absyn.exp -> expty
+  val transDec : venv * tenv * Absyn.dec -> {venv: venv, tenv: tenv}
+  val transTy :         tenv * Absyn.ty  -> ty
 end 
 
 structure Semant :> SEMANT = struct
@@ -244,7 +251,7 @@ structure Semant :> SEMANT = struct
                             E.FunEntry{formals = map #ty params', result = result_ty})
                 fun enterparam ({name, ty}, venv) = 
                     Symbol.enter (venv, name,
-                            E.VarEntry{access=(), ty=ty})
+                            E.VarEntry{ty=ty})
                 val venv'' = foldr enterparam params' venv'
             in transExp(venv'', tenv) body;
                 {venv=venv', tenv=tenv}
