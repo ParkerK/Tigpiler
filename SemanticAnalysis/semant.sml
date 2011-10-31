@@ -216,7 +216,7 @@ structure Semant :> SEMANT = struct
 
           | trvar (A.FieldVar(var,id,pos)) =
               let
-                  val var' = transExp (var)
+                  val var' = trvar var
               in
                   (case var' of
                       {exp, ty=record as Types.RECORD (fields, _)} => {exp=(), ty=record}
