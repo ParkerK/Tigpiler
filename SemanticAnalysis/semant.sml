@@ -19,7 +19,7 @@ structure Semant :> SEMANT = struct
        
   fun transTy tenv t = 
     let fun ttyl [] = []
-	  | ttyl ({name,typ,pos} :: fl) = 
+	  | ttyl ({name,escape,typ,pos} :: fl) = 
 	    (name,tlookup tenv typ pos) :: ttyl fl
     in (case t of
 	    A.NameTy (n,pos) => tlookup tenv n pos
