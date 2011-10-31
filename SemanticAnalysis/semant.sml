@@ -178,11 +178,13 @@ structure Semant :> SEMANT = struct
 
           | trexp   (A.ForExp {var, escape, lo, hi, body, pos}) =
                 
-                checkInt(transExp (lo), pos)
-                checkInt(transExp (hi), pos)
+                let
+                    val lo' = checkInt(trexp (lo), pos)
+                    val hi' = checkInt(trexp (hi), pos)
                 (* Add Stuff Here *)
-                {exp=(),ty=Types.UNIT}
-            
+                in
+                    {exp=(),ty=Types.UNIT}
+                end
 
           | trexp   (A.BreakExp pos) =
               if !nestLevel > 0 
