@@ -142,17 +142,16 @@ structure Semant :> SEMANT = struct
                   val body' = transExp (tenv,venv) body
                   (*nestLevel := !nestLevel - 1*)
               in
-                  checkInt (test, pos)
-                  checkUnit (body', pos)
+                  checkInt (test, pos);
+                  checkUnit (body', pos);
                   {exp=(), ty=Types.UNIT}
               end   
 
           | trexp   (A.RecordExp {fields, typ, pos}) =
               (case Symbol.look (tenv, typ) of
-                 SOME (record as Types.RECORD (fields, _)) => 
-                 {exp=(), ty=typ}
+                 SOME (record as Types.RECORD (fields, _)) => {exp=(), ty=typ}
                  (* Should check types *)
-                 | NONE => (err pos "no record found"))
+                 | NONE => (err pos "no record found";{exp=(), ty=Types.UNIT}))
 
           | trexp   (A.SeqExp exps) =
               {exp=(), ty=Types.UNIT}
