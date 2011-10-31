@@ -252,7 +252,7 @@ structure Semant :> SEMANT = struct
 
                 val params' = map transparam params
                 val venv' = Symbol.enter(venv, name, 
-                            E.FunEntry{formals = map #ty params', result = result_ty})
+                            E.FunEntry{formals = map #typ params', result = result_ty})
                 fun enterparam ({name, ty}, venv) = 
                     Symbol.enter (venv, name,
                             E.VarEntry{ty=ty})
