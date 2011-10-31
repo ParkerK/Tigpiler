@@ -240,7 +240,7 @@ structure Semant :> SEMANT = struct
       
       and transDec (venv, tenv, A.VarDec{name, typ=NONE, init,... }) = 
           let 
-            val {exp,ty} = transExp(venv, tenv) (*(venv, tenv, init)*)
+            val {exp,ty} = transExp (venv, tenv) init (*(venv, tenv, init)*)
           in 
             {tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}
           end
@@ -274,5 +274,5 @@ structure Semant :> SEMANT = struct
         end)
         
     fun transProg(absyn) = 
-        let in transExp(E.base_venv, E.base_tenv) end
+        let in transExp (E.base_venv, E.base_tenv) absyn end
 end
