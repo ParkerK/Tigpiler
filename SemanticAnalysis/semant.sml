@@ -254,7 +254,7 @@ structure Semant :> SEMANT = struct
                 fun transparam {name, escape, typ, pos} = 
                     case Symbol.look(tenv, typ)
                         of SOME t => {name=name, typ=t}
-                        |  NONE => err pos "type undefined"
+                        |  NONE => (err pos "type undefined"; {name=name, typ=Types.UNIT})
                 val params' = map transparam params
                 val venv' = Symbol.enter(venv, name, 
                             E.FunEntry{formals = map #typ params', result = result_ty})
