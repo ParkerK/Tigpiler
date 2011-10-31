@@ -1,24 +1,14 @@
 signature SEMANT =
 sig
-  type ty
-  type S
-  val tenv : ty S.table
-  val venv : enventry S.table
-  val expty : {exp: Translate.exp, ty: ty}
-  val transProg : Absyn.exp -> unit
-  val transVar : venv * tenv * Absyn.var -> expty
-  val transExp : venv * tenv * Absyn.exp -> expty
-  val transDec : venv * tenv * Absyn.dec -> {venv: venv, tenv: tenv}
-  val transTy :         tenv * Absyn.ty  -> ty
-end
+    val transProg : Absyn.exp -> unit
+end 
 
 structure Semant :> SEMANT = struct
-  type ty = Type.ty
   structure A = Absyn
   structure E = Env
-  
- fun transProg(absyn) = 
-    let in transExp(venv, tenv) end
+  val err = ErrorMsg.error
+  exception ErrMsg
+
 
   val nestLevel = ref 0
 
@@ -27,9 +17,9 @@ structure Semant :> SEMANT = struct
           true => ()
           | false => err pos "type mismatch")
     
-    fun actual_ty (T.NAME (s,ty)) = 
+    fun actual_ty (Types.NAME (s,ty)) = 
         (case !ty of
-            NONE => raise ErrorReport.Error
+            NONE => raise ErrMsg
             | SOME t => actual_ty t)
             | actual_ty t = t 
 
@@ -53,11 +43,11 @@ structure Semant :> SEMANT = struct
 
 
      (* Takes venv, tenv, exp *)
-    fun transExp(venv, tenv, exp)  =      
+    fun transExp(venv, tenv)  =      
 
-      let fun trexp (A.NilExp)    =    {exp=Translate.Nil(), ty=Types.NIL}
-          | trexp   (A.IntExp i)  =    {exp=Translate.Int(int), ty=Types.INT}
-          | trexp   (A.StringExp (str, pos)) = {exp=Translate.String(str), ty=Types.STRING}
+      let fun trexp (A.NilExp)    =    {exp=(), ty=Types.NIL}
+          | trexp   (A.IntExp i)  =    {exp=(), ty=Types.INT}
+          | trexp   (A.StringExp (str, pos)) = {exp=(), ty=Types.STRING}
 
           | trexp   (A.OpExp {left, oper, right, pos}) = 
               if oper = A.PlusOp orelse oper = A.MinusOp
@@ -97,7 +87,7 @@ structure Semant :> SEMANT = struct
                 NONE => (err pos "can't call nonexistant functions")
                 | SOME (E.FunEntry {formals=args, result}) =>
                 if
-                    length(formals) <> length(args)
+                    length(#formals) <> length(args)
                 then err pos "wrong amount of arguments"
                 else
                 {exp=(), ty=result}
@@ -131,10 +121,9 @@ structure Semant :> SEMANT = struct
 
           | trexp   (A.WhileExp {test, body, pos}) =
               let
-                  val break = Translate (*set new break*)
-                  nestLevel := !nestLevel + 1
-                  val body' = transExp (tenv,venv,lev,break) body
-                  nestLevel := !nestLevel - 1
+                  (*nestLevel := !nestLevel + 1*)
+                  val body' = transExp (tenv,venv) body
+                  (*nestLevel := !nestLevel - 1*)
               in
                   checkInt (test, pos)
                   checkUnit (body', pos)
@@ -153,7 +142,7 @@ structure Semant :> SEMANT = struct
 
           | trexp   (A.AssignExp {var, exp, pos}) =
               let
-                  val  {exp=left,  ty=expect} = transVar (var)
+                  val  {exp=left,  ty=expect} = transExp (var)
                   val  {exp=right, ty=actual} = transExp (venv, tenv, exp)
               in
                   if
@@ -194,8 +183,9 @@ structure Semant :> SEMANT = struct
                       (case Symbol.look(venv, id) of
                           SOME (E.VarEntry{ty}) =>
                               {exp=(), ty=actual_ty ty}
-                          | NONE => (err pos ("undefined variable: ")
-                              exp(), ty=Types.INT))
+                          | NONE => (err pos "undefined variable: ";
+                              {exp=(), ty=Types.INT})
+                             )
 
           | trvar (A.FieldVar(var,id,pos)) =
               let
@@ -214,7 +204,7 @@ structure Semant :> SEMANT = struct
               {exp=(), ty=Types.UNIT}
 
       in
-        trexp(exp)
+        trexp
       end
       fun transDec (venv, tenv, A.VarDec{name, typ=NONE, init, escape, pos}) = 
           let val {exp,ty} = transExp(venv, temv, init)
@@ -243,4 +233,7 @@ structure Semant :> SEMANT = struct
                   {venv=venv', tenv=tenv}
               end
     
+    
+    fun transProg(absyn) = 
+        let in transExp(venv, tenv) end
 end
