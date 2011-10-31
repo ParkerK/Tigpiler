@@ -200,8 +200,7 @@ structure Semant :> SEMANT = struct
                           SOME (E.VarEntry{ty}) =>
                               {exp=(), ty=actual_ty ty}
                           | NONE => (err pos "undefined variable: ";
-                              {exp=(), ty=Types.INT})
-                             )
+                              {exp=(), ty=Types.INT}))
 
           | trvar (A.FieldVar(var,id,pos)) =
               let
