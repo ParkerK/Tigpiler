@@ -224,7 +224,7 @@ structure Semant :> SEMANT = struct
         trexp
       end
       
-      and transDec (venv, tenv, A.VarDec{name, typ=NONE, init, escape, pos}) = 
+      and transDec (venv, tenv, A.VarDec{name, typ=NONE, init,... }) = 
           let val {exp,ty} = transExp(venv, tenv, init)
               in {tenv = tenv,
                   venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}
