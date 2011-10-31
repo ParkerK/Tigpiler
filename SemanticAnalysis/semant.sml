@@ -8,7 +8,7 @@ structure Semant :> SEMANT = struct
   structure E = Env
   val err = ErrorMsg.error
   exception ErrMsg
-
+  
 
   val nestLevel = ref 0
 
@@ -253,5 +253,5 @@ structure Semant :> SEMANT = struct
     
     
     fun transProg(absyn) = 
-        let in transExp(venv, tenv) end
+        let in transExp(E.base_venv, E.base_tenv) end
 end
