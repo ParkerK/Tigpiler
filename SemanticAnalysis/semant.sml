@@ -148,10 +148,12 @@ structure Semant :> SEMANT = struct
               let
                   (*nestLevel := !nestLevel + 1*)
                   val body' = transExp (tenv,venv) body
+                  val test' = transExp (tenv,venv) body
                   (*nestLevel := !nestLevel - 1*)
+              
+                  val test'' = checkInt (test', pos);
+                  val body'' = checkUnit (body', pos);
               in
-                  checkInt (test, pos);
-                  checkUnit (body', pos);
                   {exp=(), ty=Types.UNIT}
               end   
 
@@ -166,8 +168,8 @@ structure Semant :> SEMANT = struct
 
           | trexp   (A.AssignExp {var, exp, pos}) =
               let
-                  val  {exp=left,  ty=expect} = transExp (var)
-                  val  {exp=right, ty=actual} = transExp (venv, tenv, exp)
+                  val  {exp=left,  ty=expect} = trvar (var)
+                  val  {exp=right, ty=actual} = trexp (exp)
               in
                   if
                     expect <> actual
