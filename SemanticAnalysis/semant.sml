@@ -248,7 +248,8 @@ structure Semant :> SEMANT = struct
             let val SOME(result_ty) = Symbol.look(tenv, rt)
                 fun transparam {name, escape, typ, pos} = 
                     case Symbol.look(tenv, typ)
-                        of SOME t => {name=name typ=t}
+                        of SOME t => {name=name, typ=t}
+
                 val params' = map transparam params
                 val venv' = Symbol.enter(venv, name, 
                             E.FunEntry{formals = map #ty params', result = result_ty})
