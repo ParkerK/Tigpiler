@@ -246,7 +246,7 @@ structure Semant :> SEMANT = struct
                   fun enterparam ({name, ty}, venv) = 
                       Symbol.enter (venv, name,
                               E.VarEntry{access=(), ty=ty})
-                  val venv'' = fold enterparam params' venv'
+                  val venv'' = foldr enterparam params' venv'
               in transExp(venv'', tenv) body;
                   {venv=venv', tenv=tenv}
               end
