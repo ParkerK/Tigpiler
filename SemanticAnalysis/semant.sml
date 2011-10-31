@@ -129,9 +129,9 @@ structure Semant :> SEMANT = struct
                      val then'' = trexp (then')
                      val else'' = trexp (else')                    
                  in
-                     checkInt(test', pos)
-                     checkUnit(then'', pos)
-                     checkUnit(else'', pos)
+                     checkInt(test', pos);
+                     checkUnit(then'', pos);
+                     checkUnit(else'', pos);
                      {exp=(), ty=Types.UNIT}
                  end
               )
