@@ -230,7 +230,7 @@ structure Semant :> SEMANT = struct
                   venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}
               end
 
-          | transDec (venv, tenv, A.TypeDec[{name, ty}]) = 
+          | transDec (venv, tenv, A.TypeDec[{name, ty, pos}]) = 
               {venv = venv,
                 tenv=Symbol.enter(tenv, name, transTy(tenv, ty))}
 
