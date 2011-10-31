@@ -1,13 +1,13 @@
 signature SEMANT =
 sig
-  val tenv : ty S.table
-  val venv : enventry S.table
-  val expty : {exp: Translate.exp, ty: ty}
+  type tenv
+  type venv
+  type expty
+  
   val transProg : Absyn.exp -> unit
-  val transVar : venv * tenv * Absyn.var -> expty
   val transExp : venv * tenv * Absyn.exp -> expty
   val transDec : venv * tenv * Absyn.dec -> {venv: venv, tenv: tenv}
-  val transTy :         tenv * Absyn.ty  -> ty
+  val transTy :         tenv * Absyn.ty  -> Types.ty
 end 
 
 structure Semant :> SEMANT = struct
@@ -15,10 +15,11 @@ structure Semant :> SEMANT = struct
   structure E = Env
   val err = ErrorMsg.error
   exception ErrMsg
-  
+  type tenv = Types.ty Symbol.table
+  type env = Env.enventry Symbol.table
+  type expty = {exp: Translate.exp, ty: Types.ty}
 
   val nestLevel = ref 0
-
   fun tlookup tenv name pos = 
     (case Symbol.look(tenv,name) of
 	 NONE => (err pos ("unbound type name "); Types.UNIT)
