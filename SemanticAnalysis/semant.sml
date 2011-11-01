@@ -13,9 +13,9 @@ structure Semant :> SEMANT = struct
 
   fun typelookup tenv n pos= 
   let 
-    val tyoption=Symbol.look (tenv, n)
+    val result=Symbol.look (tenv, n)
   in  
-    (case tyoption of
+    (case result of
       SOME ty2 => ty2
     | NONE => (err pos ("type is not defined: " ^ Symbol.name n) ; Types.INT))
   end
