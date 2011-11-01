@@ -11,7 +11,7 @@ structure Semant :> SEMANT = struct
 
   val nestLevel = ref 0
 
-  fun typelookup tenv n  pos= 
+  fun typelookup tenv n pos= 
   let 
     val tyoption=Symbol.look (tenv, n)
   in  
