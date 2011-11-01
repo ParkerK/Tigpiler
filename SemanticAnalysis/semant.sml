@@ -15,7 +15,7 @@ structure Semant :> SEMANT = struct
   structure E = Env
   val err = ErrorMsg.error
   exception ErrMsg
-  type tenv = E.ty Symbol.table
+  type tenv = Types.ty Symbol.table
   type venv = E.enventry Symbol.table
   type expty = {exp: Translate.exp, ty: Types.ty}
 
