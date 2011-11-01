@@ -143,6 +143,35 @@ structure Semant :> SEMANT = struct
         end 
 
       | trexp (A.RecordExp {fields, typ, pos}) =
+        let 
+            val result = actual_ty (typelookup tenv, typ, pos)
+            val fnames = map #name fields
+            val tyfields = trexp (map #escape fields)
+            val types = map #ty tyfields
+            
+        in case result of
+            Types.RECORD(s, u) =>
+                let val dfnames = map #1 s
+                    val dftypes = map actual_ty (map #2 s)
+                in
+                    if fnames = dfnames then
+                    if (ListPair.all
+                    (fn (ty1, ty2) => compare_ty (ty1, ty2, pos))
+                    (types, dftypes))
+                then
+                    {exp=(), ty=Types.RECORD(s,u)} 
+                else 
+                    (err pos ("field types not consistant: " ^ Symbol.name typ);
+                    {exp=(),ty=Types.RECORD(s,u)})
+                else
+                    (err pos ("field types not consistant: " ^ Symbol.name typ);
+                    {exp=(),ty=Types.RECORD(s,u)})
+                end
+                | _ => (err pos ("not a valid record type: " ^ Symbol.name typ);
+                    {exp=(), ty=Types.UNIT})
+                  end
+
+            
         (case Symbol.look (tenv, typ) of
          SOME (record as Types.RECORD (fields, _)) => {exp=(), ty=record}
             (* Should check types *)
