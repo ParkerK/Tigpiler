@@ -157,7 +157,7 @@ structure Semant :> SEMANT = struct
               (case Symbol.look (tenv, typ) of
                  SOME (record as Types.RECORD (fields, _)) => {exp=(), ty=record}
                  (* Should check types *)
-                 | NONE => (err pos "no record found";{exp=(), ty=Types.UNIT}))
+                 | _ => (err pos "no record found";{exp=(), ty=Types.UNIT}))
 
           | trexp   (A.SeqExp exps) =
               {exp=(), ty=Types.UNIT}
