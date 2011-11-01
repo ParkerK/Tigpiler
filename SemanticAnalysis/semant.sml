@@ -262,7 +262,7 @@ structure Semant :> SEMANT = struct
 		  val typs = [ty]
 		  fun addt (n,tenv) = Symbol.enter(tenv,n,Types.NAME(n,ref NONE))
 	          val tenv' = foldr addt tenv names
-		  val nts = map (fn t => transTy tenv' t) typs
+		  val nts = map (fn t => transTy (tenv', t)) typs
 		  fun updt (n,nt) = 
 		    let val (SOME (Types.NAME(_,r))) = Symbol.look(tenv',n)
                   in r := SOME nt
