@@ -1,13 +1,6 @@
 signature SEMANT =
 sig
-  type tenv
-  type venv
-  type expty
-  
   val transProg : Absyn.exp -> unit
-  val transExp : venv * tenv * Absyn.exp -> expty
-  val transDec : venv * tenv * Absyn.dec -> {venv: venv, tenv: tenv}
-  val transTy :         tenv * Absyn.ty  -> Types.ty
 end 
 
 structure Semant :> SEMANT = struct
@@ -15,9 +8,6 @@ structure Semant :> SEMANT = struct
   structure E = Env
   val err = ErrorMsg.error
   exception ErrMsg
-  type tenv = Types.ty Symbol.table
-  type venv = E.enventry Symbol.table
-  type expty = {exp: Translate.exp, ty: Types.ty}
 
   val nestLevel = ref 0
 
