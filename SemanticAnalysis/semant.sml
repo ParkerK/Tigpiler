@@ -263,6 +263,5 @@ structure Semant :> SEMANT = struct
           transDecs(venv', tenv', ds)
         end)
         
-    fun transProg(absyn) = 
-        let in transExp (E.base_venv, E.base_tenv)  end
+    fun transProg(absyn) = (transExp (E.base_venv, E.base_tenv) absyn; ())
 end
