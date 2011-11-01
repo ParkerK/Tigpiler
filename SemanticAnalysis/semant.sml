@@ -65,7 +65,7 @@ structure Semant :> SEMANT = struct
     fun transExp(venv, tenv)  =      
 
       let fun trexp (A.NilExp)    =    {exp=(), ty=Types.NIL}
-          | trexp (VarExp var) = trvar var
+          | trexp (A.VarExp var) = trvar var
           | trexp   (A.IntExp i)  =    {exp=(), ty=Types.INT}
           | trexp   (A.StringExp (str, pos)) = {exp=(), ty=Types.STRING}
 
