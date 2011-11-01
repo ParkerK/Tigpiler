@@ -274,5 +274,5 @@ structure Semant :> SEMANT = struct
         end)
         
     fun transProg(absyn) = 
-        let in transExp (E.base_venv, E.base_tenv) absyn end
+        let in transExp (E.base_venv, E.base_tenv)  end
 end
