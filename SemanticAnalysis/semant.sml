@@ -17,7 +17,7 @@ structure Semant :> SEMANT = struct
   in  
     (case tyoption of
       SOME ty2 => ty2
-    | NONE => (err pos "type is not defined"; Types.INT))
+    | NONE => (err pos ("type is not defined: " ^ Symbol.name n) ; Types.INT))
   end
 
   fun transTy (tenv, t)=
@@ -102,7 +102,7 @@ structure Semant :> SEMANT = struct
           then (err pos "wrong amount of arguments";    {exp=(), ty=result})
           else*)
           {exp=(), ty=Types.UNIT}
-        | _ => (err pos "can't call nonexistant functions"; {exp=(), ty=Types.UNIT}))
+        | _ => (err pos ("can't call nonexistant function: " ^ Symbol.name func ); {exp=(), ty=Types.UNIT}))
         (* Should check to make sure return types match, as do argtypes *)
 
     | trexp   (A.IfExp {test, then', else', pos}) =
@@ -193,7 +193,7 @@ structure Semant :> SEMANT = struct
      and trvar (A.SimpleVar(id,pos)) = 
           (case Symbol.look(venv, id) of
             SOME (E.VarEntry{ty}) => {exp=(), ty=actual_ty ty}
-          | _ => (err pos "undefined variable: "; {exp=(), ty=Types.INT}))
+          | _ => (err pos ("undefined variable: " ^ Symbol.name id); {exp=(), ty=Types.INT}))
 
       | trvar (A.FieldVar(var,id,pos)) =
           let
