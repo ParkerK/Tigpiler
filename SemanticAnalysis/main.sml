@@ -1,6 +1,6 @@
 structure Main =
 struct
-  fun main =
+  fun main() =
     let
       fun test dir = 
         let
