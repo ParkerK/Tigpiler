@@ -32,7 +32,7 @@ structure Semant :> SEMANT = struct
       end
   
   fun compare_ty (ty1, ty2, pos)=
-    (case !ty1 = !ty2 of
+    (case ty1 = ty2 of
       true => ()
     | false => err pos "type mismatch")
   
@@ -217,6 +217,17 @@ structure Semant :> SEMANT = struct
           in 
             {tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}
           end
+
+    | transDec (venv, tenv, A.VarDec{name,escape= ref true ,typ=SOME(s, pos), init, pos=pos1}) =
+        let
+            val {exp, ty} = transExp (venv, tenv) init 
+        in
+            ( case Symbol.look (tenv,s) of
+                NONE => (err pos ("type not defined: " ^ Symbol.name s))
+                | SOME ty2=>  if ty<>ty2 then (err pos "type mismatch") else ();
+                {tenv=tenv,
+                venv=Symbol.enter(venv, name, Env.VarEntry{ty=ty})  } )
+        end
 
     | transDec (venv, tenv, A.TypeDec[{name, ty, pos}]) = 
         {venv = venv, tenv=Symbol.enter(tenv, name, transTy(tenv, ty))}
