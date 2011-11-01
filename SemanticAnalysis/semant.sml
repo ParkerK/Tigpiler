@@ -240,7 +240,9 @@ structure Semant :> SEMANT = struct
               tenv=Symbol.enter(tenv, name, transTy(tenv, ty))}
 
         | transDec(venv, tenv, A.FunctionDec[{name, params, body, pos, result=SOME(rt,pos1)}]) =
-            let val SOME(result_ty) = Symbol.look(tenv, rt)
+            let val result_ty = case Symbol.look(tenv, rt) of 
+                                  SOME(res) => res
+                                | NONE => Types.UNIT
                 fun transparam {name, escape, typ, pos} = 
                     case Symbol.look(tenv, typ)
                         of SOME t => {name=name, typ=t}
@@ -254,6 +256,7 @@ structure Semant :> SEMANT = struct
             in transExp(venv'', tenv) body;
                 {venv=venv', tenv=tenv}
             end
+        | transDec(venv, tenv, _) = {venv=venv, tenv=tenv}
 
       and transDecs (venv, tenv, decs) =
         (case decs
