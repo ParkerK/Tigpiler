@@ -105,13 +105,13 @@ structure Semant :> SEMANT = struct
 
         | trexp   (A.CallExp {func, args, pos}) = 
             (case Symbol.look (venv, func) of
-                NONE => (err pos "can't call nonexistant functions"; {exp=(), ty=Types.UNIT})
-                | SOME (E.FunEntry {formals, result}) =>
+                SOME (E.FunEntry {formals, result}) =>
                 (*if
                     length(args') <> length(args)
                 then (err pos "wrong amount of arguments";    {exp=(), ty=result})
                 else*)
                 {exp=(), ty=Types.UNIT}
+                | _ => (err pos "can't call nonexistant functions"; {exp=(), ty=Types.UNIT})
                 )
 
                 (* Should check to make sure return types match, as do argtypes *)
@@ -207,7 +207,7 @@ structure Semant :> SEMANT = struct
                       (case Symbol.look(venv, id) of
                           SOME (E.VarEntry{ty}) =>
                               {exp=(), ty=actual_ty ty}
-                          | NONE => (err pos "undefined variable: ";
+                          | _ => (err pos "undefined variable: ";
                               {exp=(), ty=Types.INT}))
 
           | trvar (A.FieldVar(var,id,pos)) =
