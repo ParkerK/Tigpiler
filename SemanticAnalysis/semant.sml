@@ -255,19 +255,19 @@ structure Semant :> SEMANT = struct
 
     | transDec (venv, tenv, A.TypeDec[{name, ty, pos}]) = 
           let
-        val names = [name]
-         val poss = [pos]
-          (*val _ = find_duplicates (ListPair.zip(ns,poss))*)
-          (*val _ = dfs ntps (* check for cycles *)*)
-		  val typs = [ty]
-		  fun addt (n,tenv) = Symbol.enter(tenv,n,Types.NAME(n,ref NONE))
-	          val tenv' = foldr addt tenv names
-		  val nts = map (fn t => transTy (tenv', t)) typs
-		  fun updt (n,nt) = 
-		    let val (SOME (Types.NAME(_,r))) = Symbol.look(tenv',n)
-                  in r := SOME nt
-                  end
-                val _ = app updt (ListPair.zip(names,nts))
+              val names = [name]
+              val poss = [pos]
+              (*val _ = find_duplicates (ListPair.zip(ns,poss))*)
+              (*val _ = dfs ntps (* check for cycles *)*)
+              val typs = [ty]
+              fun addt (n,tenv) = Symbol.enter(tenv,n,Types.NAME(n,ref NONE))
+                val tenv' = foldr addt tenv names
+            val nts = map (fn t => transTy (tenv', t)) typs
+            fun updt (n,nt) = 
+            let val (SOME (Types.NAME(_,r))) = Symbol.look(tenv',n)
+                in r := SOME nt
+            end
+            val _ = app updt (ListPair.zip(names,nts))
             in 
                 {tenv=tenv', venv=venv}
             end
