@@ -146,7 +146,7 @@ structure Semant :> SEMANT = struct
         let 
             val result = actual_ty (typelookup tenv, typ, pos)
             val fnames = map #1 fields
-            val tyfields = trexp (map #2 fields)
+            val tyfields = map trep (map #2 fields)
             val types = map #ty tyfields
             
         in case result of
