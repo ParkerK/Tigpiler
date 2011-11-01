@@ -268,7 +268,8 @@ structure Semant :> SEMANT = struct
                   in r := SOME nt
                   end
                 val _ = app updt (ListPair.zip(names,nts))
-            in {tree=[], tenv=tenv', venv=venv}
+            in 
+                {tenv=tenv', venv=venv}
             end
 
     | transDec(venv, tenv, A.FunctionDec[{name, params, body, pos, result=SOME(rt,pos1)}]) =
