@@ -33,8 +33,8 @@ structure Semant :> SEMANT = struct
   
   fun compare_ty (ty1, ty2, pos)=
     (case ty1 = ty2 of
-      true => ()
-    | false => err pos "type mismatch")
+      true => true
+    | false => (err pos "type mismatch"; false))
   
   fun actual_ty (Types.NAME (s,ty)) = 
     (case !ty of
@@ -146,7 +146,7 @@ structure Semant :> SEMANT = struct
         let 
             val result = actual_ty (typelookup tenv, typ, pos)
             val fnames = map #1 fields
-            val tyfields = map trep (map #2 fields)
+            val tyfields = map trexp (map #2 fields)
             val types = map #ty tyfields
             
         in case result of
