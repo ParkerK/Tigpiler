@@ -144,9 +144,10 @@ structure Semant :> SEMANT = struct
 
       | trexp (A.RecordExp {fields, typ, pos}) =
         let 
-            val result = actual_ty (typelookup tenv, typ, pos)
+            val typ' = typelookup tenv typ pos
+            val result = actual_ty typ'
             val fnames = map #1 fields
-            val tyfields = map trep (map #2 fields)
+            val tyfields = map trexp (map #2 fields)
             val types = map #ty tyfields
             
         in case result of
