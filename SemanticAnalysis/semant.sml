@@ -12,25 +12,24 @@ structure Semant :> SEMANT = struct
   val nestLevel = ref 0
 
   fun typelookup tenv n  pos= 
-  	let val tyoption=Symbol.look (tenv, n)
-	in  
-			 ( case tyoption of
-	     	  	   	 NONE => (err pos "type is not defined"; Types.INT)
-	    	  		 |SOME ty2=> ty2 )
-	 end
-	 
-  fun transTy (tenv, t)=
-  	let fun recordtys []=[]
-	    	|recordtys ({name=n,escape,typ,pos}:: fields)=
-		(n,typelookup tenv n pos ):: recordtys  fields 
-	in	
-		case t of
-		A.NameTy (n, pos)=> typelookup tenv n pos			 
-		|A.RecordTy fields=> Types.RECORD (recordtys fields, ref())
-		|A.ArrayTy (n,pos)=>Types.ARRAY(typelookup tenv n pos, ref())
-	end
-	
-	    
+    let val tyoption=Symbol.look (tenv, n)
+    in  
+        ( case tyoption of
+            NONE => (err pos "type is not defined"; Types.INT)
+            | SOME ty2=> ty2 )
+        end
+
+    fun transTy (tenv, t)=
+    let fun recordtys []=[]
+        |recordtys ({name=n,escape,typ,pos}:: fields)=
+            (n,typelookup tenv n pos ):: recordtys  fields 
+        in
+            case t of
+                A.NameTy (n, pos)=> typelookup tenv n pos   
+                | A.RecordTy fields=> Types.RECORD (recordtys fields, ref())
+                | A.ArrayTy (n,pos)=>Types.ARRAY(typelookup tenv n pos, ref())
+    end
+    
     fun compare_ty (ty1, ty2, pos)=
       (case !ty1 = !ty2 of
           true => ()
