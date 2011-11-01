@@ -16,7 +16,8 @@ structure Env :> ENV = struct
   
   val base_tenv = foldr enter Symbol.empty [
     (Symbol.symbol("int"), Types.INT),
-    (Symbol.symbol("string"), Types.STRING)
+    (Symbol.symbol("string"), Types.STRING),
+    (Symbol.symbol("nil"), Types.NIL)
   ]
 
   val base_venv = foldr enter Symbol.empty [
