@@ -17,16 +17,18 @@ structure Semant :> SEMANT = struct
   in  
     (case result of
       SOME ty2 => ty2
-    | NONE => (err pos ("type is not defined: " ^ Symbol.name n) ; Types.INT))
+    | NONE => (err pos ("type is not defined: " ^ Symbol.name n) ; Types.UNIT))
   end
 
   fun transTy (tenv, t)=
     let 
-      fun recordtys [] = []
-        | recordtys ({name=n,escape,typ,pos}::fields) = (n, typelookup tenv n pos):: recordtys fields 
+      fun recordtys(fields)= map (fn{name, escape, typ, pos}=>
+            (case SOME(typelookup tenv name pos) of 
+               SOME typ => (name, typ)
+             | NONE => (name, Types.UNIT))) fields
       in
         case t of
-          A.NameTy (n, pos) => typelookup tenv n pos 
+          A.NameTy (n, pos) => typelookup tenv n pos
         | A.RecordTy fields => Types.RECORD (recordtys fields, ref())
         | A.ArrayTy (n,pos) => Types.ARRAY(typelookup tenv n pos, ref())
       end
@@ -149,28 +151,29 @@ structure Semant :> SEMANT = struct
             val fnames = map #1 fields
             val tyfields = map trexp (map #2 fields)
             val types = map #ty tyfields
-            
         in case result of
             Types.RECORD(s, u) =>
-                let val dfnames = map #1 s
-                    val dftypes = map actual_ty (map #2 s)
+                let 
+                  val dfnames = map #1 s
+                  val dftypes = map actual_ty (map #2 s)
                 in
-                    if fnames = dfnames then
+                  if fnames = dfnames then
                     if (ListPair.all
-                    (fn (ty1, ty2) => compare_ty (ty1, ty2, pos))
-                    (types, dftypes))
-                then
-                    {exp=(), ty=Types.RECORD(s,u)} 
-                else 
-                    (err pos ("field types not consistant: " ^ Symbol.name typ);
-                    {exp=(),ty=Types.RECORD(s,u)})
-                else
+                        (fn (ty1, ty2) => compare_ty (ty1, ty2, pos))
+                        (types, dftypes))
+                    then
+                        {exp=(), ty=Types.RECORD(s,u)} 
+                    else 
+                        (err pos ("field types not consistant: " ^ Symbol.name typ);
+                        {exp=(),ty=Types.RECORD(s,u)})
+                  else
                     (err pos ("field types not consistant: " ^ Symbol.name typ);
                     {exp=(),ty=Types.RECORD(s,u)})
                 end
-                | _ => (err pos ("not a valid record type: " ^ Symbol.name typ);
+            | _ => (err pos ("not a valid record type: " ^ Symbol.name typ);
                     {exp=(), ty=Types.UNIT})
-                  end
+        end
+        
 
       | trexp (A.SeqExp exps) =
         {exp=(), ty=Types.UNIT}
@@ -253,20 +256,18 @@ structure Semant :> SEMANT = struct
                 venv=Symbol.enter(venv, name, Env.VarEntry{ty=ty})  } )
         end
 
-    | transDec (venv, tenv, A.TypeDec[{name, ty, pos}]) = 
+    | transDec (venv, tenv, A.TypeDec vardecs) = 
           let
-              val names = [name]
-              val poss = [pos]
-              (*val _ = find_duplicates (ListPair.zip(ns,poss))*)
-              (*val _ = dfs ntps (* check for cycles *)*)
-              val typs = [ty]
-              fun addt (n,tenv) = Symbol.enter(tenv,n,Types.NAME(n,ref NONE))
-                val tenv' = foldr addt tenv names
+            val names = map #name vardecs
+            val poss = map #pos vardecs
+            val typs = map #ty vardecs
+            fun addt (n,env) = Symbol.enter(env,n,Types.NAME(n,ref(Symbol.look(tenv, n))))
+            val tenv' = foldr addt tenv names
             val nts = map (fn t => transTy (tenv', t)) typs
             fun updt (n,nt) = 
-            let val (SOME (Types.NAME(_,r))) = Symbol.look(tenv',n)
-                in r := SOME nt
-            end
+              let val (SOME (Types.NAME(_,r))) = Symbol.look(tenv',n)
+                  in r := SOME nt
+              end
             val _ = app updt (ListPair.zip(names,nts))
             in 
                 {tenv=tenv', venv=venv}
