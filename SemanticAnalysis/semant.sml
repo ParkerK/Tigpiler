@@ -254,7 +254,22 @@ structure Semant :> SEMANT = struct
         end
 
     | transDec (venv, tenv, A.TypeDec[{name, ty, pos}]) = 
-        {venv = venv, tenv=Symbol.enter(tenv, name, transTy(tenv, ty))}
+          let
+        val names = [name]
+         val poss = [pos]
+          (*val _ = find_duplicates (ListPair.zip(ns,poss))*)
+          (*val _ = dfs ntps (* check for cycles *)*)
+		  val typs = [ty]
+		  fun addt (n,tenv) = Symbol.enter(tenv,n,Types.NAME(n,ref NONE))
+	          val tenv' = foldr addt tenv names
+		  val nts = map (fn t => transTy tenv' t) typs
+		  fun updt (n,nt) = 
+		    let val (SOME (Types.NAME(_,r))) = Symbol.look(tenv',n)
+                  in r := SOME nt
+                  end
+                val _ = app updt (ListPair.zip(names,nts))
+            in {tree=[], tenv=tenv', venv=venv}
+            end
 
     | transDec(venv, tenv, A.FunctionDec[{name, params, body, pos, result=SOME(rt,pos1)}]) =
         let val result_ty = case Symbol.look(tenv, rt) of 
