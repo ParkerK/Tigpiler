@@ -5,7 +5,7 @@ sig
                 | Nx of Tree.stm
                 | Cx of Temp.label * Temp.label -> Tree.stm
   val unEx : exp -> Tree.exp
-  (*val unNx : exp -> Tree.stm*)
+  val unNx : exp -> Tree.stm
   val unCx : exp -> (Temp.label * Temp.label -> Tree.stm)
 end
 structure Translate : TRANSLATE = struct 
@@ -13,6 +13,8 @@ structure Translate : TRANSLATE = struct
   datatype exp  = Ex of Tree.exp
                 | Nx of Tree.stm
                 | Cx of Temp.label * Temp.label -> Tree.stm
+  exception Impossible of string
+  
   fun seq([]) = T.LABEL(Temp.newlabel())
     | seq(h::t) = T.SEQ(h,seq(t))
     
@@ -31,7 +33,16 @@ structure Translate : TRANSLATE = struct
         end
     | unEx(Nx s) = T.ESEQ(s, T.CONST 0)
   
-  exception Impossible of string
+  fun unNx(Ex e) = T.EXP(e)
+    | unNx(Cx genstm) = 
+        let
+          val t = Temp.newlabel()
+          val f = t
+        in
+          T.SEQ(genstm(t,f), T.LABEL t)
+        end
+    | unNx(Nx s) = s
+  
   fun unCx(Ex e) = (fn (t, f) => T.CJUMP(T.NE, e, T.CONST 0, t, f))
     | unCx(Cx genstm) = genstm
     | unCx(Nx _) = raise Impossible("Cannot unCx an Nx")
