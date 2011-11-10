@@ -63,7 +63,7 @@ structure Semant :> SEMANT = struct
       exp)
 
    (* Takes venv, tenv, exp *)
-  fun transExp(venv, tenv)  =    
+  fun transExp(venv, tenv, break)  =    
 
     let fun trexp (A.NilExp) = {exp=(), ty=Types.NIL}
       | trexp (A.VarExp var) = trvar var
@@ -238,14 +238,14 @@ structure Semant :> SEMANT = struct
       trexp
     end
     
-    and transDec (venv, tenv, A.VarDec{name, typ=NONE, init,... }) = 
+    and transDec (venv, tenv, A.VarDec{name, typ=NONE, init,... }, break) = 
           let 
             val {exp,ty} = transExp (venv, tenv) init
           in 
             {tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}
           end
 
-    | transDec (venv, tenv, A.VarDec{name,escape= ref true ,typ=SOME(s, pos), init, pos=pos1}) =
+    | transDec (venv, tenv, A.VarDec{name,escape= ref true ,typ=SOME(s, pos), init, pos=pos1}, break) =
         let
             val {exp, ty} = transExp (venv, tenv) init 
         in
@@ -256,7 +256,7 @@ structure Semant :> SEMANT = struct
                 venv=Symbol.enter(venv, name, Env.VarEntry{ty=ty})  } )
         end
 
-    | transDec (venv, tenv, A.TypeDec vardecs) = 
+    | transDec (venv, tenv, A.TypeDec vardecs, break) = 
           let
             val names = map #name vardecs
             val poss = map #pos vardecs
@@ -273,7 +273,7 @@ structure Semant :> SEMANT = struct
                 {tenv=tenv', venv=venv}
             end
 
-    | transDec(venv, tenv, A.FunctionDec[{name, params, body, pos, result=SOME(rt,pos1)}]) =
+    | transDec(venv, tenv, A.FunctionDec[{name, params, body, pos, result=SOME(rt,pos1)}], break) =
         let val result_ty = case Symbol.look(tenv, rt) of 
                               SOME(res) => res
                             | NONE => Types.UNIT
