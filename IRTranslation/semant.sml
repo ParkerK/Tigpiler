@@ -63,7 +63,7 @@ structure Semant :> SEMANT = struct
       exp)
 
    (* Takes venv, tenv, exp *)
-  fun transExp(venv, tenv, break)  =    
+  fun transExp(venv, tenv)  = (*removed break to make things compile*)
 
     let fun trexp (A.NilExp) = {exp=(), ty=Types.NIL}
       | trexp (A.VarExp var) = trvar var
@@ -238,7 +238,7 @@ structure Semant :> SEMANT = struct
       trexp
     end
     
-    and transDec (venv, tenv, A.VarDec{name, typ=NONE, init,... }, break) = 
+    and transDec (venv, tenv, A.VarDec{name, typ=NONE, init, ... }, break) = 
           let 
             val {exp,ty} = transExp (venv, tenv) init
           in 
@@ -290,13 +290,13 @@ structure Semant :> SEMANT = struct
         in transExp(venv'', tenv) body;
           {venv=venv', tenv=tenv}
         end
-    | transDec(venv, tenv, _) = {venv=venv, tenv=tenv}
+    | transDec(venv, tenv, _, _) = {venv=venv, tenv=tenv}
 
     and transDecs (venv, tenv, decs) =
     (case decs of
       [] => {venv=venv, tenv=tenv}
     | (d::ds) => let 
-                  val {venv=venv', tenv=tenv'} = transDec(venv, tenv, d)
+                  val {venv=venv', tenv=tenv'} = transDec(venv, tenv, d, NONE) (*NONE = break?*)
                 in
                   transDecs(venv', tenv', ds)
                 end)
