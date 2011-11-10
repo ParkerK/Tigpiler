@@ -1,0 +1,23 @@
+Group is
+
+absyn.sml
+env.sml
+errormsg.sml
+parse.sml
+printtree.sml
+semant.sml
+symbol.sml
+table.sig
+table.sml
+temp.sig
+temp.sml
+tree.sml
+tiger.grm.sig
+tiger.lex
+translate.sml
+types.sml
+
+tiger.grm : shell (target: tiger.grm.sml ml-yacc %s)
+$/smlnj-lib.cm
+$/ml-yacc-lib.cm
+$/basis.cm
