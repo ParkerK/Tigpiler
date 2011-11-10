@@ -24,10 +24,10 @@ let
           val infile = dir ^ "/" ^ (valOf(head))
           val outfile = TextIO.openOut (outdir ^ "/" ^ (valOf(head)) ^ ".out")
           val absyn = Parse.parse infile
+          val tree = Semant.transProg(absyn);
         in
           (
             print (infile ^ "\n");
-            Semant.transProg(absyn);
             Printtree.printtree(outfile, tree);
             testList(rest)
           )
