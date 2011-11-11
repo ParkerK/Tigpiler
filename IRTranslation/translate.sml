@@ -202,4 +202,20 @@ structure Translate : TRANSLATE = struct
       
     fun callExp (_:level, label, exps:exp list) = Ex(T.CALL(T.NAME(label), map unEx exps))
   
+    fun subscriptExp(arr, offset) =
+        let
+          val address = Temp.newtemp()
+          val arr = unEx arr
+          val offset = unEx offset
+        in
+            Ex(T.ESEQ(
+              T.MOVE(T.TEMP(address),
+              T.BINOP(T.PLUS,
+              arr,
+              T.BINOP(T.MUL,
+              offset,
+              T.CONST(Frame.wordsize)))),
+              T.MEM(T.TEMP(address))))
+          end
+  
 end
