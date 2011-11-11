@@ -74,8 +74,10 @@ structure Translate : TRANSLATE = struct
           T.SEQ(genstm(t,f), T.LABEL t)
         end
     | unNx(Nx s) = s
-  
-  fun unCx(Ex e) = (fn (t, f) => T.CJUMP(T.NE, e, T.CONST 0, t, f))
+    
+  fun unCx(T.CONST 0) = Cx(fn (t, f) => T.JUMP(T.NAME f, [f]))
+    | unCx(T.CONST _) = Cx(fn (t, f) => T.JUMP(T.NAME t, [t]))
+    | unCx(Ex e) = Cx(fn (t, f) => T.CJUMP(T.NE, e, T.CONST 0, t, f))
     | unCx(Cx genstm) = genstm
     | unCx(Nx _) = raise Impossible("Cannot unCx an Nx")
     
@@ -115,20 +117,16 @@ structure Translate : TRANSLATE = struct
           T.LABEL escape])
         end
     
-    fun ifExp (T.CONST _, thenExp, _) = thenExp
-      | ifExp (T.CONST 0, _, elseExp) = elseExp
-      | ifExp (cond, thenExp, elseExp) =
+    fun ifExp (cond, thenExp, elseExp) =
         let
-          val cond = unCx(Ex(cond))
+          val cond = unCx(Ex cond)
           val thenLabel = Temp.newlabel()
           val elseLabel = Temp.newlabel()
           val joinLabel = Temp.newlabel()
           val r = Temp.newtemp() (* Only for when thenExp/elseExp = Ex, suggested on page 162 *)
         in
           case (cond, thenExp, elseExp) of
-                    (T.CONST 1, _, _) => thenExp
-                  | (T.CONST 0, _, _) => elseExp
-                  | (_, Cx _, Cx _) =>
+                  (_, Cx _, Cx _) =>
                     Cx (fn (t, f) =>
                            seq [(cond) (thenLabel, elseLabel),
                                 T.LABEL thenLabel,
