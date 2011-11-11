@@ -42,7 +42,7 @@ structure Translate : TRANSLATE = struct
   fun simpleVar(acc, l) = Ex(T.CONST 0) (*TODO*)
 
   fun seq([]) = T.LABEL(Temp.newlabel())
-    | seq ([s]) = s
+    | seq([s]) = s
     | seq(h::t) = T.SEQ(h,seq(t))
   
   fun unEx(Ex e) = e
