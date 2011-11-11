@@ -104,13 +104,13 @@ structure Translate : TRANSLATE = struct
           body,
           T.CJUMP (T.LT, var, hi, forLabel, escape), (* Check if exiting loop *)
           T.LABEL forLabel,
-          T.MOVE (var, T.BINOP (T.PLUS, var, T.CONST (1))), (* var += 1 *)
+          T.MOVE (var, T.BINOP (T.PLUS, var, T.CONST 1)), (* var += 1 *)
           T.JUMP (T.NAME forLabel, [forLabel]),
           T.LABEL escape])
         end
     
-    fun ifExp (T.CONST (1), thenExp, _) = thenExp
-      | ifExp (T.CONST (0), _, elseExp) = elseExp
+    fun ifExp (T.CONST _, thenExp, _) = thenExp
+      | ifExp (T.CONST 0, _, elseExp) = elseExp
       | ifExp () (* TODO *)
       
     end
