@@ -19,18 +19,20 @@ end
 
 structure Translate : TRANSLATE = struct 
   structure Frame : FRAME = MipsFrame
+  structure A = Absyn
   structure T = Tree
   datatype exp  = Ex of Tree.exp
                 | Nx of Tree.stm
                 | Cx of Temp.label * Temp.label -> Tree.stm
-  type access = level * Frame.access
   datatype level =  Top
                   | Level of {frame:Frame.frame, parent: level} * unit ref
+  type access = level * Frame.access
   val outermost = Top
+  exception Impossible of string
   
-  fun newLevel({parent=l, name=n, formals=f}) = (Level ({frame=Frame.newFrame {name=n, formals=true::f}, parent=l}, ref())) (*change level?*)
+  fun newLevel({l, n, f}) = (Level ({frame=Frame.newFrame {name=n, formals=true::f}, parent=l}, ref())) (*change level?*)
   fun formals(Top) = []
-    | formals(Level({frame, parent}, uref)) =
+    | formals(l as Level({frame, parent}, uref)) =
         let val fs = tl(Frame.formals(frame)) (*remove the true value for static link*)
              fun convertAccess([]) = []
                | convertAccess(h::accs) = (l, h) :: convertAccess(accs)
@@ -38,10 +40,9 @@ structure Translate : TRANSLATE = struct
              convertAccess(fs)
          end
 
- fun allocLocal(Top) = []
-   | allocLocal(Level({frame, parent}, uref) l) = fn(b) => (l,Frame.allocLocal(frame)(b))
+ fun allocLocal(Top) = raise Impossible ("can't allocate a local variable at the top most scope")
+   | allocLocal(l as Level({frame, parent}, uref)) = (fn(b) => (l,Frame.allocLocal(frame)(b)))
   
-  exception Impossible of string
   
   fun simpleVar(acc, l) = Ex(T.CONST 0) (*TODO*)
 
@@ -88,7 +89,7 @@ structure Translate : TRANSLATE = struct
     in 
       Nx (seq [T.LABEL testLabel, 
           test (bodyLabel, done),
-          T.LABEL bodyLable,
+          T.LABEL bodyLabel,
           body,
           T.JUMP (T.NAME testLabel, [testLabel]),
           T.LABEL done])
@@ -118,11 +119,11 @@ structure Translate : TRANSLATE = struct
       | ifExp (T.CONST 0, _, elseExp) = elseExp
       | ifExp (cond, thenExp, elseExp) =
         let
-          val cond = unCx cond
+          val cond = unCx(Ex(cond))
           val thenLabel = Temp.newlabel()
           val elseLabel = Temp.newlabel()
           val joinLabel = Temp.newlabel()
-          val r = Temp.newTemp() (* Only for when thenExp/elseExp = Ex, suggested on page 162 *)
+          val r = Temp.newtemp() (* Only for when thenExp/elseExp = Ex, suggested on page 162 *)
         in
           case (cond, thenExp, elseExp) of
                     (T.CONST 1, _, _) => thenExp
@@ -157,12 +158,12 @@ structure Translate : TRANSLATE = struct
       
     fun intExp (i) = Ex (T.CONST (i)) (* Return a constant of that value *)
     fun nilExp () = Ex (T.CONST (0))
-    fun stringExp (str) = 
+    (*fun stringExp (str) = 
       let
         val strLabel = Temp.newlabel()
       in
         (* Frame call to handle string *)
-      end
+      end*)
       
     fun assignExp (var, exp) =
       let
@@ -175,17 +176,17 @@ structure Translate : TRANSLATE = struct
     fun breakExp break = Nx (T.JUMP(T.NAME break, [break]))
     
     fun fieldVar (var, offset, true) =
-          Ex (T.MEM (T.BINOP (T.PLUS, unEx varExp, T.CONST (offset * Frame.wordSize))))
+          Ex (T.MEM (T.BINOP (T.PLUS, unEx varExp, T.CONST (offset * Frame.wordsize))))
         | fieldVar (varExp, offset, false) =
           let
-            val varTemp = Temp.newTemp ()
+            val varTemp = Temp.newtemp ()
             val safeLabel = Temp.newLabel ()
             val var = unEx varExp
           in
             Ex (T.ESEQ (seq [T.MOVE (T.TEMP varTemp, var),
                              T.CJUMP (T.NE, unEx NIL, T.TEMP varTemp, safeLabel,ERROR),
                              T.LABEL safeLabel],
-                        T.MEM (T.BINOP (T.PLUS, unEx varExp, T.CONST (offset * Frame.wordSize)))))
+                        T.MEM (T.BINOP (T.PLUS, unEx varExp, T.CONST (offset * Frame.wordsize)))))
           end
     
     
