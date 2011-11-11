@@ -183,12 +183,12 @@ structure Translate : TRANSLATE = struct
       | intOpExp (A.MinusOp, operands)  = binopExp T.MINUS, operands
       | intOpExp (A.TimesOp, operands)  = binopExp T.MUL, operands
       | intOpExp (A.DivideOp, operands) = binopExp T.DIV, operands
-      | intOpExp (A.EqOp, operands)     = relop T.EQ, operands
-      | intOpExp (A.NeqOp, operands)    = relop T.NE, operands
-      | intOpExp (A.LtOp, operands)     = relop T.LT, operands
-      | intOpExp (A.LeOp, operands)     = relop T.LE, operands
-      | intOpExp (A.GtOp, operands)     = relop T.GT, operands
-      | intOpExp (A.GeOp, operands)     = relop T.GE, operands
+      | intOpExp (A.EqOp, operands)     = relopExp T.EQ, operands
+      | intOpExp (A.NeqOp, operands)    = relopExp T.NE, operands
+      | intOpExp (A.LtOp, operands)     = relopExp T.LT, operands
+      | intOpExp (A.LeOp, operands)     = relopExp T.LE, operands
+      | intOpExp (A.GtOp, operands)     = relopExp T.GT, operands
+      | intOpExp (A.GeOp, operands)     = relopExp T.GE, operands
       
     fun callExp (_:level, label, exps:exp list) = Ex(T.CALL(T.NAME(label), map unEx exps))
   
