@@ -30,4 +30,7 @@ struct
                                       end
   fun exp(a) = 
     fn(_) => Tree.TEMP(FP) (*todo*)
+    
+  fun move (reg, var) = T.MOVE (T.TEMP reg, T.TEMP var)
+  
 end
