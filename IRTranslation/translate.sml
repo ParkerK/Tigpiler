@@ -190,8 +190,6 @@ structure Translate : TRANSLATE = struct
       | intOpExp (A.GtOp, operands)     = relop T.GT, operands
       | intOpExp (A.GeOp, operands)     = relop T.GE, operands
       
-    fun arithExp (oper, )  
-    
     fun callExp (_:level, label, exps:exp list) = Ex(T.CALL(T.NAME(label), map unEx exps))
   
     fun subscriptExp(arr, offset) =
