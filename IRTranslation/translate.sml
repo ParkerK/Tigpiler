@@ -174,21 +174,6 @@ structure Translate : TRANSLATE = struct
     
     fun breakExp break = Nx (T.JUMP(T.NAME break, [break]))
     
-    fun fieldVar (var, offset, true) =
-          Ex (T.MEM (T.BINOP (T.PLUS, unEx varExp, T.CONST (offset * Frame.wordSize))))
-        | fieldVar (varExp, offset, false) =
-          let
-            val varTemp = Temp.newTemp ()
-            val safeLabel = Temp.newLabel ()
-            val var = unEx varExp
-          in
-            Ex (T.ESEQ (seq [T.MOVE (T.TEMP varTemp, var),
-                             T.CJUMP (T.NE, unEx NIL, T.TEMP varTemp, safeLabel,ERROR),
-                             T.LABEL safeLabel],
-                        T.MEM (T.BINOP (T.PLUS, unEx varExp, T.CONST (offset * Frame.wordSize)))))
-          end
-    
-    
     fun intOpExp (A.PlusOp)   = BINOP T.PLUS
       | intOpExp (A.MinusOp)  = BINOP T.MINUS
       | intOpExp (A.TimesOp)  = BINOP T.MUL
@@ -200,6 +185,8 @@ structure Translate : TRANSLATE = struct
       | intOpExp (A.GtOp)     = RELOP T.GT
       | intOpExp (A.GeOp)     = RELOP T.GE
       
+    fun arithExp (oper, )  
+    
     fun callExp (_:level, label, exps:exp list) = Ex(T.CALL(T.NAME(label), map unEx exps))
   
     fun subscriptExp(arr, offset) =
@@ -217,5 +204,6 @@ structure Translate : TRANSLATE = struct
               T.CONST(Frame.wordsize)))),
               T.MEM(T.TEMP(address))))
           end
+
   
 end
