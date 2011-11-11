@@ -116,7 +116,7 @@ structure Semant :> SEMANT = struct
          in
            (checkInt (test', pos);
            checkUnit (then'', pos);
-           {exp=(), ty=Types.UNIT})
+           {exp=(Tr.ifExp(test', then'', ?)), ty=Types.UNIT})
          end
          | SOME else' =>
          let
@@ -127,7 +127,7 @@ structure Semant :> SEMANT = struct
            checkInt(test', pos);
            checkUnit(then'', pos);
            checkUnit(else'', pos);
-           {exp=(), ty=Types.UNIT}
+           {exp=(Tr.ifExp(test', then'', else'')), ty=Types.UNIT}
          end
         )
 
