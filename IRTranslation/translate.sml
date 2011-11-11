@@ -96,6 +96,8 @@ structure Translate : TRANSLATE = struct
           T.LABEL done])
     end
     
+    
+    
     fun forExp (var, escape, lo, hi, body) = 
       let 
         val var = unEx var
@@ -192,6 +194,19 @@ structure Translate : TRANSLATE = struct
   
     fun letExp ([], body) = unNx body
       | letExp (decs, body) = Ex (T.ESEQ (seq (map unEx decs), unEx body))
+    
+    
+    fun fieldVar (var, offset) =
+      let
+        val var = unEx var
+        val addr = Temp.newtemp ()
+      in
+          Ex(T.ESEQ(T.MOVE(T.TEMP(addr),
+            T.BINOP(T.PLUS,var,
+            T.BINOP(T.MUL,T.CONST(offset),
+            T.CONST(Frame.wordsize)))),
+            T.MEM(T.TEMP(addr))))
+        end
     
     fun subscriptExp(arr, offset) =
         let
