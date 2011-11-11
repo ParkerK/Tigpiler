@@ -175,20 +175,21 @@ structure Translate : TRANSLATE = struct
     
     fun breakExp break = Nx (T.JUMP(T.NAME break, [break]))
     
-    fun binopExp oper (left, right) = Ex(T.BINOP(oper, unEx(left), unEx(right)))
+    fun binopExp (oper, (left, right)) = Ex(T.BINOP(oper, unEx(left), unEx(right)))
     
-    fun relopExp oper (left, right) = Cx(T.RELOP(oper, unEx(left), unEx(right)))
-    
-    fun intOpExp (A.PlusOp, operands)   = binopExp T.PLUS, operands
-      | intOpExp (A.MinusOp, operands)  = binopExp T.MINUS, operands
-      | intOpExp (A.TimesOp, operands)  = binopExp T.MUL, operands
-      | intOpExp (A.DivideOp, operands) = binopExp T.DIV, operands
-      | intOpExp (A.EqOp, operands)     = relopExp T.EQ, operands
-      | intOpExp (A.NeqOp, operands)    = relopExp T.NE, operands
-      | intOpExp (A.LtOp, operands)     = relopExp T.LT, operands
-      | intOpExp (A.LeOp, operands)     = relopExp T.LE, operands
-      | intOpExp (A.GtOp, operands)     = relopExp T.GT, operands
-      | intOpExp (A.GeOp, operands)     = relopExp T.GE, operands
+    fun relopExp (oper, (left, right)) = 
+      Cx(fn(t, f) => T.CJUMP(oper, unEx(left), unEx(right), t, f))
+        
+    fun intOpExp (A.PlusOp, operands)   = binopExp (T.PLUS, operands)
+      | intOpExp (A.MinusOp, operands)  = binopExp (T.MINUS, operands)
+      | intOpExp (A.TimesOp, operands)  = binopExp (T.MUL, operands)
+      | intOpExp (A.DivideOp, operands) = binopExp (T.DIV, operands)
+      | intOpExp (A.EqOp, operands)     = relopExp (T.EQ, operands)
+      | intOpExp (A.NeqOp, operands)    = relopExp (T.NE, operands)
+      | intOpExp (A.LtOp, operands)     = relopExp (T.LT, operands)
+      | intOpExp (A.LeOp, operands)     = relopExp (T.LE, operands)
+      | intOpExp (A.GtOp, operands)     = relopExp (T.GT, operands)
+      | intOpExp (A.GeOp, operands)     = relopExp (T.GE, operands)
       
     fun callExp (_:level, label, exps:exp list) = Ex(T.CALL(T.NAME(label), map unEx exps))
   
