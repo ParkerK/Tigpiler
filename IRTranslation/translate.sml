@@ -147,13 +147,13 @@ structure Translate : TRANSLATE = struct
                              T.LABEL elseLabel,
                              unNx elseExp,
                              T.LABEL joinLabel])
-                  | (_,_,_) => (* We shouldn't get here ever *)          
+                  | (_,_,_) => raise Impossible("ifBody and elseBody must be same type") (* We shouldn't get here ever *)          
       
     end
       
     fun intExp (i) = Ex (T.CONST (i)) (* Return a constant of that value *)
     fun nilExp () = Ex (T.CONST (0))
-    fun stringExp (str) =
+    fun stringExp (str) = 
       let
         val strLabel = Temp.newlabel()
       in
@@ -167,6 +167,8 @@ structure Translate : TRANSLATE = struct
       in
         Nx (T.MOVE (var, exp))
       end
+    
+    fun breakExp break = Nx (T.JUMP(T.NAME break, [break]))
       
     fun intOpExp (A.PlusOp)   = BINOP T.PLUS
       | intOpExp (A.MinusOp)  = BINOP T.MINUS
@@ -179,6 +181,6 @@ structure Translate : TRANSLATE = struct
       | intOpExp (A.GtOp)     = RELOP T.GT
       | intOpExp (A.GeOp)     = RELOP T.GE
       
-    
+    fun callExp() (* TODO *)
   
 end
