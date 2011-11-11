@@ -24,18 +24,22 @@ structure Translate : TRANSLATE = struct
                 | Nx of Tree.stm
                 | Cx of Temp.label * Temp.label -> Tree.stm
   type access = level * Frame.access
-  type level = int ref
-  val outermost = ref 0
+  datatype level =  Top
+                  | Level of {frame:Frame.frame, parent: level} * unit ref
+  val outermost = Top
   
-  fun newLevel({parent=l, name=n, formals=f}) = (Frame.newFrame({name=n, formals=true::f}); ref(!l+1)) (*change level?*)
-  fun formals(l:level) = let val fs = tl(Frame.formals()) (*remove the true value for static link*)
-                       fun convertAccess([]) = []
-                         | convertAccess(h::accs) = (l, h) :: convertAccess(accs)
-                   in
-                       convertAccess(fs)
-                   end
-                     
-  fun allocLocal (level as Nested {parent, frame, id}) escapes = (level, Frame.allocLocal frame escapes)
+  fun newLevel({parent=l, name=n, formals=f}) = (Level ({frame=Frame.newFrame {name=n, formals=true::f}, parent=l}, ref())) (*change level?*)
+  fun formals(Top) = []
+    | formals(Level({frame, parent}, uref)) =
+        let val fs = tl(Frame.formals(frame)) (*remove the true value for static link*)
+             fun convertAccess([]) = []
+               | convertAccess(h::accs) = (l, h) :: convertAccess(accs)
+         in
+             convertAccess(fs)
+         end
+
+ fun allocLocal(Top) = []
+   | allocLocal(Level({frame, parent}, uref) l) = fn(b) => (l,Frame.allocLocal(frame)(b))
   
   exception Impossible of string
   
