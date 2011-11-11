@@ -75,12 +75,11 @@ structure Translate : TRANSLATE = struct
         end
     | unNx(Nx s) = s
     
-  fun unCx(T.CONST 0) = Cx(fn (t, f) => T.JUMP(T.NAME f, [f]))
-    | unCx(T.CONST _) = Cx(fn (t, f) => T.JUMP(T.NAME t, [t]))
+  fun unCx(Ex(T.CONST 0)) = Cx(fn (t, f) => T.JUMP(T.NAME f, [f]))
+    | unCx(Ex(T.CONST _)) = Cx(fn (t, f) => T.JUMP(T.NAME t, [t]))
     | unCx(Ex e) = Cx(fn (t, f) => T.CJUMP(T.NE, e, T.CONST 0, t, f))
     | unCx(Cx genstm) = genstm
     | unCx(Nx _) = raise Impossible("Cannot unCx an Nx")
-    
     
   fun whileExp (test, body, done) = 
     let
