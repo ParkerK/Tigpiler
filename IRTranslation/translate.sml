@@ -74,7 +74,7 @@ structure Translate : TRANSLATE = struct
     | unCx(Nx _) = raise Impossible("Cannot unCx an Nx")
     
     
-  fun whileExp (test, body, done)
+  fun whileExp (test, body, done) = 
     let
       val test = unCx test
       val body = unNx body
@@ -89,7 +89,7 @@ structure Translate : TRANSLATE = struct
           T.LABEL done])
     end
     
-    fun forExp (var, escape, lo, hi, body)
+    fun forExp (var, escape, lo, hi, body) = 
       let 
         val var = unEx var
         val lo = unEx lo
@@ -108,8 +108,28 @@ structure Translate : TRANSLATE = struct
           T.JUMP (T.NAME forLabel, [forLabel]),
           T.LABEL escape])
         end
-        
-       
- 
-  
+    
+    fun ifExp (T.CONST (1), then, _) = then
+      | ifExp (T.CONST (0), _, else) = else
+      | ifExp () (* TODO *)
+      
+    end
+      
+    fun int (i) = Ex (T.CONST (i)) (* Return a constant of that value *)
+    
+    fun string (str) =
+      let
+        val strLabel = Temp.newlabel()
+      in
+        (* Frame call to handle string *)
+      end
+      
+    fun assignExp (var, exp) =
+      let
+        val var = unEx var
+        val exp = unEx exp
+      in
+        Nx (T.MOVE (var, exp))
+      end
+    
 end
