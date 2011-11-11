@@ -1,20 +1,33 @@
 structure MipsFrame : FRAME =
 struct
-  structure frame = {formalloc: Temp.label, shift: Temp.temp -> Temp.temp, 
-                     locals: int ref, label: Temp.label}
+  type frame = {name: Temp.label, formals: bool list, locals: int ref}
   datatype access = InFrame of int (*a memory location at offset x from FP*)
                   | InReg of Temp.temp (*value held in register*)
-  val FP = Temp.newlabel();
-  val wordsize = 4;
+  val FP = Temp.newtemp();
+  val wordsize = 4; (*bytes*)
   
-  fun newFrame({lbl, fs}) = (!FP := !FP - length(fs))
-  fun name(f) = case frame.look(f) of 
-                  SOME() =>
-                | NONE =>
-  fun formals(f) = access list
-  fun allocLocal(f) = fn(b) => case b of 
-                                  true => (!FP := !FP + 1; InFrame(!FP))
-                                | false => InReg(Temp.newtemp())
+  fun newFrame({name, formals}) = {name=name, formals=formals, locals=ref 0}
+  
+  fun name(f:frame) = #name f
+  
+  fun formalToAcc(b:bool, offet:int ref) = case b of 
+                                    true => (!offet = !offet + 1; 
+                                              InFrame(0 - !offet * wordsize))
+                                  | false => InReg(Temp.newtemp())
+  fun formals(f:frame) = let
+                          val escacc = ref 0
+                          fun formalAccs([]) = []
+                            | formalAccs(h::r) = formalToAcc(h, escacc)::formalAccs(r)
+                        in
+                          formalAccs (#formals f)
+                        end
+  
+  fun allocLocal(f:frame) = fn(b) => let
+                                        val escacc = #locals f
+                                      in
+                                        !escacc = !escacc + 1;
+                                        formalToAcc(b, escacc)
+                                      end
   fun exp(a) = 
-    fn(Tree.TEMP(FP)) => Tree.Tree(FP) (*todo*)
+    fn(_) => Tree.TEMP(FP) (*todo*)
 end
