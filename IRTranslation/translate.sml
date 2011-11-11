@@ -30,7 +30,7 @@ structure Translate : TRANSLATE = struct
   val outermost = Top
   exception Impossible of string
   
-  fun newLevel({l, n, f}) = (Level ({frame=Frame.newFrame {name=n, formals=true::f}, parent=l}, ref())) (*change level?*)
+  fun newLevel({parent=l, name=n, formals=f}) = (Level ({frame=Frame.newFrame {name=n, formals=true::f}, parent=l}, ref())) (*change level?*)
   fun formals(Top) = []
     | formals(l as Level({frame, parent}, uref)) =
         let val fs = tl(Frame.formals(frame)) (*remove the true value for static link*)
