@@ -72,4 +72,77 @@ structure Translate : TRANSLATE = struct
   fun unCx(Ex e) = (fn (t, f) => T.CJUMP(T.NE, e, T.CONST 0, t, f))
     | unCx(Cx genstm) = genstm
     | unCx(Nx _) = raise Impossible("Cannot unCx an Nx")
+    
+    
+  fun whileExp (test, body, done) = 
+    let
+      val test = unCx test
+      val body = unNx body
+      val testLabel = Temp.newlabel()
+      val bodyLabel = Temp.newlabel() 
+    in 
+      Nx (seq [T.LABEL testLabel, 
+          test (bodyLabel, done),
+          T.LABEL bodyLable,
+          body,
+          T.JUMP (T.NAME testLabel, [testLabel]),
+          T.LABEL done])
+    end
+    
+    fun forExp (var, escape, lo, hi, body) = 
+      let 
+        val var = unEx var
+        val lo = unEx lo
+        val hi = unEx hi
+        val body = unNx body
+        val bodyLabel = Temp.newlabel()
+        val forLabel = Temp.newlabel()
+      in
+        Nx (seq [T.MOVE (var, lo), (* Set var := lo *)
+          T.CJUMP (T.LE, var, hi, bodyLabel, escape),
+          T.LABEL bodyLabel,
+          body,
+          T.CJUMP (T.LT, var, hi, forLabel, escape), (* Check if exiting loop *)
+          T.LABEL forLabel,
+          T.MOVE (var, T.BINOP (T.PLUS, var, T.CONST (1))), (* var += 1 *)
+          T.JUMP (T.NAME forLabel, [forLabel]),
+          T.LABEL escape])
+        end
+    
+    fun ifExp (T.CONST (1), then, _) = then
+      | ifExp (T.CONST (0), _, else) = else
+      | ifExp () (* TODO *)
+      
+    end
+      
+    fun int (i) = Ex (T.CONST (i)) (* Return a constant of that value *)
+    
+    fun string (str) =
+      let
+        val strLabel = Temp.newlabel()
+      in
+        (* Frame call to handle string *)
+      end
+      
+    fun assignExp (var, exp) =
+      let
+        val var = unEx var
+        val exp = unEx exp
+      in
+        Nx (T.MOVE (var, exp))
+      end
+      
+    fun intOpExp (A.PlusOp)   = BINOP T.PLUS
+      | intOpExp (A.MinusOp)  = BINOP T.MINUS
+      | intOpExp (A.TimesOp)  = BINOP T.MUL
+      | intOpExp (A.DivideOp) = BINOP T.DIV
+      | intOpExp (A.EqOp)     = RELOP T.EQ
+      | intOpExp (A.NeqOp)    = RELOP T.NE
+      | intOpExp (A.LtOp)     = RELOP T.LT
+      | intOpExp (A.LeOp)     = RELOP T.LE
+      | intOpExp (A.GtOp)     = RELOP T.GT
+      | intOpExp (A.GeOp)     = RELOP T.GE
+      
+    
+  
 end
