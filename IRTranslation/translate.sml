@@ -35,7 +35,7 @@ structure Translate : TRANSLATE = struct
                        convertAccess(fs)
                    end
                      
-  fun allocLocal(l:level) = fn(b) => (l, Frame.allocLocal(f??)(b))
+  fun allocLocal (level as Nested {parent, frame, id}) escapes = (level, Frame.allocLocal frame escapes)
   
   exception Impossible of string
   
