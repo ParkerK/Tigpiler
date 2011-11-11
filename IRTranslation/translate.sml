@@ -116,13 +116,48 @@ structure Translate : TRANSLATE = struct
     
     fun ifExp (T.CONST _, thenExp, _) = thenExp
       | ifExp (T.CONST 0, _, elseExp) = elseExp
-      | ifExp () (* TODO *)
+      | ifExp (cond, thenExp, elseExp) =
+        let
+          val cond = unCx cond
+          val thenLabel = Temp.newlabel()
+          val elseLabel = Temp.newlabel()
+          val joinLabel = Temp.newlabel()
+          val r = Temp.newTemp() (* Only for when thenExp/elseExp = Ex, suggested on page 162 *)
+        in
+          case (cond, thenExp, elseExp) of
+                    (T.CONST 1, _, _) => thenExp
+                  | (T.CONST 0, _, _) => elseExp
+                  | (_, Cx _, Cx _) =>
+                    Cx (fn (t, f) =>
+                           seq [(cond) (thenLabel, elseLabel),
+                                T.LABEL thenLabel,
+                                (unCx thenExp) (t, f),
+                                T.LABEL elseLabel,
+                                (unCx elseExp) (t, f)])
+                  | (_, Ex _, Ex _) =>
+                    Ex (T.ESEQ (seq [(cond) (thenLabel, elseLabel),
+                                     T.LABEL thenLabel,
+                                     T.MOVE (T.TEMP r, unEx thenExp),
+                                     T.JUMP (T.NAME joinLabel, [joinLabel]),
+                                     T.LABEL elseLabel,
+                                     T.MOVE (T.TEMP r, unEx elseExp),
+                                     T.LABEL joinLabel],
+                                T.TEMP r))
+                  | (_, Nx _, Nx _) =>
+                    Nx (seq [(cond) (thenLabel, elseLabel),
+                             T.LABEL thenLabel,
+                             unNx thenExp,
+                             T.JUMP (T.NAME joinLabel, [joinLabel]),
+                             T.LABEL elseLabel,
+                             unNx elseExp,
+                             T.LABEL joinLabel])
+                  | (_,_,_) => raise Impossible("ifBody and elseBody must be same type") (* We shouldn't get here ever *)          
       
     end
       
-    fun int (i) = Ex (T.CONST (i)) (* Return a constant of that value *)
-    
-    fun string (str) =
+    fun intExp (i) = Ex (T.CONST (i)) (* Return a constant of that value *)
+    fun nilExp () = Ex (T.CONST (0))
+    fun stringExp (str) = 
       let
         val strLabel = Temp.newlabel()
       in
@@ -136,6 +171,8 @@ structure Translate : TRANSLATE = struct
       in
         Nx (T.MOVE (var, exp))
       end
+    
+    fun breakExp break = Nx (T.JUMP(T.NAME break, [break]))
       
     fun intOpExp (A.PlusOp)   = BINOP T.PLUS
       | intOpExp (A.MinusOp)  = BINOP T.MINUS
@@ -148,6 +185,6 @@ structure Translate : TRANSLATE = struct
       | intOpExp (A.GtOp)     = RELOP T.GT
       | intOpExp (A.GeOp)     = RELOP T.GE
       
-    
+    fun callExp() (* TODO *)
   
 end
