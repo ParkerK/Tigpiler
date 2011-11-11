@@ -210,7 +210,7 @@ structure Semant :> SEMANT = struct
             {exp=(), ty=Types.UNIT})
 
       | trexp (A.LetExp {decs, body, pos}) =
-        let val {venv=venv', tenv=tenv'} = transDecs(venv, tenv, decs)
+        let val ({venv=venv', tenv=tenv'}, explist) = transDecs(venv, tenv, decs)
           in transExp(venv', tenv') body
         end
 
@@ -238,25 +238,25 @@ structure Semant :> SEMANT = struct
       trexp
     end
     
-    and transDec (venv, tenv, A.VarDec{name, typ=NONE, init, ... }, break) = 
+    and transDec (venv, tenv, A.VarDec{name, typ=NONE, init, ... }, break, explist) = 
           let 
             val {exp,ty} = transExp (venv, tenv) init
           in 
-            {tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}
+            ({tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}, explist::exp)
           end
 
-    | transDec (venv, tenv, A.VarDec{name,escape= ref true ,typ=SOME(s, pos), init, pos=pos1}, break) =
+    | transDec (venv, tenv, A.VarDec{name,escape= ref true ,typ=SOME(s, pos), init, pos=pos1}, break, explist) =
         let
             val {exp, ty} = transExp (venv, tenv) init 
         in
             ( case Symbol.look (tenv,s) of
                 NONE => (err pos ("type not defined: " ^ Symbol.name s))
                 | SOME ty2=>  if ty<>ty2 then (err pos "type mismatch") else ();
-                {tenv=tenv,
-                venv=Symbol.enter(venv, name, Env.VarEntry{ty=ty})  } )
+                ({tenv=tenv,
+                venv=Symbol.enter(venv, name, Env.VarEntry{ty=ty})}, explist) )
         end
 
-    | transDec (venv, tenv, A.TypeDec vardecs, break) = 
+    | transDec (venv, tenv, A.TypeDec vardecs, break, explist) = 
           let
             val names = map #name vardecs
             val poss = map #pos vardecs
@@ -270,10 +270,10 @@ structure Semant :> SEMANT = struct
               end
             val _ = app updt (ListPair.zip(names,nts))
             in 
-                {tenv=tenv', venv=venv}
+                ({tenv=tenv', venv=venv}, explist)
             end
 
-    | transDec(venv, tenv, A.FunctionDec[{name, params, body, pos, result=SOME(rt,pos1)}], break) =
+    | transDec(venv, tenv, A.FunctionDec[{name, params, body, pos, result=SOME(rt,pos1)}], break, explist) =
         let val result_ty = case Symbol.look(tenv, rt) of 
                               SOME(res) => res
                             | NONE => Types.UNIT
@@ -288,17 +288,17 @@ structure Semant :> SEMANT = struct
               Symbol.enter (venv, name, E.VarEntry{ty=typ})
           val venv'' = foldr enterparam venv' params'
         in transExp(venv'', tenv) body;
-          {venv=venv', tenv=tenv}
+          ({venv=venv', tenv=tenv}, explist)
         end
     | transDec(venv, tenv, _, _) = {venv=venv, tenv=tenv}
 
-    and transDecs (venv, tenv, decs) =
+    and transDecs (venv, tenv, decs, explist) =
     (case decs of
-      [] => {venv=venv, tenv=tenv}
+      [] => ({venv=venv, tenv=tenv}, [])
     | (d::ds) => let 
-                  val {venv=venv', tenv=tenv'} = transDec(venv, tenv, d, NONE) (*NONE = break?*)
+                  val ({venv=venv', tenv=tenv'}, explist') = transDec(venv, tenv, d, NONE, explist) (*NONE = break?*)
                 in
-                  transDecs(venv', tenv', ds)
+                  transDecs(venv', tenv', ds, explist')
                 end)
     
   fun transProg(absyn) = (transExp (E.base_venv, E.base_tenv) absyn; ())
