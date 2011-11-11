@@ -1,23 +1,49 @@
 signature TRANSLATE = 
 sig
-  (*val simpleVar : access * level -> exp*)
+  type access (*not the same as Frame.access*)
+  type level 
   datatype exp  = Ex of Tree.exp
                 | Nx of Tree.stm
                 | Cx of Temp.label * Temp.label -> Tree.stm
+  
+  val outermost : level
+  val newLevel : {parent: level, name: Temp.label, formals: bool list} -> level
+  val formals : level -> access list
+  val allocLocal : level -> bool -> access
+
+  val simpleVar : access * level -> exp
   val unEx : exp -> Tree.exp
   val unNx : exp -> Tree.stm
   val unCx : exp -> (Temp.label * Temp.label -> Tree.stm)
 end
+
 structure Translate : TRANSLATE = struct 
+  structure Frame = MipsFrame
   structure T = Tree
   datatype exp  = Ex of Tree.exp
                 | Nx of Tree.stm
                 | Cx of Temp.label * Temp.label -> Tree.stm
+  type access = level * Frame.access
+  type level = int ref
+  val outermost = ref 0
+  
+  fun newLevel({parent: l, name: n, formals: f}) = (Frame.newFrame(n, true::f); !l+1) (*change level?*)
+  fun formals(l) = let val fs = drop(Frame.formals(frame?), 1) (*remove the true value for static link*)
+                       fun convertAccess([]) = []
+                         | convertAccess(h::accs) = (l * h) @ convertAccess(accs)
+                   in
+                       convertAccess(fs)
+                   end
+                     
+  fun allocLocal(l) = fn(b) => (l * Frame.allocLocal(f??)(b))
+  
   exception Impossible of string
   
+  fun simpleVar(acc, l) = Ex(T.CONST 0) (*TODO*)
+
   fun seq([]) = T.LABEL(Temp.newlabel())
     | seq(h::t) = T.SEQ(h,seq(t))
-    
+  
   fun unEx(Ex e) = e
     | unEx(Cx genstm) =
         let 
