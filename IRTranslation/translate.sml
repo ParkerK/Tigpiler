@@ -72,4 +72,44 @@ structure Translate : TRANSLATE = struct
   fun unCx(Ex e) = (fn (t, f) => T.CJUMP(T.NE, e, T.CONST 0, t, f))
     | unCx(Cx genstm) = genstm
     | unCx(Nx _) = raise Impossible("Cannot unCx an Nx")
+    
+    
+  fun whileExp (test, body, done)
+    let
+      val test = unCx test
+      val body = unNx body
+      val testLabel = Temp.newlabel()
+      val bodyLabel = Temp.newlabel() 
+    in 
+      Nx (seq [T.LABEL testLabel, 
+          test (bodyLabel, done),
+          T.LABEL bodyLable,
+          body,
+          T.JUMP (T.NAME testLabel, [testLabel]),
+          T.LABEL done])
+    end
+    
+    fun forExp (var, escape, lo, hi, body)
+      let 
+        val var = unEx var
+        val lo = unEx lo
+        val hi = unEx hi
+        val body = unNx body
+        val bodyLabel = Temp.newlabel()
+        val forLabel = Temp.newlabel()
+      in
+        Nx (seq [T.MOVE (var, lo), (* Set var := lo *)
+          T.CJUMP (T.LE, var, hi, bodyLabel, escape),
+          T.LABEL bodyLabel,
+          body,
+          T.CJUMP (T.LT, var, hi, forLabel, escape), (* Check if exiting loop *)
+          T.LABEL forLabel,
+          T.MOVE (var, T.BINOP (T.PLUS, var, T.CONST (1))), (* var += 1 *)
+          T.JUMP (T.NAME forLabel, [forLabel]),
+          T.LABEL escape])
+        end
+        
+       
+ 
+  
 end
