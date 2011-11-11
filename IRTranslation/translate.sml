@@ -109,8 +109,8 @@ structure Translate : TRANSLATE = struct
           T.LABEL escape])
         end
     
-    fun ifExp (T.CONST (1), then, _) = then
-      | ifExp (T.CONST (0), _, else) = else
+    fun ifExp (T.CONST (1), thenExp, _) = thenExp
+      | ifExp (T.CONST (0), _, elseExp) = elseExp
       | ifExp () (* TODO *)
       
     end
