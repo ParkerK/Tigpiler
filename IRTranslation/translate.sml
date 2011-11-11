@@ -190,8 +190,9 @@ structure Translate : TRANSLATE = struct
       
     fun callExp (_:level, label, exps:exp list) = Ex(T.CALL(T.NAME(label), map unEx exps))
   
-  
-  
+    fun letExp ([], body) = unNx body
+      | letExp (decs, body) = Ex (T.ESEQ (seq (map unEx decs), unEx body))
+    
     fun subscriptExp(arr, offset) =
         let
           val address = Temp.newtemp()
