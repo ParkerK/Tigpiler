@@ -6,6 +6,7 @@ end
 structure Semant :> SEMANT = struct
   structure A = Absyn
   structure E = Env
+  structure Tr = Translate
   val err = ErrorMsg.error
   exception ErrMsg
 

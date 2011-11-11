@@ -3,7 +3,12 @@ struct
   type frame = {name: Temp.label, formals: bool list, locals: int ref}
   datatype access = InFrame of int (*a memory location at offset x from FP*)
                   | InReg of Temp.temp (*value held in register*)
-  val FP = Temp.newtemp();
+  
+  val ZERO = Temp.newtemp(); (* r0, zero *)
+  val FP = Temp.newtemp();   (* Framepointer *)
+  val SP = Temp.newtemp();   (* Stackpointer *)
+  val RA = Temp.newtemp();   (* Return address *)
+  
   val wordsize = 4; (*bytes*)
   
   fun newFrame({name, formals}) = {name=name, formals=formals, locals=ref 0}
