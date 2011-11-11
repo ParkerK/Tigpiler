@@ -18,7 +18,7 @@ sig
 end
 
 structure Translate : TRANSLATE = struct 
-  structure Frame = MipsFrame
+  structure Frame : FRAME = MipsFrame
   structure T = Tree
   datatype exp  = Ex of Tree.exp
                 | Nx of Tree.stm
@@ -27,15 +27,15 @@ structure Translate : TRANSLATE = struct
   type level = int ref
   val outermost = ref 0
   
-  fun newLevel({parent: l, name: n, formals: f}) = (Frame.newFrame(n, true::f); !l+1) (*change level?*)
-  fun formals(l) = let val fs = drop(Frame.formals(frame?), 1) (*remove the true value for static link*)
+  fun newLevel({parent=l, name=n, formals=f}) = (Frame.newFrame({name=n, formals=true::f}); ref(!l+1)) (*change level?*)
+  fun formals(l:level) = let val fs = tl(Frame.formals()) (*remove the true value for static link*)
                        fun convertAccess([]) = []
-                         | convertAccess(h::accs) = (l * h) @ convertAccess(accs)
+                         | convertAccess(h::accs) = (l, h) :: convertAccess(accs)
                    in
                        convertAccess(fs)
                    end
                      
-  fun allocLocal(l) = fn(b) => (l * Frame.allocLocal(f??)(b))
+  fun allocLocal(l:level) = fn(b) => (l, Frame.allocLocal(f??)(b))
   
   exception Impossible of string
   
