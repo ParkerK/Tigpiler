@@ -131,5 +131,18 @@ structure Translate : TRANSLATE = struct
       in
         Nx (T.MOVE (var, exp))
       end
+      
+    fun intOpExp (A.PlusOp)   = BINOP T.PLUS
+      | intOpExp (A.MinusOp)  = BINOP T.MINUS
+      | intOpExp (A.TimesOp)  = BINOP T.MUL
+      | intOpExp (A.DivideOp) = BINOP T.DIV
+      | intOpExp (A.EqOp)     = RELOP T.EQ
+      | intOpExp (A.NeqOp)    = RELOP T.NE
+      | intOpExp (A.LtOp)     = RELOP T.LT
+      | intOpExp (A.LeOp)     = RELOP T.LE
+      | intOpExp (A.GtOp)     = RELOP T.GT
+      | intOpExp (A.GeOp)     = RELOP T.GE
+      
     
+  
 end
