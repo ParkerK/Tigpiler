@@ -217,7 +217,7 @@ structure Semant :> SEMANT = struct
 
       | trexp (A.LetExp {decs, body, pos}) =
           let
-            val ({tenv=tenv', venv=venv'}, decList) = transDecs(venv,tenv,decs)
+            val ({tenv=tenv', venv=venv'}, decList) = transDecs(venv,tenv,decs,[])
             val {exp=bodyExp, ty=bodyTy} = transExp (venv',tenv') body
           in
             {exp=Tr.letExp(decList,bodyExp), ty=bodyTy}
