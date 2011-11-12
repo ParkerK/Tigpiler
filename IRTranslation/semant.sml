@@ -146,8 +146,9 @@ structure Semant :> SEMANT = struct
         
           val test'' = checkInt (test', pos);
           val body'' = checkUnit (body', pos);
+          val break = Tr.breakExp()
         in
-          {exp=Tr.nilExp(), ty=Types.UNIT}
+          {exp=Tr.whileExp(#exp test', #exp body', break), ty=Types.UNIT}
         end 
 
       | trexp (A.RecordExp {fields, typ, pos}) =
