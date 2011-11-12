@@ -95,7 +95,7 @@ structure Semant :> SEMANT = struct
             | Types.STRING =>
                 (checkString(left', pos);
                 checkString(right', pos);
-                {exp=Tr.nilExp(), ty=Types.INT})
+                {exp=Tr.stringOpExp(oper, (#exp left', #exp right')), ty=Types.INT})
             | _ => (err pos "can't perform comparisons on this type";
                   {exp=Tr.nilExp(), ty=Types.INT}))
            end

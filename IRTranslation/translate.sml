@@ -191,8 +191,8 @@ structure Translate : TRANSLATE = struct
     fun relopExp (oper, (left, right)) = 
       Cx(fn(t, f) => T.CJUMP(oper, unEx(left), unEx(right), t, f))
       
-    fun relopStrExp (oper, (left, right)) = 
-      Cx(fn(t, f) => T.CJUMP(oper, unEx(left), unEx(right), t, f))
+    fun relopStrExp (oper, (left, right), str) = 
+      Ex (Frame.externalCall (str, [left, right]))
         
     fun intOpExp (A.PlusOp, operands)   = binopExp (T.PLUS, operands)
       | intOpExp (A.MinusOp, operands)  = binopExp (T.MINUS, operands)
@@ -205,12 +205,12 @@ structure Translate : TRANSLATE = struct
       | intOpExp (A.GtOp, operands)     = relopExp (T.GT, operands)
       | intOpExp (A.GeOp, operands)     = relopExp (T.GE, operands)
       
-    fun stringOpExp (A.EqOp, operands)     = relopStrExp (T.EQ, operands)
-      | stringOpExp (A.NeqOp, operands)    = relopStrExp (T.NE, operands)
-      | stringOpExp (A.LtOp, operands)     = relopStrExp (T.LT, operands)
-      | stringOpExp (A.LeOp, operands)     = relopStrExp (T.LE, operands)
-      | stringOpExp (A.GtOp, operands)     = relopStrExp (T.GT, operands)
-      | stringOpExp (A.GeOp, operands)     = relopStrExp (T.GE, operands)      
+    fun stringOpExp (A.EqOp, operands)     = relopStrExp (T.EQ, operands, "stringEqual")
+      | stringOpExp (A.NeqOp, operands)    = relopStrExp (T.NE, operands, "stringNotEqual")
+      | stringOpExp (A.LtOp, operands)     = relopStrExp (T.LT, operands, "stringLessThan")
+      | stringOpExp (A.LeOp, operands)     = relopStrExp (T.LE, operands, "stringLessThanOrEqual")
+      | stringOpExp (A.GtOp, operands)     = relopStrExp (T.GT, operands, "stringGreaterThan")
+      | stringOpExp (A.GeOp, operands)     = relopStrExp (T.GE, operands, "stringGreaterThanEqual")      
 
     fun callExp (_:level, label, exps:exp list) = Ex(T.CALL(T.NAME(label), map unEx exps))
   
