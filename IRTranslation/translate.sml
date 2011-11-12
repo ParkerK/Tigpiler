@@ -22,6 +22,9 @@ sig
   val intOpExp : Absyn.oper * (exp * exp) -> exp
   val letExp : exp list * exp -> exp
   val stringExp : string -> exp
+  
+  val procEntryExit: {level: level, body: exp} -> unit
+  val getResult : unit -> Frame.frag list
 end
 
 structure Translate : TRANSLATE = struct 
