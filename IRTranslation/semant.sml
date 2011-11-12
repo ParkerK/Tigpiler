@@ -262,7 +262,7 @@ structure Semant :> SEMANT = struct
                 NONE => (err pos ("type not defined: " ^ Symbol.name s))
                 | SOME ty2=>  if ty<>ty2 then (err pos "type mismatch") else ();
                 ({tenv=tenv,
-                venv=Symbol.enter(venv, name, Env.VarEntry{ty=ty})}, explist) )
+                venv=Symbol.enter(venv, name, Env.VarEntry{ty=ty})}, explist))
         end
 
     | transDec (venv, tenv, A.TypeDec vardecs, explist) = 
@@ -299,7 +299,7 @@ structure Semant :> SEMANT = struct
         in transExp(venv'', tenv) body;
           ({venv=venv', tenv=tenv}, explist)
         end
-    | transDec(venv, tenv, _, _) = {venv=venv, tenv=tenv}
+    | transDec(venv, tenv, _, explist) = ({venv=venv, tenv=tenv}, explist)
 
     and transDecs (venv, tenv, decs, explist) =
     (case decs of
