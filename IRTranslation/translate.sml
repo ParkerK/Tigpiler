@@ -21,6 +21,7 @@ sig
   val ifExp : exp * exp * exp -> exp
   val intOpExp : Absyn.oper * (exp * exp) -> exp
   val letExp : exp list * exp -> exp
+  val stringExp : string -> exp
   
   val procEntryExit: {level: level, body: exp} -> unit
   val getResult : unit -> Frame.frag list
@@ -166,12 +167,14 @@ structure Translate : TRANSLATE = struct
       
     fun intExp (i) = Ex (T.CONST (i)) (* Return a constant of that value *)
     fun nilExp () = Ex (T.CONST (0))
-    (*fun stringExp (str) = 
-      let
-        val strLabel = Temp.newlabel()
-      in
-        (* Frame call to handle string *)
-      end*)
+    
+    fun stringExp str =
+        let
+          val label = Temp.newlabel()
+        in
+          (*frags := Frame.STRING (label, str) :: (!frags);*)
+          Ex (T.NAME label)
+        end
       
     fun assignExp (var, exp) =
       let
