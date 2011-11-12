@@ -1,6 +1,6 @@
 signature SEMANT =
 sig
-  val transProg : Absyn.exp -> unit
+  val transProg : Absyn.exp -> {exp:Translate.exp, ty:Types.ty}
 end 
 
 structure Semant :> SEMANT = struct
@@ -310,5 +310,5 @@ structure Semant :> SEMANT = struct
                   transDecs(venv', tenv', ds, explist')
                 end)
     
-  fun transProg(absyn) = (transExp (E.base_venv, E.base_tenv) absyn; ())
+  fun transProg(absyn) = (transExp (E.base_venv, E.base_tenv) absyn)
 end
