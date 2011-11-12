@@ -69,13 +69,13 @@ structure Semant :> SEMANT = struct
     let fun trexp (A.NilExp) = {exp=Tr.nilExp(), ty=Types.NIL}
       | trexp (A.VarExp var) = trvar var
       | trexp (A.IntExp i) = {exp=(Tr.intExp(i)), ty=Types.INT}
-      | trexp (A.StringExp (str, pos)) = {exp=Tr.stringExp(?), ty=Types.STRING}
+      | trexp (A.StringExp (str, pos)) = {exp=(), ty=Types.STRING}
       | trexp (A.OpExp {left, oper, right, pos}) = 
         if oper = A.PlusOp orelse oper = A.MinusOp orelse 
            oper = A.TimesOp orelse oper = A.DivideOp then
           (checkInt(trexp left, pos);
            checkInt(trexp right, pos);
-           {exp=(), ty=Types.INT})
+           {exp=Tr.binopExp(oper, (left, right)), ty=Types.INT})
         else if oper = A.EqOp orelse oper = A.NeqOp orelse oper = A.LtOp orelse
                 oper = A.LeOp orelse oper = A.GtOp orelse oper = A.GeOp then
           let
@@ -86,7 +86,7 @@ structure Semant :> SEMANT = struct
               Types.INT =>
                 (checkInt(left', pos);
                 checkInt(right', pos);
-                {exp=(), ty=Types.INT})
+                {exp=Tr.relopExp(oper, (left, right)), ty=Types.INT})
             | Types.STRING =>
                 (checkString(left', pos);
                 checkString(right', pos);

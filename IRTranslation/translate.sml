@@ -15,6 +15,13 @@ sig
   val unEx : exp -> Tree.exp
   val unNx : exp -> Tree.stm
   val unCx : exp -> (Temp.label * Temp.label -> Tree.stm)
+  
+  val intExp : int -> exp
+  val nilExp : unit -> exp
+  val binopExp : Tree.binop * (exp * exp) -> exp
+  val relopExp : Tree.relop * (exp * exp) -> exp
+  val ifExp : exp * exp * exp -> exp
+    
 end
 
 structure Translate : TRANSLATE = struct 
@@ -120,7 +127,7 @@ structure Translate : TRANSLATE = struct
     
     fun ifExp (cond, thenExp, elseExp) =
         let
-          val cond = unCx(Ex cond)
+          val cond = unCx(cond)
           val thenLabel = Temp.newlabel()
           val elseLabel = Temp.newlabel()
           val joinLabel = Temp.newlabel()
@@ -192,8 +199,8 @@ structure Translate : TRANSLATE = struct
       
     fun callExp (_:level, label, exps:exp list) = Ex(T.CALL(T.NAME(label), map unEx exps))
   
-    fun letExp ([], body) = unNx body
-      | letExp (decs, body) = Ex (T.ESEQ (seq (map unEx decs), unEx body))
+    fun letExp ([], body) = body
+      | letExp (decs, body) = Ex (T.ESEQ (seq (map unNx decs), unEx body))
     
     
     fun fieldVar (var, offset) =
