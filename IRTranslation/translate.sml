@@ -18,10 +18,9 @@ sig
   
   val intExp : int -> exp
   val nilExp : unit -> exp
-  val binopExp : Tree.binop * (exp * exp) -> exp
-  val relopExp : Tree.relop * (exp * exp) -> exp
   val ifExp : exp * exp * exp -> exp
-    
+  val intOpExp : Absyn.oper * (exp * exp) -> exp
+  val letExp : exp list * exp -> exp
 end
 
 structure Translate : TRANSLATE = struct 

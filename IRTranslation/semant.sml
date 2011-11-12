@@ -69,13 +69,18 @@ structure Semant :> SEMANT = struct
     let fun trexp (A.NilExp) = {exp=Tr.nilExp(), ty=Types.NIL}
       | trexp (A.VarExp var) = trvar var
       | trexp (A.IntExp i) = {exp=(Tr.intExp(i)), ty=Types.INT}
-      | trexp (A.StringExp (str, pos)) = {exp=(), ty=Types.STRING}
+      | trexp (A.StringExp (str, pos)) = {exp=Tr.nilExp(), ty=Types.STRING}
       | trexp (A.OpExp {left, oper, right, pos}) = 
         if oper = A.PlusOp orelse oper = A.MinusOp orelse 
            oper = A.TimesOp orelse oper = A.DivideOp then
-          (checkInt(trexp left, pos);
-           checkInt(trexp right, pos);
-           {exp=Tr.binopExp(oper, (left, right)), ty=Types.INT})
+          let 
+            val left' = trexp left
+            val right' = trexp right
+          in
+          (checkInt(left', pos);
+           checkInt(right', pos);
+           {exp=Tr.intOpExp(oper, (#exp left', #exp right')), ty=Types.INT})
+         end
         else if oper = A.EqOp orelse oper = A.NeqOp orelse oper = A.LtOp orelse
                 oper = A.LeOp orelse oper = A.GtOp orelse oper = A.GeOp then
           let
@@ -86,26 +91,26 @@ structure Semant :> SEMANT = struct
               Types.INT =>
                 (checkInt(left', pos);
                 checkInt(right', pos);
-                {exp=Tr.relopExp(oper, (left, right)), ty=Types.INT})
+                {exp=Tr.intOpExp(oper, (#exp left', #exp right')), ty=Types.INT})
             | Types.STRING =>
                 (checkString(left', pos);
                 checkString(right', pos);
-                {exp=(), ty=Types.INT})
+                {exp=Tr.nilExp(), ty=Types.INT})
             | _ => (err pos "can't perform comparisons on this type";
-                  {exp=(), ty=Types.INT}))
+                  {exp=Tr.nilExp(), ty=Types.INT}))
            end
        else
-        (err pos "error";{exp=(), ty=Types.INT})
+        (err pos "error";{exp=Tr.nilExp(), ty=Types.INT})
 
     | trexp   (A.CallExp {func, args, pos}) = 
       (case Symbol.look (venv, func) of
         SOME (E.FunEntry {formals, result}) =>
           (*if
             length(args') <> length(args)
-          then (err pos "wrong amount of arguments";    {exp=(), ty=result})
+          then (err pos "wrong amount of arguments";    {exp=Tr.nilExp(), ty=result})
           else*)
-          {exp=(), ty=Types.UNIT}
-        | _ => (err pos ("can't call nonexistant function: " ^ Symbol.name func ); {exp=(), ty=Types.UNIT}))
+          {exp=Tr.nilExp(), ty=Types.UNIT}
+        | _ => (err pos ("can't call nonexistant function: " ^ Symbol.name func ); {exp=Tr.nilExp(), ty=Types.UNIT}))
         (* Should check to make sure return types match, as do argtypes *)
 
     | trexp   (A.IfExp {test, then', else', pos}) =
@@ -117,7 +122,7 @@ structure Semant :> SEMANT = struct
          in
            (checkInt (test', pos);
            checkUnit (then'', pos);
-           {exp=(Tr.ifExp(test', then'', ?)), ty=Types.UNIT})
+           {exp=Tr.nilExp(), ty=Types.UNIT})
          end
          | SOME else' =>
          let
@@ -128,7 +133,7 @@ structure Semant :> SEMANT = struct
            checkInt(test', pos);
            checkUnit(then'', pos);
            checkUnit(else'', pos);
-           {exp=(Tr.ifExp(test', then'', else'')), ty=Types.UNIT}
+           {exp=(Tr.ifExp(#exp test', #exp then'', #exp else'')), ty=Types.UNIT}
          end
         )
 
@@ -142,7 +147,7 @@ structure Semant :> SEMANT = struct
           val test'' = checkInt (test', pos);
           val body'' = checkUnit (body', pos);
         in
-          {exp=(), ty=Types.UNIT}
+          {exp=Tr.nilExp(), ty=Types.UNIT}
         end 
 
       | trexp (A.RecordExp {fields, typ, pos}) =
@@ -163,21 +168,21 @@ structure Semant :> SEMANT = struct
                         (fn (ty1, ty2) => compare_ty (ty1, ty2, pos))
                         (types, dftypes))
                     then
-                        {exp=(), ty=Types.RECORD(s,u)} 
+                        {exp=Tr.nilExp(), ty=Types.RECORD(s,u)} 
                     else 
                         (err pos ("field types not consistant: " ^ Symbol.name typ);
-                        {exp=(),ty=Types.RECORD(s,u)})
+                        {exp=Tr.nilExp(),ty=Types.RECORD(s,u)})
                   else
                     (err pos ("field types not consistant: " ^ Symbol.name typ);
-                    {exp=(),ty=Types.RECORD(s,u)})
+                    {exp=Tr.nilExp(),ty=Types.RECORD(s,u)})
                 end
             | _ => (err pos ("not a valid record type: " ^ Symbol.name typ);
-                    {exp=(), ty=Types.UNIT})
+                    {exp=Tr.nilExp(), ty=Types.UNIT})
         end
         
 
       | trexp (A.SeqExp exps) =
-        {exp=(), ty=Types.UNIT}
+        {exp=Tr.nilExp(), ty=Types.UNIT}
 
       | trexp (A.AssignExp {var, exp, pos}) =
         let
@@ -187,9 +192,9 @@ structure Semant :> SEMANT = struct
           if
           expect <> actual
           then
-          (err pos "assignment mismatch";{exp=(), ty=Types.UNIT})
+          (err pos "assignment mismatch";{exp=Tr.nilExp(), ty=Types.UNIT})
           else
-          {exp=(), ty=Types.UNIT}
+          {exp=Tr.nilExp(), ty=Types.UNIT}
         end
 
       | trexp (A.ForExp {var, escape, lo, hi, body, pos}) =
@@ -199,54 +204,57 @@ structure Semant :> SEMANT = struct
           val hi' = checkInt(trexp (hi), pos)
         (* Add Stuff Here *)
         in
-          {exp=(),ty=Types.UNIT}
+          {exp=Tr.nilExp(),ty=Types.UNIT}
         end
 
       | trexp (A.BreakExp pos) =
         if !nestLevel > 0 
         then
-          {exp=(), ty=Types.UNIT}
+          {exp=Tr.nilExp(), ty=Types.UNIT}
         else
           (err pos "Break not nested correctly";
-            {exp=(), ty=Types.UNIT})
+            {exp=Tr.nilExp(), ty=Types.UNIT})
 
       | trexp (A.LetExp {decs, body, pos}) =
-        let val ({venv=venv', tenv=tenv'}, explist) = transDecs(venv, tenv, decs)
-          in transExp(venv', tenv') body
-        end
+          let
+            val ({tenv=tenv', venv=venv'}, decList) = transDecs(venv,tenv,decs)
+            val {exp=bodyExp, ty=bodyTy} = transExp (venv',tenv') body
+          in
+            {exp=Tr.letExp(decList,bodyRxp), ty=bodyTy}
+          end
 
       | trexp (A.ArrayExp {typ, size, init, pos}) =
-        {exp=(), ty=Types.UNIT}
+        {exp=Tr.nilExp(), ty=Types.UNIT}
 
      and trvar (A.SimpleVar(id,pos)) = 
           (case Symbol.look(venv, id) of
-            SOME (E.VarEntry{ty}) => {exp=(), ty=actual_ty ty}
-          | _ => (err pos ("undefined variable: " ^ Symbol.name id); {exp=(), ty=Types.INT}))
+            SOME (E.VarEntry{ty}) => {exp=Tr.nilExp(), ty=actual_ty ty}
+          | _ => (err pos ("undefined variable: " ^ Symbol.name id); {exp=Tr.nilExp(), ty=Types.INT}))
 
       | trvar (A.FieldVar(var,id,pos)) =
           let
             val var' = trvar var
           in
             (case var' of
-              {exp, ty=record as Types.RECORD (fields, _)} => {exp=(), ty=record}
-            | _ => (err pos "no var found"; {exp=(), ty=Types.UNIT}))
+              {exp, ty=record as Types.RECORD (fields, _)} => {exp=Tr.nilExp(), ty=record}
+            | _ => (err pos "no var found"; {exp=Tr.nilExp(), ty=Types.UNIT}))
           end
 
       | trvar (A.SubscriptVar(var, exp,pos)) =
           (checkInt(trexp exp, pos);
-          {exp=(), ty=Types.UNIT})
+          {exp=Tr.nilExp(), ty=Types.UNIT})
     in
       trexp
     end
     
-    and transDec (venv, tenv, A.VarDec{name, typ=NONE, init, ... }, break, explist) = 
+    and transDec (venv, tenv, A.VarDec{name, typ=NONE, init, ... }, explist) = 
           let 
             val {exp,ty} = transExp (venv, tenv) init
           in 
             ({tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}, explist::exp)
           end
 
-    | transDec (venv, tenv, A.VarDec{name,escape= ref true ,typ=SOME(s, pos), init, pos=pos1}, break, explist) =
+    | transDec (venv, tenv, A.VarDec{name,escape= ref true ,typ=SOME(s, pos), init, pos=pos1}, explist) =
         let
             val {exp, ty} = transExp (venv, tenv) init 
         in
@@ -257,7 +265,7 @@ structure Semant :> SEMANT = struct
                 venv=Symbol.enter(venv, name, Env.VarEntry{ty=ty})}, explist) )
         end
 
-    | transDec (venv, tenv, A.TypeDec vardecs, break, explist) = 
+    | transDec (venv, tenv, A.TypeDec vardecs, explist) = 
           let
             val names = map #name vardecs
             val poss = map #pos vardecs
@@ -274,7 +282,7 @@ structure Semant :> SEMANT = struct
                 ({tenv=tenv', venv=venv}, explist)
             end
 
-    | transDec(venv, tenv, A.FunctionDec[{name, params, body, pos, result=SOME(rt,pos1)}], break, explist) =
+    | transDec(venv, tenv, A.FunctionDec[{name, params, body, pos, result=SOME(rt,pos1)}], explist) =
         let val result_ty = case Symbol.look(tenv, rt) of 
                               SOME(res) => res
                             | NONE => Types.UNIT
