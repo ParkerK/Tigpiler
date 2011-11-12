@@ -220,7 +220,7 @@ structure Semant :> SEMANT = struct
             val ({tenv=tenv', venv=venv'}, decList) = transDecs(venv,tenv,decs)
             val {exp=bodyExp, ty=bodyTy} = transExp (venv',tenv') body
           in
-            {exp=Tr.letExp(decList,bodyRxp), ty=bodyTy}
+            {exp=Tr.letExp(decList,bodyExp), ty=bodyTy}
           end
 
       | trexp (A.ArrayExp {typ, size, init, pos}) =
