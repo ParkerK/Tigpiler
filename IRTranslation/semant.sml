@@ -182,8 +182,20 @@ structure Semant :> SEMANT = struct
         
 
       | trexp (A.SeqExp exps) =
-        {exp=Tr.nilExp(), ty=Types.UNIT}
-
+      let
+           val (exps', ty) =
+             foldl (fn ((exp, _), (exps', _)) =>
+                     let
+                       val {exp=newExp, ty} = transExp (venv, tenv, exp)
+                     in
+                       (exps' @ [newExp], ty)
+                     end)
+                   ([], Types.UNIT)
+              exps
+      in
+           {exp=Tr.seq exps', ty=ty}
+      end
+         
       | trexp (A.AssignExp {var, exp, pos}) =
         let
           val  {exp=left,  ty=expect} = trvar (var)
@@ -194,7 +206,7 @@ structure Semant :> SEMANT = struct
           then
           (err pos "assignment mismatch";{exp=Tr.nilExp(), ty=Types.UNIT})
           else
-          {exp=Tr.nilExp(), ty=Types.UNIT}
+          {exp=Tr.assignExp(left, right), ty=Types.UNIT}
         end
 
       | trexp (A.ForExp {var, escape, lo, hi, body, pos}) =
