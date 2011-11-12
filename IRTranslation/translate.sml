@@ -21,6 +21,7 @@ sig
   val ifExp : exp * exp * exp -> exp
   val intOpExp : Absyn.oper * (exp * exp) -> exp
   val letExp : exp list * exp -> exp
+  val stringExp : string -> exp
 end
 
 structure Translate : TRANSLATE = struct 
@@ -166,7 +167,7 @@ structure Translate : TRANSLATE = struct
     
     fun stringExp str =
         let
-          val label = Temp.newabel()
+          val label = Temp.newlabel()
         in
           (*frags := Frame.STRING (label, str) :: (!frags);*)
           Ex (T.NAME label)
