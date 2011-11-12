@@ -251,7 +251,7 @@ structure Semant :> SEMANT = struct
           let 
             val {exp,ty} = transExp (venv, tenv) init
           in 
-            ({tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}, explist::exp)
+            ({tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}, exp::explist)
           end
 
     | transDec (venv, tenv, A.VarDec{name,escape= ref true ,typ=SOME(s, pos), init, pos=pos1}, explist) =
