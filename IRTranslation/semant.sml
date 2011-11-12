@@ -122,7 +122,7 @@ structure Semant :> SEMANT = struct
          in
            (checkInt (test', pos);
            checkUnit (then'', pos);
-           {exp=Tr.nilExp(), ty=Types.UNIT})
+           {exp=(Tr.ifExp(#exp test', #exp then'', nil)), ty=Types.UNIT})
          end
          | SOME else' =>
          let
