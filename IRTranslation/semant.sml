@@ -303,7 +303,7 @@ structure Semant :> SEMANT = struct
 
     and transDecs (venv, tenv, decs, explist) =
     (case decs of
-      [] => ({venv=venv, tenv=tenv}, [])
+      [] => ({venv=venv, tenv=tenv}, explist)
     | (d::ds) => let 
                   val ({venv=venv', tenv=tenv'}, explist') = transDec(venv, tenv, d, NONE, explist) (*NONE = break?*)
                 in
