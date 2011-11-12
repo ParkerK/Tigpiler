@@ -36,8 +36,8 @@ struct
   fun exp(a) = 
     fn(_) => Tree.TEMP(FP) (*todo*)
     
-    fun string (label, str) = 
-        (Symbol.name label  ^ ": .asciiz \"" ^ str ^ "\"\n")
+  fun string (label, str) = 
+      (Symbol.name label  ^ ": .asciiz \"" ^ str ^ "\"\n")
     
   fun move (reg, var) = Tree.MOVE (Tree.TEMP reg, Tree.TEMP var)
   

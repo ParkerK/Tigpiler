@@ -163,12 +163,14 @@ structure Translate : TRANSLATE = struct
       
     fun intExp (i) = Ex (T.CONST (i)) (* Return a constant of that value *)
     fun nilExp () = Ex (T.CONST (0))
-    (*fun stringExp (str) = 
-      let
-        val strLabel = Temp.newlabel()
-      in
-        (* Frame call to handle string *)
-      end*)
+    
+    fun stringExp str =
+        let
+          val label = Temp.newabel()
+        in
+          (*frags := Frame.STRING (label, str) :: (!frags);*)
+          Ex (T.NAME label)
+        end
       
     fun assignExp (var, exp) =
       let
