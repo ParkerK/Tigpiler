@@ -215,7 +215,7 @@ structure Translate : TRANSLATE = struct
       | stringOpExp (A.LeOp, operands)     = relopStrExp (T.LE, operands, "stringLessThanOrEqual")
       | stringOpExp (A.GtOp, operands)     = relopStrExp (T.GT, operands, "stringGreaterThan")
       | stringOpExp (A.GeOp, operands)     = relopStrExp (T.GE, operands, "stringGreaterThanEqual")      
-
+      | stringOpExp (_, _)                 = raise Impossible ("illegal operation on strings")
     fun callExp (_:level, label, exps:exp list) = Ex(T.CALL(T.NAME(label), map unEx exps))
   
     fun letExp ([], body) = body

@@ -13,7 +13,7 @@ sig
   
   val exp : access -> Tree.exp -> Tree.exp
   
-  val externalCall : Tree.exp * Tree.exp * Tree.exp -> Tree.exp
+  val externalCall : string * Tree.exp * Tree.exp -> Tree.exp
   
   val procEntryExit1 : frame * Tree.stm -> Tree.stm
   
