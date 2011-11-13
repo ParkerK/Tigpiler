@@ -79,7 +79,7 @@ structure Semant :> SEMANT = struct
           in
           (checkInt(left', pos);
            checkInt(right', pos);
-           {exp=Tr.intOpExp(oper, (#exp left', #exp right')), ty=Types.INT})
+           {exp=Tr.intOpExp(oper, #exp left', #exp right'), ty=Types.INT})
          end
         else if oper = A.EqOp orelse oper = A.NeqOp orelse oper = A.LtOp orelse
                 oper = A.LeOp orelse oper = A.GtOp orelse oper = A.GeOp then
@@ -91,11 +91,11 @@ structure Semant :> SEMANT = struct
               Types.INT =>
                 (checkInt(left', pos);
                 checkInt(right', pos);
-                {exp=Tr.intOpExp(oper, (#exp left', #exp right')), ty=Types.INT})
+                {exp=Tr.intOpExp(oper, #exp left', #exp right'), ty=Types.INT})
             | Types.STRING =>
                 (checkString(left', pos);
                 checkString(right', pos);
-                {exp=Tr.stringOpExp(oper, (#exp left', #exp right')), ty=Types.INT})
+                {exp=Tr.stringOpExp(oper, #exp left', #exp right'), ty=Types.INT})
             | _ => (err pos "can't perform comparisons on this type";
                   {exp=Tr.nilExp(), ty=Types.INT}))
            end
@@ -122,7 +122,7 @@ structure Semant :> SEMANT = struct
          in
            (checkInt (test', pos);
            checkUnit (then'', pos);
-           {exp=(Tr.ifExp(#exp test', #exp then'', nil)), ty=Types.UNIT})
+           {exp=(Tr.ifExp(#exp test', #exp then'', NONE)), ty=Types.UNIT})
          end
          | SOME else' =>
          let

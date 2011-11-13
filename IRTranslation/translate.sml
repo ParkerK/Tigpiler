@@ -24,10 +24,10 @@ sig
   val intExp : int -> exp
   val nilExp : unit -> exp
   val ifExp : exp * exp * exp -> exp
-  val intOpExp : Absyn.oper * (exp * exp) -> exp
+  val intOpExp : Absyn.oper * exp * exp -> exp
   val letExp : exp list * exp -> exp
   val stringExp : string -> exp
-  val stringOpExp : Absyn.oper * (Tree.exp * Tree.exp) -> exp
+  val stringOpExp : Absyn.oper * exp * exp -> exp
   val whileExp : exp * exp * Tree.label -> exp
   
   val procEntryExit: {level: level, body: exp} -> unit
@@ -195,33 +195,33 @@ structure Translate : TRANSLATE = struct
     
     fun breakExp break = Nx (T.JUMP(T.NAME break, [break]))
     
-    fun binopExp (oper, (left, right)) = Ex(T.BINOP(oper, unEx(left), unEx(right)))
+    fun binopExp (oper, left, right) = Ex(T.BINOP(oper, unEx left, unEx right))
     
-    fun relopExp (oper, (left, right)) = 
-      Cx(fn(t, f) => T.CJUMP(oper, unEx(left), unEx(right), t, f))
+    fun relopExp (oper, left, right) = 
+      Cx(fn(t, f) => T.CJUMP(oper, unEx left , unEx right , t, f))
       
-    fun relopStrExp (oper, (left, right), str) = 
-      Ex (Frame.externalCall (str, left, right))
-        
-    fun intOpExp (A.PlusOp, operands)   = binopExp (T.PLUS, operands)
-      | intOpExp (A.MinusOp, operands)  = binopExp (T.MINUS, operands)
-      | intOpExp (A.TimesOp, operands)  = binopExp (T.MUL, operands)
-      | intOpExp (A.DivideOp, operands) = binopExp (T.DIV, operands)
-      | intOpExp (A.EqOp, operands)     = relopExp (T.EQ, operands)
-      | intOpExp (A.NeqOp, operands)    = relopExp (T.NE, operands)
-      | intOpExp (A.LtOp, operands)     = relopExp (T.LT, operands)
-      | intOpExp (A.LeOp, operands)     = relopExp (T.LE, operands)
-      | intOpExp (A.GtOp, operands)     = relopExp (T.GT, operands)
-      | intOpExp (A.GeOp, operands)     = relopExp (T.GE, operands)
-      
-    fun stringOpExp (A.EqOp, operands)     = relopStrExp (T.EQ, operands, "stringEqual")
-      | stringOpExp (A.NeqOp, operands)    = relopStrExp (T.NE, operands, "stringNotEqual")
-      | stringOpExp (A.LtOp, operands)     = relopStrExp (T.LT, operands, "stringLessThan")
-      | stringOpExp (A.LeOp, operands)     = relopStrExp (T.LE, operands, "stringLessThanOrEqual")
-      | stringOpExp (A.GtOp, operands)     = relopStrExp (T.GT, operands, "stringGreaterThan")
-      | stringOpExp (A.GeOp, operands)     = relopStrExp (T.GE, operands, "stringGreaterThanEqual")      
-      | stringOpExp (_, _)                 = raise Impossible ("illegal operation on strings")
-    fun callExp (_:level, label, exps:exp list) = Ex(T.CALL(T.NAME(label), map unEx exps))
+    fun relopStrExp (oper, left, right, str) = 
+      Ex (Frame.externalCall (str, unEx left, unEx right))
+                                            
+    fun intOpExp (A.PlusOp, left, right)   = binopExp (T.PLUS, left, right)
+      | intOpExp (A.MinusOp, left, right)  = binopExp (T.MINUS, left, right)
+      | intOpExp (A.TimesOp, left, right)  = binopExp (T.MUL, left, right)
+      | intOpExp (A.DivideOp, left, right) = binopExp (T.DIV, left, right)
+      | intOpExp (A.EqOp, left, right)     = relopExp (T.EQ, left, right)
+      | intOpExp (A.NeqOp, left, right)    = relopExp (T.NE, left, right)
+      | intOpExp (A.LtOp, left, right)     = relopExp (T.LT, left, right)
+      | intOpExp (A.LeOp, left, right)     = relopExp (T.LE, left, right)
+      | intOpExp (A.GtOp, left, right)     = relopExp (T.GT, left, right)
+      | intOpExp (A.GeOp, left, right)     = relopExp (T.GE, left, right)
+                                            
+    fun stringOpExp (A.EqOp, left, right)     = relopStrExp (T.EQ, left, right, "stringEqual")
+      | stringOpExp (A.NeqOp, left, right)    = relopStrExp (T.NE, left, right, "stringNotEqual")
+      | stringOpExp (A.LtOp, left, right)     = relopStrExp (T.LT, left, right, "stringLessThan")
+      | stringOpExp (A.LeOp, left, right)     = relopStrExp (T.LE, left, right, "stringLessThanOrEqual")
+      | stringOpExp (A.GtOp, left, right)     = relopStrExp (T.GT, left, right, "stringGreaterThan")
+      | stringOpExp (A.GeOp, left, right)     = relopStrExp (T.GE, left, right, "stringGreaterThanEqual")      
+      | stringOpExp (_, _, _)                 = raise Impossible ("illegal operation on strings")
+    fun callExp (_:level, label, exps:exp list) = Ex(T.CALL(T.NAME(label), map unEx exps))       
   
     fun letExp ([], body) = body
       | letExp (decs, body) = Ex (T.ESEQ (seq (map unNx decs), unEx body))
