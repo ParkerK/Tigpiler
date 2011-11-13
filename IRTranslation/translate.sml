@@ -23,7 +23,8 @@ sig
   val breakExp : Tree.label -> exp
   val intExp : int -> exp
   val nilExp : unit -> exp
-  val ifExp : exp * exp * exp -> exp
+  val ifThenExp : exp * exp -> exp
+  val ifThenElseExp : exp * exp * exp -> exp
   val intOpExp : Absyn.oper * exp * exp -> exp
   val letExp : exp list * exp -> exp
   val seqExp : exp list -> exp
@@ -137,8 +138,27 @@ structure Translate : TRANSLATE = struct
           T.JUMP (T.NAME forLabel, [forLabel]),
           T.LABEL escape])
         end
-    
-    fun ifExp (cond, thenExp, elseExp) =
+    fun ifThenExp (cond, thenExp) =
+        let
+          val cond = unCx(cond)
+          val thenLabel = Temp.newlabel()
+          val endLabel = Temp.newlabel()
+        in
+          case (cond, thenExp) of
+                  (_, Cx _) =>
+                    Cx (fn (t, f) =>
+                           seq [(cond) (thenLabel, endLabel),
+                                T.LABEL thenLabel,
+                                (unCx thenExp) (t, f),
+                                T.LABEL endLabel])
+                  | (_, Nx _) =>
+                    Nx (seq [(cond) (thenLabel, endLabel),
+                             T.LABEL thenLabel,
+                             unNx thenExp,
+                             T.LABEL endLabel])
+                  | (_, Ex _) => raise Impossible ("Must have else!")
+        end
+    fun ifThenElseExp (cond, thenExp, elseExp) =
         let
           val cond = unCx(cond)
           val thenLabel = Temp.newlabel()
