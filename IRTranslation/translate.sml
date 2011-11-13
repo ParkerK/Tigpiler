@@ -17,13 +17,18 @@ sig
   val unEx : exp -> Tree.exp
   val unNx : exp -> Tree.stm
   val unCx : exp -> (Temp.label * Temp.label -> Tree.stm)
+  val seq : Tree.stm list ->Tree.stm
   
+  val assignExp : exp * exp -> exp
+  val breakExp : Tree.label -> exp
   val intExp : int -> exp
   val nilExp : unit -> exp
   val ifExp : exp * exp * exp -> exp
   val intOpExp : Absyn.oper * (exp * exp) -> exp
   val letExp : exp list * exp -> exp
   val stringExp : string -> exp
+  val stringOpExp : Absyn.oper * (Tree.exp * Tree.exp) -> exp
+  val whileExp : exp * exp * Tree.label -> exp
   
   val procEntryExit: {level: level, body: exp} -> unit
   val getResult : unit -> frag list
