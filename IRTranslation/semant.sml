@@ -122,7 +122,7 @@ structure Semant :> SEMANT = struct
          in
            (checkInt (test', pos);
            checkUnit (then'', pos);
-           {exp=Tr.nilExp(), ty=Types.UNIT})
+           {exp=(Tr.ifExp(#exp test', #exp then'', nil)), ty=Types.UNIT})
          end
          | SOME else' =>
          let
@@ -146,8 +146,9 @@ structure Semant :> SEMANT = struct
         
           val test'' = checkInt (test', pos);
           val body'' = checkUnit (body', pos);
+          val break = Tr.breakExp()
         in
-          {exp=Tr.nilExp(), ty=Types.UNIT}
+          {exp=Tr.whileExp(#exp test', #exp body', break), ty=Types.UNIT}
         end 
 
       | trexp (A.RecordExp {fields, typ, pos}) =
@@ -266,7 +267,7 @@ structure Semant :> SEMANT = struct
             ({tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}, exp::explist)
           end
 
-    | transDec (venv, tenv, A.VarDec{name,escape= ref true ,typ=SOME(s, pos), init, pos=pos1}, explist) =
+    | transDec (venv, tenv, A.VarDec{name,escape= ref true, typ=SOME(s, pos), init, pos=pos1}, explist) =
         let
             val {exp, ty} = transExp (venv, tenv) init 
         in
