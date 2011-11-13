@@ -26,6 +26,7 @@ sig
   val ifExp : exp * exp * exp -> exp
   val intOpExp : Absyn.oper * exp * exp -> exp
   val letExp : exp list * exp -> exp
+  val seqExp : exp list -> exp
   val stringExp : string -> exp
   val stringOpExp : Absyn.oper * exp * exp -> exp
   val whileExp : exp * exp * Tree.label -> exp
@@ -226,7 +227,14 @@ structure Translate : TRANSLATE = struct
     fun letExp ([], body) = body
       | letExp (decs, body) = Ex (T.ESEQ (seq (map unNx decs), unEx body))
     
-    
+    fun seqExp(exps) =   
+      let
+        val firsts = List.rev(List.tl(List.rev exps))
+        val last = List.last exps
+      in
+        Ex(T.ESEQ(seq(map unNx firsts),unEx last))
+      end
+          
     fun fieldVar (var, offset) =
       let
         val var = unEx var
