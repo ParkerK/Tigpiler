@@ -2,10 +2,12 @@ signature TRANSLATE =
 sig
   type access (*not the same as Frame.access*)
   type level 
+  type frag
   datatype exp  = Ex of Tree.exp
                 | Nx of Tree.stm
                 | Cx of Temp.label * Temp.label -> Tree.stm
-  
+
+  val frags : frag list ref
   val outermost : level
   val newLevel : {parent: level, name: Temp.label, formals: bool list} -> level
   val formals : level -> access list
@@ -24,7 +26,7 @@ sig
   val stringExp : string -> exp
   
   val procEntryExit: {level: level, body: exp} -> unit
-  val getResult : unit -> Frame.frag list
+  val getResult : unit -> frag list
 end
 
 structure Translate : TRANSLATE = struct 
@@ -38,6 +40,8 @@ structure Translate : TRANSLATE = struct
                   | Level of {frame:Frame.frame, parent: level} * unit ref
   type access = level * Frame.access
   val outermost = Top
+  type frag = Frame.frag
+  val frags = ref([] : frag list)
   exception Impossible of string
   
   fun newLevel({parent=l, name=n, formals=f}) = (Level ({frame=Frame.newFrame {name=n, formals=true::f}, parent=l}, ref())) (*change level?*)
@@ -172,7 +176,7 @@ structure Translate : TRANSLATE = struct
         let
           val label = Temp.newlabel()
         in
-          (*frags := Frame.STRING (label, str) :: (!frags);*)
+          frags := Frame.STRING (label, str) :: !frags;
           Ex (T.NAME label)
         end
       
@@ -192,7 +196,7 @@ structure Translate : TRANSLATE = struct
       Cx(fn(t, f) => T.CJUMP(oper, unEx(left), unEx(right), t, f))
       
     fun relopStrExp (oper, (left, right), str) = 
-      Ex (Frame.externalCall (str, [left, right]))
+      Ex (Frame.externalCall (str, left, right))
         
     fun intOpExp (A.PlusOp, operands)   = binopExp (T.PLUS, operands)
       | intOpExp (A.MinusOp, operands)  = binopExp (T.MINUS, operands)
@@ -246,5 +250,6 @@ structure Translate : TRANSLATE = struct
               T.MEM(T.TEMP(address))))
           end
 
-  
+    fun procEntryExit({level=level, body=exp})= () (*todo*)
+    fun getResult() = !frags
 end

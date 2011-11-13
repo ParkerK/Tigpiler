@@ -3,13 +3,16 @@ struct
   type frame = {name: Temp.label, formals: bool list, locals: int ref}
   datatype access = InFrame of int (*a memory location at offset x from FP*)
                   | InReg of Temp.temp (*value held in register*)
+  datatype frag = PROC of {body: Tree.stm, frame: frame}
+                | STRING of Temp.label * string
+
+  val ZERO = Temp.newtemp() (* r0, zero *)
+  val FP = Temp.newtemp()   (* Framepointer *)
+  val SP = Temp.newtemp()   (* Stackpointer *)
+  val RA = Temp.newtemp()   (* Return address *)
+  val RV = Temp.newtemp()   (* Return value *)
   
-  val ZERO = Temp.newtemp(); (* r0, zero *)
-  val FP = Temp.newtemp();   (* Framepointer *)
-  val SP = Temp.newtemp();   (* Stackpointer *)
-  val RA = Temp.newtemp();   (* Return address *)
-  
-  val wordsize = 4; (*bytes*)
+  val wordsize = 4 (*bytes*)
   
   fun newFrame({name, formals}) = {name=name, formals=formals, locals=ref 0}
   
@@ -41,4 +44,6 @@ struct
     
   fun move (reg, var) = Tree.MOVE (Tree.TEMP reg, Tree.TEMP var)
   
+  fun externalCall (str, left, right) = Tree.TEMP (Temp.newtemp()) (*todo*)
+  fun procEntryExit1 (frame, stm) = stm (*todo*)
 end

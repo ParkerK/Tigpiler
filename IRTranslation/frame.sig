@@ -13,6 +13,8 @@ sig
   
   val exp : access -> Tree.exp -> Tree.exp
   
+  val externalCall : Tree.exp * Tree.exp * Tree.exp -> Tree.exp
+  
   val procEntryExit1 : frame * Tree.stm -> Tree.stm
   
   datatype frag = PROC of {body: Tree.stm, frame: frame}
