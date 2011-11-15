@@ -14,7 +14,6 @@ sig
   val formals : level -> access list
   val allocLocal : level -> bool -> access
 
-  val simpleVar : access * level -> exp
   val unEx : exp -> Tree.exp
   val unNx : exp -> Tree.stm
   val unCx : exp -> (Temp.label * Temp.label -> Tree.stm)
@@ -33,6 +32,11 @@ sig
   val stringOpExp : Absyn.oper * exp * exp -> exp
   val whileExp : exp * exp * Tree.label -> exp
   val forExp : exp * Tree.label * exp * exp * exp -> exp
+
+  val simpleVar : access * level -> exp
+  val subscriptExp : exp * exp -> exp
+  val fieldVar : exp * exp -> exp
+
   val procEntryExit: {level: level, body: exp} -> unit
   val getResult : unit -> frag list
   (*val breakExp : exp -> Temp.label*)
@@ -269,7 +273,7 @@ structure Translate : TRANSLATE = struct
       in
           Ex(T.ESEQ(T.MOVE(T.TEMP(addr),
             T.BINOP(T.PLUS,var,
-            T.BINOP(T.MUL,T.CONST(offset),
+            T.BINOP(T.MUL,unEx offset,
             T.CONST(Frame.wordsize)))),
             T.MEM(T.TEMP(addr))))
         end
