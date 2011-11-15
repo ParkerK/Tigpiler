@@ -217,7 +217,7 @@ structure Semant :> SEMANT = struct
         val breakpoint = Tr.newbreakpoint
         val {exp=lo', ty=loty} = transExp (venv, tenv, break, level) lo
         val {exp=hi', ty=hity} = transExp (venv, tenv, break, level) hi
-        val venv' = Symbol.enter (venv, var, Env.VarEntry {ty=Types.INT})
+        val venv' = Symbol.enter (venv, var, Env.VarEntry {access=access, ty=Types.INT})
         val {exp=bodyExp, ty=body_ty} = transExp (venv', tenv, breakpoint, level) body
       in
         {exp=Tr.forExp(Tr.simpleVar (access, level), breakpoint, lo', hi', bodyExp), ty=Types.UNIT}
