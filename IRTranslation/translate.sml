@@ -3,6 +3,7 @@ sig
   type access (*not the same as Frame.access*)
   type level 
   type frag
+  type breakpoint
   datatype exp  = Ex of Tree.exp
                 | Nx of Tree.stm
                 | Cx of Temp.label * Temp.label -> Tree.stm
@@ -18,7 +19,7 @@ sig
   val unNx : exp -> Tree.stm
   val unCx : exp -> (Temp.label * Temp.label -> Tree.stm)
   val seq : Tree.stm list ->Tree.stm
-  
+  val newbreakpoint : unit -> breakpoint
   val assignExp : exp * exp -> exp
   val breakExp : Tree.label -> exp
   val intExp : int -> exp
@@ -42,6 +43,8 @@ structure Translate : TRANSLATE = struct
   structure Frame : FRAME = MipsFrame
   structure A = Absyn
   structure T = Tree
+  type breakpoint = Temp.label
+  
   datatype exp  = Ex of Tree.exp
                 | Nx of Tree.stm
                 | Cx of Temp.label * Temp.label -> Tree.stm
@@ -51,6 +54,8 @@ structure Translate : TRANSLATE = struct
   val outermost = Top
   type frag = Frame.frag
   val frags = ref([] : frag list)
+  val newbreakpoint = Temp.newlabel
+  
   exception Impossible of string
   
   fun newLevel({parent=l, name=n, formals=f}) = (Level ({frame=Frame.newFrame {name=n, formals=true::f}, parent=l}, ref())) (*change level?*)
@@ -72,7 +77,7 @@ structure Translate : TRANSLATE = struct
   fun seq([]) = T.LABEL(Temp.newlabel())
     | seq([s]) = s
     | seq(h::t) = T.SEQ(h,seq(t))
-  
+    
   fun unEx(Ex e) = e
     | unEx(Cx genstm) =
         let 
