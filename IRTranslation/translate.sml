@@ -317,7 +317,18 @@ structure Translate : TRANSLATE = struct
               T.MEM(T.TEMP(address))))
           end
 
-    fun procEntryExit({level=level, body=exp})= () (*todo*)
+    fun procEntryExit({level=level, body=exp})= 
+      let
+        val frame = (case level of
+                      Level({frame,parent}, _) => frame
+                    | Top => raise ErrorMsg.Error)
+
+        val body' = Frame.procEntryExit1(frame, unNx(exp))
+        val frag = Frame.PROC({body=body',frame=frame})
+        val _ = (frags := frag::(!frags))
+      in
+        ()
+      end
     fun getResult() = !frags
     
 end

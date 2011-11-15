@@ -46,5 +46,6 @@ struct
   fun move (reg, var) = Tree.MOVE (Tree.TEMP reg, Tree.TEMP var)
   
   fun externalCall (str, left, right) = Tree.TEMP (Temp.newtemp()) (*todo*)
-  fun procEntryExit1 (frame, stm) = stm (*todo*)
+  fun procEntryExit1 (frame, stm) = stm (*later*)
+  fun procEntryExit3 () = () (*later*)
 end
