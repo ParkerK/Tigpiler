@@ -214,7 +214,7 @@ structure Semant :> SEMANT = struct
         
       let
         val access = Tr.allocLocal level (!escape)
-        val breakpoint = Tr.newbreakpoint
+        val breakpoint = Tr.newbreakpoint()
         val {exp=lo', ty=loty} = transExp (venv, tenv, break, level) lo
         val {exp=hi', ty=hity} = transExp (venv, tenv, break, level) hi
         val venv' = Symbol.enter (venv, var, Env.VarEntry {access=access, ty=Types.INT})
@@ -328,5 +328,5 @@ structure Semant :> SEMANT = struct
                   transDecs(venv', tenv', ds, break, explist', level)
                 end)
     
-  fun transProg(absyn) = (transExp (E.base_venv, E.base_tenv, Tr.newbreakpoint) absyn)
+  fun transProg(absyn) = (transExp (E.base_venv, E.base_tenv, Tr.newbreakpoint()) absyn)
 end
