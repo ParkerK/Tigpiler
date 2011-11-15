@@ -47,7 +47,7 @@ structure Translate : TRANSLATE = struct
   structure Frame : FRAME = MipsFrame
   structure A = Absyn
   structure T = Tree
-  type breakpoint = Temp.label
+  type breakpoint = Tree.label
   
   datatype exp  = Ex of Tree.exp
                 | Nx of Tree.stm
