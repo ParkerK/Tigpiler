@@ -31,9 +31,11 @@ sig
   val stringExp : string -> exp
   val stringOpExp : Absyn.oper * exp * exp -> exp
   val whileExp : exp * exp * Tree.label -> exp
-  
+  val forExp : exp * Tree.label * exp * exp * exp -> exp
   val procEntryExit: {level: level, body: exp} -> unit
   val getResult : unit -> frag list
+  (*val breakExp : exp -> Temp.label*)
+  
 end
 
 structure Translate : TRANSLATE = struct 

@@ -64,7 +64,7 @@ structure Semant :> SEMANT = struct
       exp)
 
    (* Takes venv, tenv, exp *)
-  fun transExp(venv, tenv, break)  = (*removed break to make things compile*)
+  fun transExp(venv, tenv, break, level)  = (*removed break to make things compile*)
 
     let 
       fun trexp (A.NilExp) = {exp=Tr.nilExp(), ty=Types.NIL}
@@ -141,8 +141,8 @@ structure Semant :> SEMANT = struct
       | trexp (A.WhileExp {test, body, pos}) =
         let
           (*nestLevel := !nestLevel + 1*)
-          val body' = transExp (venv,tenv,break) body
-          val test' = transExp (venv,tenv,break) body
+          val body' = transExp (venv,tenv,break,level) body
+          val test' = transExp (venv,tenv,break,level) body
           (*nestLevel := !nestLevel - 1*)
         
           val test'' = checkInt (test', pos);
@@ -187,7 +187,7 @@ structure Semant :> SEMANT = struct
            val (exps', ty) =
              foldl (fn ((exp, _), (exps', _)) =>
                      let
-                       val {exp=newExp, ty} = (transExp(venv, tenv, break) exp)
+                       val {exp=newExp, ty} = (transExp(venv, tenv, break, level) exp)
                      in
                        (exps' @ [newExp], ty)
                      end)
@@ -212,13 +212,16 @@ structure Semant :> SEMANT = struct
 
       | trexp (A.ForExp {var, escape, lo, hi, body, pos}) =
         
-        let
-          val lo' = checkInt(trexp (lo), pos)
-          val hi' = checkInt(trexp (hi), pos)
-        (* Add Stuff Here *)
-        in
-          {exp=Tr.nilExp(),ty=Types.UNIT}
-        end
+      let
+        val access = Tr.allocLocal level (!escape)
+        val breakpoint = Tr.breakExp (break)
+        val {exp=lo', ty=loty} = transExp (venv, tenv, break, level) lo
+        val {exp=hi', ty=hity} = transExp (venv, tenv, break, level) hi
+        val venv' = Symbol.enter (venv, var, Env.VarEntry {ty=Types.INT})
+        val {exp=bodyExp, ty=body_ty} = transExp (venv', tenv, breakpoint, level) body
+      in
+        {exp=Tr.forExp(Tr.simpleVar (access, level), lo', hi', bodyExp, breakpoint), ty=Types.UNIT}
+      end
 
       | trexp (A.BreakExp pos) =
         if !nestLevel > 0 
@@ -241,7 +244,7 @@ structure Semant :> SEMANT = struct
 
      and trvar (A.SimpleVar(id,pos)) = 
           (case Symbol.look(venv, id) of
-            SOME (E.VarEntry{ty}) => {exp=Tr.nilExp(), ty=actual_ty ty}
+            SOME (E.VarEntry{acc, ty}) => {exp=Tr.simpleVar(acc, level), ty=actual_ty ty}
           | _ => (err pos ("undefined variable: " ^ Symbol.name id); {exp=Tr.nilExp(), ty=Types.INT}))
 
       | trvar (A.FieldVar(var,id,pos)) =
@@ -260,25 +263,25 @@ structure Semant :> SEMANT = struct
       trexp
     end
     
-    and transDec (venv, tenv, A.VarDec{name, typ=NONE, init, ... }, break, explist) = 
+    and transDec (venv, tenv, A.VarDec{name, typ=NONE, init, ... }, break, explist, level) = 
           let 
-            val {exp,ty} = transExp (venv, tenv, break) init
+            val {exp,ty} = transExp (venv, tenv, break, level) init
           in 
-            ({tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}, exp::explist)
+            ({tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}, exp::explist, level)
           end
 
-    | transDec (venv, tenv, A.VarDec{name,escape= ref true, typ=SOME(s, pos), init, pos=pos1}, break, explist) =
+    | transDec (venv, tenv, A.VarDec{name,escape= ref true, typ=SOME(s, pos), init, pos=pos1}, break, explist, level) =
         let
-            val {exp, ty} = transExp (venv, tenv, break) init 
+            val {exp, ty} = transExp (venv, tenv, break, level) init 
         in
             ( case Symbol.look (tenv,s) of
                 NONE => (err pos ("type not defined: " ^ Symbol.name s))
                 | SOME ty2=>  if ty<>ty2 then (err pos "type mismatch") else ();
                 ({tenv=tenv,
-                venv=Symbol.enter(venv, name, Env.VarEntry{ty=ty})}, explist))
+                venv=Symbol.enter(venv, name, Env.VarEntry{ty=ty})}, explist, level))
         end
 
-    | transDec (venv, tenv, A.TypeDec vardecs, break, explist) = 
+    | transDec (venv, tenv, A.TypeDec vardecs, break, explist, level) = 
           let
             val names = map #name vardecs
             val poss = map #pos vardecs
@@ -292,10 +295,10 @@ structure Semant :> SEMANT = struct
               end
             val _ = app updt (ListPair.zip(names,nts))
             in 
-                ({tenv=tenv', venv=venv}, explist)
+                ({tenv=tenv', venv=venv}, explist, level)
             end
 
-    | transDec(venv, tenv, A.FunctionDec[{name, params, body, pos, result=SOME(rt,pos1)}], break, explist) =
+    | transDec(venv, tenv, A.FunctionDec[{name, params, body, pos, result=SOME(rt,pos1)}], break, explist, level) =
         let val result_ty = case Symbol.look(tenv, rt) of 
                               SOME(res) => res
                             | NONE => Types.UNIT
@@ -309,18 +312,18 @@ structure Semant :> SEMANT = struct
           fun enterparam ({name, typ}, venv) = 
               Symbol.enter (venv, name, E.VarEntry{ty=typ})
           val venv'' = foldr enterparam venv' params'
-        in transExp(venv'', tenv, break) body;
-          ({venv=venv', tenv=tenv}, explist)
+        in transExp(venv'', tenv, break, level) body;
+          ({venv=venv', tenv=tenv}, explist, level)
         end
-    | transDec(venv, tenv, _, break, explist) = ({venv=venv, tenv=tenv}, explist)
+    | transDec(venv, tenv, _, break, explist, _) = ({venv=venv, tenv=tenv}, explist, level)
 
-    and transDecs (venv, tenv, decs, break, explist) =
+    and transDecs (venv, tenv, decs, break, explist, level) =
     (case decs of
       [] => ({venv=venv, tenv=tenv}, explist)
     | (d::ds) => let 
                   val ({venv=venv', tenv=tenv'}, explist') = transDec(venv, tenv, d, break, explist) (*NONE = break?*)
                 in
-                  transDecs(venv', tenv', ds, break, explist')
+                  transDecs(venv', tenv', ds, break, explist', level)
                 end)
     
   fun transProg(absyn) = (transExp (E.base_venv, E.base_tenv, Temp.newlabel()) absyn)

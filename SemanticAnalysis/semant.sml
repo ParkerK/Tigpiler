@@ -65,16 +65,16 @@ structure Semant :> SEMANT = struct
    (* Takes venv, tenv, exp *)
   fun transExp(venv, tenv)  =    
 
-    let fun trexp (A.NilExp) = {exp=(), ty=Types.NIL}
+    let fun trexp (A.NilExp) = {exp=Tr.nilExp(), ty=Types.NIL}
       | trexp (A.VarExp var) = trvar var
-      | trexp (A.IntExp i) = {exp=(), ty=Types.INT}
-      | trexp (A.StringExp (str, pos)) = {exp=(), ty=Types.STRING}
+      | trexp (A.IntExp i) = {exp=Tr.nilExp(), ty=Types.INT}
+      | trexp (A.StringExp (str, pos)) = {exp=Tr.nilExp(), ty=Types.STRING}
       | trexp (A.OpExp {left, oper, right, pos}) = 
         if oper = A.PlusOp orelse oper = A.MinusOp orelse 
            oper = A.TimesOp orelse oper = A.DivideOp then
           (checkInt(trexp left, pos);
            checkInt(trexp right, pos);
-           {exp=(), ty=Types.INT})
+           {exp=Tr.nilExp(), ty=Types.INT})
         else if oper = A.EqOp orelse oper = A.NeqOp orelse oper = A.LtOp orelse
                 oper = A.LeOp orelse oper = A.GtOp orelse oper = A.GeOp then
           let
@@ -85,26 +85,26 @@ structure Semant :> SEMANT = struct
               Types.INT =>
                 (checkInt(left', pos);
                 checkInt(right', pos);
-                {exp=(), ty=Types.INT})
+                {exp=Tr.nilExp(), ty=Types.INT})
             | Types.STRING =>
                 (checkString(left', pos);
                 checkString(right', pos);
-                {exp=(), ty=Types.INT})
+                {exp=Tr.nilExp(), ty=Types.INT})
             | _ => (err pos "can't perform comparisons on this type";
-                  {exp=(), ty=Types.INT}))
+                  {exp=Tr.nilExp(), ty=Types.INT}))
            end
        else
-        (err pos "error";{exp=(), ty=Types.INT})
+        (err pos "error";{exp=Tr.nilExp(), ty=Types.INT})
 
     | trexp   (A.CallExp {func, args, pos}) = 
       (case Symbol.look (venv, func) of
         SOME (E.FunEntry {formals, result}) =>
           (*if
             length(args') <> length(args)
-          then (err pos "wrong amount of arguments";    {exp=(), ty=result})
+          then (err pos "wrong amount of arguments";    {exp=Tr.nilExp(), ty=result})
           else*)
-          {exp=(), ty=Types.UNIT}
-        | _ => (err pos ("can't call nonexistant function: " ^ Symbol.name func ); {exp=(), ty=Types.UNIT}))
+          {exp=Tr.nilExp(), ty=Types.UNIT}
+        | _ => (err pos ("can't call nonexistant function: " ^ Symbol.name func ); {exp=Tr.nilExp(), ty=Types.UNIT}))
         (* Should check to make sure return types match, as do argtypes *)
 
     | trexp   (A.IfExp {test, then', else', pos}) =
@@ -116,7 +116,7 @@ structure Semant :> SEMANT = struct
          in
            (checkInt (test', pos);
            checkUnit (then'', pos);
-           {exp=(), ty=Types.UNIT})
+           {exp=Tr.nilExp(), ty=Types.UNIT})
          end
          | SOME else' =>
          let
@@ -127,7 +127,7 @@ structure Semant :> SEMANT = struct
            checkInt(test', pos);
            checkUnit(then'', pos);
            checkUnit(else'', pos);
-           {exp=(), ty=Types.UNIT}
+           {exp=Tr.nilExp(), ty=Types.UNIT}
          end
         )
 
@@ -141,7 +141,7 @@ structure Semant :> SEMANT = struct
           val test'' = checkInt (test', pos);
           val body'' = checkUnit (body', pos);
         in
-          {exp=(), ty=Types.UNIT}
+          {exp=Tr.nilExp(), ty=Types.UNIT}
         end 
 
       | trexp (A.RecordExp {fields, typ, pos}) =
@@ -162,21 +162,21 @@ structure Semant :> SEMANT = struct
                         (fn (ty1, ty2) => compare_ty (ty1, ty2, pos))
                         (types, dftypes))
                     then
-                        {exp=(), ty=Types.RECORD(s,u)} 
+                        {exp=Tr.nilExp(), ty=Types.RECORD(s,u)} 
                     else 
                         (err pos ("field types not consistant: " ^ Symbol.name typ);
-                        {exp=(),ty=Types.RECORD(s,u)})
+                        {exp=Tr.nilExp(),ty=Types.RECORD(s,u)})
                   else
                     (err pos ("field types not consistant: " ^ Symbol.name typ);
-                    {exp=(),ty=Types.RECORD(s,u)})
+                    {exp=Tr.nilExp(),ty=Types.RECORD(s,u)})
                 end
             | _ => (err pos ("not a valid record type: " ^ Symbol.name typ);
-                    {exp=(), ty=Types.UNIT})
+                    {exp=Tr.nilExp(), ty=Types.UNIT})
         end
         
 
       | trexp (A.SeqExp exps) =
-        {exp=(), ty=Types.UNIT}
+        {exp=Tr.nilExp(), ty=Types.UNIT}
 
       | trexp (A.AssignExp {var, exp, pos}) =
         let
@@ -186,9 +186,9 @@ structure Semant :> SEMANT = struct
           if
           expect <> actual
           then
-          (err pos "assignment mismatch";{exp=(), ty=Types.UNIT})
+          (err pos "assignment mismatch";{exp=Tr.nilExp(), ty=Types.UNIT})
           else
-          {exp=(), ty=Types.UNIT}
+          {exp=Tr.nilExp(), ty=Types.UNIT}
         end
 
       | trexp (A.ForExp {var, escape, lo, hi, body, pos}) =
@@ -198,16 +198,16 @@ structure Semant :> SEMANT = struct
           val hi' = checkInt(trexp (hi), pos)
         (* Add Stuff Here *)
         in
-          {exp=(),ty=Types.UNIT}
+          {exp=Tr.nilExp(),ty=Types.UNIT}
         end
 
       | trexp (A.BreakExp pos) =
         if !nestLevel > 0 
         then
-          {exp=(), ty=Types.UNIT}
+          {exp=Tr.nilExp(), ty=Types.UNIT}
         else
           (err pos "Break not nested correctly";
-            {exp=(), ty=Types.UNIT})
+            {exp=Tr.nilExp(), ty=Types.UNIT})
 
       | trexp (A.LetExp {decs, body, pos}) =
         let val {venv=venv', tenv=tenv'} = transDecs(venv, tenv, decs)
@@ -215,25 +215,25 @@ structure Semant :> SEMANT = struct
         end
 
       | trexp (A.ArrayExp {typ, size, init, pos}) =
-        {exp=(), ty=Types.UNIT}
+        {exp=Tr.nilExp(), ty=Types.UNIT}
 
      and trvar (A.SimpleVar(id,pos)) = 
           (case Symbol.look(venv, id) of
-            SOME (E.VarEntry{ty}) => {exp=(), ty=actual_ty ty}
-          | _ => (err pos ("undefined variable: " ^ Symbol.name id); {exp=(), ty=Types.INT}))
+            SOME (E.VarEntry{ty}) => {exp=Tr.nilExp(), ty=actual_ty ty}
+          | _ => (err pos ("undefined variable: " ^ Symbol.name id); {exp=Tr.nilExp(), ty=Types.INT}))
 
       | trvar (A.FieldVar(var,id,pos)) =
           let
             val var' = trvar var
           in
             (case var' of
-              {exp, ty=record as Types.RECORD (fields, _)} => {exp=(), ty=record}
-            | _ => (err pos "no var found"; {exp=(), ty=Types.UNIT}))
+              {exp, ty=record as Types.RECORD (fields, _)} => {exp=Tr.nilExp(), ty=record}
+            | _ => (err pos "no var found"; {exp=Tr.nilExp(), ty=Types.UNIT}))
           end
 
       | trvar (A.SubscriptVar(var, exp,pos)) =
           (checkInt(trexp exp, pos);
-          {exp=(), ty=Types.UNIT})
+          {exp=Tr.nilExp(), ty=Types.UNIT})
     in
       trexp
     end
