@@ -214,27 +214,27 @@ structure Semant :> SEMANT = struct
         
       let
         val access = Tr.allocLocal level (!escape)
-        val breakpoint = Tr.breakExp (break)
+        val breakpoint = Tr.newbreakpoint
         val {exp=lo', ty=loty} = transExp (venv, tenv, break, level) lo
         val {exp=hi', ty=hity} = transExp (venv, tenv, break, level) hi
-        val venv' = Symbol.enter (venv, var, Env.VarEntry {ty=Types.INT})
+        val venv' = Symbol.enter (venv, var, Env.VarEntry {access=access, ty=Types.INT})
         val {exp=bodyExp, ty=body_ty} = transExp (venv', tenv, breakpoint, level) body
       in
-        {exp=Tr.forExp(Tr.simpleVar (access, level), lo', hi', bodyExp, breakpoint), ty=Types.UNIT}
+        {exp=Tr.forExp(Tr.simpleVar (access, level), breakpoint, lo', hi', bodyExp), ty=Types.UNIT}
       end
 
       | trexp (A.BreakExp pos) =
         if !nestLevel > 0 
         then
-          {exp=Tr.nilExp(), ty=Types.UNIT}
+          {exp=Tr.breakExp(break), ty=Types.UNIT}
         else
           (err pos "Break not nested correctly";
             {exp=Tr.nilExp(), ty=Types.UNIT})
 
       | trexp (A.LetExp {decs, body, pos}) =
           let
-            val ({tenv=tenv', venv=venv'}, decList) = transDecs(venv,tenv,decs, break, [])
-            val {exp=bodyExp, ty=bodyTy} = transExp (venv',tenv', break) body
+            val ({tenv=tenv', venv=venv'}, decList) = transDecs(venv,tenv,decs, break, [], level)
+            val {exp=bodyExp, ty=bodyTy} = transExp (venv',tenv', break, level) body
           in
             {exp=Tr.letExp(decList,bodyExp), ty=bodyTy}
           end
@@ -244,7 +244,7 @@ structure Semant :> SEMANT = struct
 
      and trvar (A.SimpleVar(id,pos)) = 
           (case Symbol.look(venv, id) of
-            SOME (E.VarEntry{acc, ty}) => {exp=Tr.simpleVar(acc, level), ty=actual_ty ty}
+            SOME (E.VarEntry{access, ty}) => {exp=Tr.simpleVar(access, level), ty=actual_ty ty}
           | _ => (err pos ("undefined variable: " ^ Symbol.name id); {exp=Tr.nilExp(), ty=Types.INT}))
 
       | trvar (A.FieldVar(var,id,pos)) =
@@ -263,22 +263,24 @@ structure Semant :> SEMANT = struct
       trexp
     end
     
-    and transDec (venv, tenv, A.VarDec{name, typ=NONE, init, ... }, break, explist, level) = 
+    and transDec (venv, tenv, A.VarDec{name, typ=NONE, init, escape=escape,... }, break, explist, level) = 
           let 
             val {exp,ty} = transExp (venv, tenv, break, level) init
+            val access = Tr.allocLocal level (!escape)
           in 
-            ({tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{ty=ty})}, exp::explist, level)
+            ({tenv = tenv, venv=Symbol.enter(venv, name, E.VarEntry{access=access, ty=ty})}, exp::explist, level)
           end
 
-    | transDec (venv, tenv, A.VarDec{name,escape= ref true, typ=SOME(s, pos), init, pos=pos1}, break, explist, level) =
+    | transDec (venv, tenv, A.VarDec{name,escape=escape, typ=SOME(s, pos), init, pos=pos1}, break, explist, level) =
         let
             val {exp, ty} = transExp (venv, tenv, break, level) init 
+            val access = Tr.allocLocal level (!escape)
         in
             ( case Symbol.look (tenv,s) of
                 NONE => (err pos ("type not defined: " ^ Symbol.name s))
                 | SOME ty2=>  if ty<>ty2 then (err pos "type mismatch") else ();
                 ({tenv=tenv,
-                venv=Symbol.enter(venv, name, Env.VarEntry{ty=ty})}, explist, level))
+                venv=Symbol.enter(venv, name, Env.VarEntry{access=access,ty=ty})}, explist, level))
         end
 
     | transDec (venv, tenv, A.TypeDec vardecs, break, explist, level) = 
@@ -309,22 +311,22 @@ structure Semant :> SEMANT = struct
           val params' = map transparam params
           val venv' = Symbol.enter(venv, name, 
               E.FunEntry{formals = map #typ params', result = result_ty})
-          fun enterparam ({name, typ}, venv) = 
-              Symbol.enter (venv, name, E.VarEntry{ty=typ})
+          fun enterparam ({name, typ}, venv, access) = 
+              Symbol.enter (venv, name, E.VarEntry{access=access,ty=typ})
           val venv'' = foldr enterparam venv' params'
         in transExp(venv'', tenv, break, level) body;
           ({venv=venv', tenv=tenv}, explist, level)
         end
-    | transDec(venv, tenv, _, break, explist, _) = ({venv=venv, tenv=tenv}, explist, level)
+    | transDec(venv, tenv, _, break, explist, level) = ({venv=venv, tenv=tenv}, explist, level)
 
     and transDecs (venv, tenv, decs, break, explist, level) =
     (case decs of
       [] => ({venv=venv, tenv=tenv}, explist)
     | (d::ds) => let 
-                  val ({venv=venv', tenv=tenv'}, explist') = transDec(venv, tenv, d, break, explist) (*NONE = break?*)
+                  val ({venv=venv', tenv=tenv'}, explist', level') = transDec(venv, tenv, d, break, explist, level) (*NONE = break?*)
                 in
                   transDecs(venv', tenv', ds, break, explist', level)
                 end)
     
-  fun transProg(absyn) = (transExp (E.base_venv, E.base_tenv, Temp.newlabel()) absyn)
+  fun transProg(absyn) = (transExp (E.base_venv, E.base_tenv, Tr.newbreakpoint) absyn)
 end
