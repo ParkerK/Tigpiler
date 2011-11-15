@@ -9,7 +9,7 @@ end
 
 structure Env :> ENV = struct
   type access = unit ref
-  datatype enventry = VarEntry of {ty: Types.ty}
+  datatype enventry = VarEntry of {access: Translate.access, ty: Types.ty}
                     | FunEntry of {formals: Types.ty list, result: Types.ty}
                     
   fun enter ((symbol, entry), env) = Symbol.enter(env, symbol, entry)
