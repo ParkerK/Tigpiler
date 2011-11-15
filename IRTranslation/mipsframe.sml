@@ -36,8 +36,9 @@ struct
                                         !escacc = !escacc + 1;
                                         formalToAcc(b, escacc)
                                       end
-  fun exp(a) = 
-    fn(_) => Tree.TEMP(FP) (*todo*)
+  fun exp(InFrame(k)) = 
+    (fn (fp) => Tree.MEM(Tree.BINOP(Tree.PLUS, fp, Tree.CONST(k))))
+  | exp (InReg(temp)) = (fn (fp) => Tree.TEMP(temp)) 
     
   fun string (label, str) = 
       (Symbol.name label  ^ ": .asciiz \"" ^ str ^ "\"\n")

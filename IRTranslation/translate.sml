@@ -67,12 +67,9 @@ structure Translate : TRANSLATE = struct
              convertAccess(fs)
          end
 
- fun allocLocal(Top) = raise Impossible ("can't allocate a local variable at the top most scope")
+  fun allocLocal(Top) = raise Impossible ("can't allocate a local variable at the top most scope")
    | allocLocal(l as Level({frame, parent}, uref)) = (fn(b) => (l,Frame.allocLocal(frame)(b)))
   
-  
-  fun simpleVar(acc, l) = Ex(T.CONST 0) (*TODO*)
-
   fun seq([]) = T.LABEL(Temp.newlabel())
     | seq([s]) = s
     | seq(h::t) = T.SEQ(h,seq(t))
@@ -260,7 +257,33 @@ structure Translate : TRANSLATE = struct
       in
         Ex(T.ESEQ(seq(map unNx firsts),unEx last))
       end
-          
+    
+    fun leveleq (Level(_,uref1),Level(_,uref2)) = uref1=uref2
+      | leveleq (_,_) = false
+
+    fun traceSL (deflevel,curlevel as Level({frame:Frame.frame, parent:level}, _)) = 
+      if leveleq(deflevel,curlevel) then
+        T.TEMP(Frame.FP)
+      else
+        let 
+          val locals = !(#locals frame)
+        in
+          T.MEM(T.BINOP(T.PLUS, T.CONST(locals), traceSL(deflevel, parent)))
+        end
+    | traceSL (_,TopLevel) = T.TEMP(Frame.FP)
+    
+    fun simpleVar(acc,l) = 
+      let
+        val deflevel = (#1 acc)
+        val curacc = (#2 acc)
+        fun getAcc(Top, _) = 
+              raise Impossible ("can't declare a local variable in global scope")
+          | getAcc(Level({frame=frame, parent=parentl}, _), frameacc) = 
+              Frame.exp(frameacc)(traceSL(deflevel, l))
+      in
+        Ex(getAcc(acc))
+      end
+    
     fun fieldVar (var, offset) =
       let
         val var = unEx var
@@ -291,4 +314,5 @@ structure Translate : TRANSLATE = struct
 
     fun procEntryExit({level=level, body=exp})= () (*todo*)
     fun getResult() = !frags
+    
 end
