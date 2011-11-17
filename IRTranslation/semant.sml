@@ -207,7 +207,7 @@ structure Semant :> SEMANT = struct
                     {exp=Tr.nilExp(), ty=Types.UNIT})
         end
         
-
+      | trexp (A.SeqExp []) = {exp=Tr.empty, ty=Types.UNIT}
       | trexp (A.SeqExp exps) =
       let
            val (exps', ty) =
