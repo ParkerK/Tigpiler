@@ -54,7 +54,7 @@ structure Semant :> SEMANT = struct
     | _ => (err pos "type mismatch"; false)
       
   fun compare_tys (t1::l1,t2::l2,pos) = 
-      (compare_ty(t1,t2,pos); compare_ty(l1,l2,pos))
+      (compare_ty(t1,t2,pos); compare_tys(l1,l2,pos))
   
   fun actual_ty (Types.NAME (s,ty)) = 
     (case !ty of
@@ -131,7 +131,7 @@ structure Semant :> SEMANT = struct
             then 
               (err pos "wrong amount of arguments"; {exp=Tr.nilExp(), ty=result})
             else
-              (map compare_tys (formals, map #ty args'), pos;
+              (compare_tys (formals, map #ty args', pos);
               {exp=Tr.callExp(level,label,map #exp (map trexp args)),ty=actual_ty result})
             )
           end
