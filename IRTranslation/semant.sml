@@ -314,6 +314,7 @@ structure Semant :> SEMANT = struct
           fun enterparam ({name, typ}, venv, access) = 
               Symbol.enter (venv, name, E.VarEntry{access=access,ty=typ})
           val venv'' = foldr enterparam venv' params'
+          val label = Temp.newlabel()
         in transExp(venv'', tenv, break, level) body;
           ({venv=venv', tenv=tenv}, explist, level)
         end
