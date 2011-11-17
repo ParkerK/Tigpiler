@@ -47,10 +47,11 @@ structure Semant :> SEMANT = struct
       end
   
   fun compare_ty (ty1, ty2, pos)=
-    if ty1 = ty2 then 
-      true
-    else 
-      (err pos "type mismatch"; false)
+    case ty1 of 
+      Types.RECORD(_,_) => (ty1 = ty2) orelse ty2 = Types.NIL
+    | Types.NIL => (ty1 = ty2) orelse case ty2 of Types.RECORD(_,_) => true
+                                        |  _ => (ty2 = Types.NIL)
+    | _ => (err pos "type mismatch"; false)
       
   fun compare_tys (t1::l1,t2::l2,pos) = 
       (compare_ty(t1,t2,pos); compare_ty(l1,l2,pos))
@@ -130,7 +131,7 @@ structure Semant :> SEMANT = struct
             then 
               (err pos "wrong amount of arguments"; {exp=Tr.nilExp(), ty=result})
             else
-              ((compare_ty (formals, map #ty args', pos));
+              (map compare_tys (formals, map #ty args'), pos;
               {exp=Tr.callExp(level,label,map #exp (map trexp args)),ty=actual_ty result})
             )
           end
@@ -193,7 +194,7 @@ structure Semant :> SEMANT = struct
                         (fn (ty1, ty2) => compare_ty (ty1, ty2, pos))
                         (types, dftypes))
                     then
-                        {exp=Tr.nilExp(), ty=result} 
+                        {exp=Tr.recordExp(map #exp tyfields), ty=result} 
                     else 
                         (err pos ("field types not consistent: " ^ Symbol.name typ);
                         {exp=Tr.nilExp(),ty=result})

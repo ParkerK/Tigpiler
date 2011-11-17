@@ -33,6 +33,7 @@ sig
   val whileExp : exp * exp * Tree.label -> exp
   val forExp : exp * Tree.label * exp * exp * exp -> exp
   val callExp : level * Tree.label * exp list  -> exp
+  val recordExp : exp list  -> exp
   
   val simpleVar : access * level -> exp
   val subscriptExp : exp * exp -> exp
@@ -325,7 +326,9 @@ structure Translate : TRANSLATE = struct
               T.CONST(Frame.wordsize)))),
               T.MEM(T.TEMP(address))))
           end
-
+          
+    fun recordExp (explist) = hd(explist) (*todo*)
+    
     fun procEntryExit({level=level, body=exp})= 
       let
         val frame = (case level of
