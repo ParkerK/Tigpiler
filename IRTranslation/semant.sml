@@ -52,7 +52,7 @@ structure Semant :> SEMANT = struct
     | Types.NIL => (ty1 = ty2) orelse case ty2 of Types.RECORD(_,_) => true
                                         |  _ => (ty2 = Types.NIL)
     | _ => (err pos "type mismatch"; false)
-      
+
   fun compare_tys ([], trexps, pos) = {exp=Tr.empty(), Types.UNIT}
       | compare_tys(tys, [], pos) = {exp=Tr.empty(), Types.UNIT}
       | compare_tys(t1::l1,t2::l2,pos) = (compare_ty(t1,t2,pos); compare_tys(l1,l2,pos))
