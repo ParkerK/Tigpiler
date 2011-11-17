@@ -304,7 +304,6 @@ structure Semant :> SEMANT = struct
 
     | transDec(venv, tenv, A.FunctionDec(fundecs), break, explist, level) =
       let
-
         val fundef = ref []
         val levels = ref []
 
@@ -336,19 +335,15 @@ structure Semant :> SEMANT = struct
         end
 
         fun enterparam (param:A.field,venv) =
-        let
-          val access = Tr.allocLocal (hd(!levels)) (!(#escape param))
-          val ty = typelookup tenv (#typ param) (#pos param)
-        in
-          Symbol.enter(venv,
-            (#name param),
-            E.VarEntry{
-            access=access,
-            ty=ty})
-        end
+          let
+            val access = Tr.allocLocal (hd(!levels)) (!(#escape param))
+            val ty = typelookup tenv (#typ param) (#pos param)
+          in
+            Symbol.enter(venv, (#name param), E.VarEntry{access=access,ty=ty})
+          end
 
         val venv' = (foldl makeheader venv fundecs)
-
+        
         fun check (fundec:A.fundec) = 
           let 
             val venv'' = (foldl enterparam venv' (#params fundec))
@@ -361,7 +356,6 @@ structure Semant :> SEMANT = struct
           end
 
         val checkres = (map check fundecs)
-
         val fundef' = !fundef
         val explist' = (explist@fundef')
         
