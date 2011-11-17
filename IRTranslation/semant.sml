@@ -51,6 +51,9 @@ structure Semant :> SEMANT = struct
       true
     else 
       (err pos "type mismatch"; false)
+      
+  fun compare_tys (t1::l1,t2::l2,pos) = 
+      (compare_ty(t1,t2,pos); compare_ty(l1,l2,pos))
   
   fun actual_ty (Types.NAME (s,ty)) = 
     (case !ty of
