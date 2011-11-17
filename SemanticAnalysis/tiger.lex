@@ -101,7 +101,7 @@ formatchar={whitespace}|{newline};
 
 <INITIAL>{letter}({letter}|{digit}|"_")* => (Tokens.ID(yytext,yypos,yypos+size(yytext)));
 
-<INITIAL,COMMENT>"/*"   => ( numComment := !numComment+1; YYBEGIN COMMENT; continue());
+<INITIAL,COMMENT>"/*"   => (numComment := !numComment+1; YYBEGIN COMMENT; continue());
 <COMMENT>"*/"           => (numComment := !numComment-1;
                             if (!numComment=0)
                             then (YYBEGIN INITIAL; continue())

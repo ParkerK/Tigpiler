@@ -72,7 +72,6 @@ structure Semant :> SEMANT = struct
       | _ => err pos "string required");
       exp)
 
-   (* Takes venv, tenv, exp *)
   fun transExp(venv, tenv)  =    
 
     let fun trexp (A.NilExp) = {exp=Tr.nilExp(), ty=Types.NIL}
