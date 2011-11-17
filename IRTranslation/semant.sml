@@ -11,7 +11,9 @@ structure Semant :> SEMANT = struct
   exception ErrMsg
 
   val nestLevel = ref 0
-
+  
+  fun incLevel = nestLevel := !nestLevel + 1
+  fun decLevel = nestLevel := !nestLevel - 1
   fun typelookup tenv n pos= 
   let 
     val result=Symbol.look (tenv, n)
@@ -140,10 +142,10 @@ structure Semant :> SEMANT = struct
 
       | trexp (A.WhileExp {test, body, pos}) =
         let
-          nestLevel := !nestLevel + 1
+          val _ = incLevel()
           val body' = transExp (venv,tenv,break,level) body
           val test' = transExp (venv,tenv,break,level) body
-          nestLevel := !nestLevel - 1
+          val _ = decLevel()
         
           val test'' = checkInt (test', pos);
           val body'' = checkUnit (body', pos);
