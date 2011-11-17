@@ -1,6 +1,7 @@
 signature SEMANT =
 sig
-  val transProg : Absyn.exp -> {exp:Translate.frag list, ty:Types.ty}
+  (*val transProg : Absyn.exp -> {exp:Translate.frag list, ty:Types.ty}*)
+  val transProg : Absyn.exp -> Tree.stm
 end 
 
 structure Semant :> SEMANT = struct
@@ -399,6 +400,7 @@ structure Semant :> SEMANT = struct
         val {exp, ty} = transExp (Env.base_venv, Env.base_tenv, Temp.newlabel(), firstlevel) exp
       in
         Tr.procEntryExit {level=firstlevel, body=exp};
-        {exp=Tr.getResult (), ty=ty}
+        (*{exp=Tr.getResult(), ty=t};*)
+        Tr.unNx(exp)
       end
     end
