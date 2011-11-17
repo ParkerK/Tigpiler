@@ -108,11 +108,19 @@ structure Semant :> SEMANT = struct
     | trexp   (A.CallExp {func, args, pos}) = 
       (case Symbol.look (venv, func) of
         SOME (E.FunEntry {formals, result, level, label}) =>
-          (*if
-            length(args') <> length(args)
-          then (err pos "wrong amount of arguments";    {exp=Tr.nilExp(), ty=result})
-          else*)
-          {exp=Tr.nilExp(), ty=Types.UNIT}
+          let
+            val args' = map trexp args
+          in
+            (if
+              length(args) <> length(formals) (* check argument lengths and compare *)
+            then 
+              (err pos "wrong amount of arguments"; {exp=Tr.nilExp(), ty=result})
+            else
+              ((compare_ty (formals, #ty args', pos));
+              {exp=Tr.callExp(level,label,args),ty=actual_ty (result,pos)})
+            )
+          end
+          
         | _ => (err pos ("can't call nonexistant function: " ^ Symbol.name func ); {exp=Tr.nilExp(), ty=Types.UNIT}))
         (* Should check to make sure return types match, as do argtypes *)
 
