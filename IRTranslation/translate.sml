@@ -49,6 +49,8 @@ structure Translate : TRANSLATE = struct
   structure A = Absyn
   structure T = Tree
   type breakpoint = Tree.label
+  val err = ErrorMsg.error
+  exception ErrMsg
   
   datatype exp  = Ex of Tree.exp
                 | Nx of Tree.stm
@@ -74,7 +76,7 @@ structure Translate : TRANSLATE = struct
          end
 
   fun allocLocal(Top) = raise Impossible ("can't allocate a local variable at the top most scope")
-   | allocLocal(l as Level({frame, parent}, uref)) = (fn(b) => (l,Frame.allocLocal(frame)(b)))
+    | allocLocal(l as Level({frame, parent}, uref)) = (fn(b) => (l,Frame.allocLocal(frame)(b)))
   
   fun seq([]) = T.LABEL(Temp.newlabel())
     | seq([s]) = s
@@ -152,6 +154,7 @@ structure Translate : TRANSLATE = struct
           val cond = unCx(cond)
           val thenLabel = Temp.newlabel()
           val endLabel = Temp.newlabel()
+          val r = Temp.newtemp()
         in
           case (cond, thenExp) of
                   (_, Cx _) =>
@@ -165,7 +168,12 @@ structure Translate : TRANSLATE = struct
                              T.LABEL thenLabel,
                              unNx thenExp,
                              T.LABEL endLabel])
-                  | (_, Ex _) => raise Impossible ("Must have else!")
+                  | (_, Ex ex) => 
+                    Ex (T.ESEQ (seq [(cond) (thenLabel, endLabel),
+                                     T.LABEL thenLabel,
+                                     T.MOVE (T.TEMP r, ex),
+                                     T.LABEL endLabel],
+                                T.TEMP r))
         end
     fun ifThenElseExp (cond, thenExp, elseExp) =
         let
