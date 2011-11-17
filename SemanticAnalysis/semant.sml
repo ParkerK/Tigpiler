@@ -6,6 +6,7 @@ end
 structure Semant :> SEMANT = struct
   structure A = Absyn
   structure E = Env
+  structure Tr = Translate
   val err = ErrorMsg.error
   exception ErrMsg
 
@@ -23,8 +24,8 @@ structure Semant :> SEMANT = struct
   fun transTy (tenv, t)=
     let 
       fun recordtys(fields)= map (fn{name, escape, typ, pos}=>
-            (case SOME(typelookup tenv name pos) of 
-               SOME typ => (name, typ)
+            (case SOME(typelookup tenv typ pos) of 
+               SOME t => (name, t)
              | NONE => (name, Types.UNIT))) fields
       in
         case t of
@@ -164,10 +165,10 @@ structure Semant :> SEMANT = struct
                     then
                         {exp=Tr.nilExp(), ty=Types.RECORD(s,u)} 
                     else 
-                        (err pos ("field types not consistant: " ^ Symbol.name typ);
+                        (err pos ("field types not consistent: " ^ Symbol.name typ);
                         {exp=Tr.nilExp(),ty=Types.RECORD(s,u)})
                   else
-                    (err pos ("field types not consistant: " ^ Symbol.name typ);
+                    (err pos ("field types not consistent: " ^ Symbol.name typ);
                     {exp=Tr.nilExp(),ty=Types.RECORD(s,u)})
                 end
             | _ => (err pos ("not a valid record type: " ^ Symbol.name typ);
