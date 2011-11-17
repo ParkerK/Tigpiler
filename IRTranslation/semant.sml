@@ -47,9 +47,10 @@ structure Semant :> SEMANT = struct
       end
   
   fun compare_ty (ty1, ty2, pos)=
-    (case ty1 = ty2 of
-      true => true
-    | false => (err pos "type mismatch"; false))
+    if ty1 = ty2 then 
+      true
+    else 
+      (err pos "type mismatch"; false)
   
   fun actual_ty (Types.NAME (s,ty)) = 
     (case !ty of
