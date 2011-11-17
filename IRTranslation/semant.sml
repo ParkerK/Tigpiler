@@ -1,6 +1,6 @@
 signature SEMANT =
 sig
-  val transProg : Absyn.exp -> {exp:Translate.exp, ty:Types.ty}
+  val transProg : Absyn.exp -> {exp:Translate.frag list, ty:Types.ty}
 end 
 
 structure Semant :> SEMANT = struct
@@ -391,5 +391,16 @@ structure Semant :> SEMANT = struct
                   transDecs(venv', tenv', ds, break, explist', level)
                 end)
     
-  fun transProg(absyn) = (transExp (E.base_venv, E.base_tenv, Tr.newbreakpoint()) absyn)
-end
+    fun transProg(exp) =
+      let
+        val firstlevel = Translate.newLevel {
+          name=Temp.namedlabel "firstlevel",
+          parent=Tr.outermost,
+          formals=[]}
+
+        val {exp, ty} = transExp (Env.base_venv, Env.base_tenv, Temp.newlabel(), firstlevel) exp
+      in
+        Tr.procEntryExit {level=firstlevel, body=exp};
+        {exp=Tr.getResult (), ty=ty}
+      end
+    end
