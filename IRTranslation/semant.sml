@@ -380,8 +380,6 @@ structure Semant :> SEMANT = struct
           ({venv=venv',tenv=tenv}, explist', level)
         end
         
-    | transDec(venv, tenv, _, break, explist, level) = ({venv=venv, tenv=tenv}, explist, level)
-
     and transDecs (venv, tenv, decs, break, explist, level) =
     (case decs of
       [] => ({venv=venv, tenv=tenv}, explist)
