@@ -336,8 +336,6 @@ structure Semant :> SEMANT = struct
                 level=nlevel}))
         end
 
-        val venv' = (foldl makeheader venv fundecs)
-
         fun enterparam (param:A.field,venv) =
         let
           val access = Tr.allocLocal (hd(!levels)) (!(#escape param))
@@ -349,6 +347,8 @@ structure Semant :> SEMANT = struct
             access=access,
             ty=ty})
         end
+
+        val venv' = (foldl makeheader venv fundecs)
 
         fun check (fundec:A.fundec) = 
           let 
