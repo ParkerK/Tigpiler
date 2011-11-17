@@ -24,7 +24,7 @@ structure Semant :> SEMANT = struct
   fun transTy (tenv, t)=
     let 
       fun recordtys(fields)= map (fn{name, escape, typ, pos}=>
-            (case SOME(typelookup tenv name pos) of 
+            (case SOME(typelookup tenv typ pos) of 
                SOME typ => (name, typ)
              | NONE => (name, Types.UNIT))) fields
       in
