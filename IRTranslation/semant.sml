@@ -369,7 +369,7 @@ structure Semant :> SEMANT = struct
             val {exp, ty} = transExp(venv'',tenv,break,level) (#body fundec)
             val check_level = hd ((!levels))
             val _ = (levels := tl ((!levels)))
-            val _ = Tr.procEntryExit({level=check_levels, body=exp})
+            val _ = Tr.procEntryExit({level=check_level, body=exp})
           in
             fundef := (!fundef)@[exp]
           end
