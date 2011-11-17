@@ -364,10 +364,11 @@ structure Semant :> SEMANT = struct
           end
 
         val checkbodies = (map check fundecs)
-        val explist' = explist@(!fundef)
+        val fundef' = !fundef
+        val explist' = (explist@fundef')
         
         in
-          ({venv=venv',tenv=tenv}, explist=explist', level=level)
+          ({venv=venv',tenv=tenv}, explist', level)
         end
         
     | transDec(venv, tenv, _, break, explist, level) = ({venv=venv, tenv=tenv}, explist, level)
