@@ -38,6 +38,7 @@ sig
   val simpleVar : access * level -> exp
   val subscriptExp : exp * exp -> exp
   val fieldVar : exp * exp -> exp
+  val todo : exp
 
   val procEntryExit: {level: level, body: exp} -> unit
   val getResult : unit -> frag list
@@ -52,6 +53,7 @@ structure Translate : TRANSLATE = struct
   type breakpoint = Tree.label
   val err = ErrorMsg.error
   exception ErrMsg
+  val todo = Ex(T.CONST(0))
   
   datatype exp  = Ex of Tree.exp
                 | Nx of Tree.stm

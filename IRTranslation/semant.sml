@@ -53,8 +53,8 @@ structure Semant :> SEMANT = struct
                                         |  _ => (ty2 = Types.NIL)
     | _ => (err pos "type mismatch"; false)
 
-  fun compare_tys ([], trexps, pos) = {exp=Tr.empty(), Types.UNIT}
-      | compare_tys(tys, [], pos) = {exp=Tr.empty(), Types.UNIT}
+  fun compare_tys ([], trexps, pos) = {exp=Tr.empty, Types.UNIT}
+      | compare_tys(tys, [], pos) = {exp=Tr.empty, Types.UNIT}
       | compare_tys(t1::l1,t2::l2,pos) = (compare_ty(t1,t2,pos); compare_tys(l1,l2,pos))
   
   fun actual_ty (Types.NAME (s,ty)) = 
