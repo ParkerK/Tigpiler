@@ -318,24 +318,21 @@ structure Semant :> SEMANT = struct
               val params' = (map (fn ({name,escape,typ,pos}) => {name=name,
                 ty=typelookup tenv typ pos})
                 (#params fundec))
-
-              val f = Temp.newlabel()
-
+                
               val escs = (map (fn ({name,escape,typ,pos}) => (!escape)) (#params fundec))
-
-              val nlevel = Tr.newLevel{parent=level,
-                name=f,
+              val funlabel = Temp.newlabel()
+              val new_level = Tr.newLevel{parent=level,
+                name=funlabel,
                 formals=escs}
-
-              val _ = levels := nlevel::(!levels)
+              val _ = levels := new_level::(!levels)
 
             in
               Symbol.enter(env,
                 (#name fundec),
                 E.FunEntry({formals=(map #ty params'),
                 result=r_ty,
-                label=f,
-                level=nlevel}))
+                label=funlabel,
+                level=new_level}))
         end
 
         fun enterparam (param:A.field,venv) =
@@ -363,7 +360,8 @@ structure Semant :> SEMANT = struct
             fundef := (!fundef)@[exp]
           end
 
-        val checkbodies = (map check fundecs)
+        val checkres = (map check fundecs)
+
         val fundef' = !fundef
         val explist' = (explist@fundef')
         
