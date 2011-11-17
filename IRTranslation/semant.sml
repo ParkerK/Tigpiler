@@ -12,8 +12,8 @@ structure Semant :> SEMANT = struct
 
   val nestLevel = ref 0
   
-  fun incLevel = nestLevel := !nestLevel + 1
-  fun decLevel = nestLevel := !nestLevel - 1
+  fun incLevel () = nestLevel := !nestLevel + 1
+  fun decLevel () = nestLevel := !nestLevel - 1
   fun typelookup tenv n pos= 
   let 
     val result=Symbol.look (tenv, n)
