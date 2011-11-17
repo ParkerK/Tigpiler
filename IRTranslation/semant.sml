@@ -304,7 +304,6 @@ structure Semant :> SEMANT = struct
 
     | transDec(venv, tenv, A.FunctionDec(fundecs), break, explist, level) =
       let
-
         val fundef = ref []
         val levels = ref []
 
@@ -318,40 +317,33 @@ structure Semant :> SEMANT = struct
               val params' = (map (fn ({name,escape,typ,pos}) => {name=name,
                 ty=typelookup tenv typ pos})
                 (#params fundec))
-
-              val f = Temp.newlabel()
-
+                
               val escs = (map (fn ({name,escape,typ,pos}) => (!escape)) (#params fundec))
-
-              val nlevel = Tr.newLevel{parent=level,
-                name=f,
+              val funlabel = Temp.newlabel()
+              val new_level = Tr.newLevel{parent=level,
+                name=funlabel,
                 formals=escs}
-
-              val _ = levels := nlevel::(!levels)
+              val _ = levels := new_level::(!levels)
 
             in
               Symbol.enter(env,
                 (#name fundec),
                 E.FunEntry({formals=(map #ty params'),
                 result=r_ty,
-                label=f,
-                level=nlevel}))
+                label=funlabel,
+                level=new_level}))
         end
 
         fun enterparam (param:A.field,venv) =
-        let
-          val access = Tr.allocLocal (hd(!levels)) (!(#escape param))
-          val ty = typelookup tenv (#typ param) (#pos param)
-        in
-          Symbol.enter(venv,
-            (#name param),
-            E.VarEntry{
-            access=access,
-            ty=ty})
-        end
+          let
+            val access = Tr.allocLocal (hd(!levels)) (!(#escape param))
+            val ty = typelookup tenv (#typ param) (#pos param)
+          in
+            Symbol.enter(venv, (#name param), E.VarEntry{access=access,ty=ty})
+          end
 
         val venv' = (foldl makeheader venv fundecs)
-
+        
         fun check (fundec:A.fundec) = 
           let 
             val venv'' = (foldl enterparam venv' (#params fundec))
@@ -363,11 +355,12 @@ structure Semant :> SEMANT = struct
             fundef := (!fundef)@[exp]
           end
 
-        val checkbodies = (map check fundecs)
-        val explist' = explist@(!fundef)
+        val checkres = (map check fundecs)
+        val fundef' = !fundef
+        val explist' = (explist@fundef')
         
         in
-          ({venv=venv',tenv=tenv}, explist=explist', level=level)
+          ({venv=venv',tenv=tenv}, explist', level)
         end
         
     | transDec(venv, tenv, _, break, explist, level) = ({venv=venv, tenv=tenv}, explist, level)
