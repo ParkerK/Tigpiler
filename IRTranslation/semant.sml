@@ -27,12 +27,21 @@ structure Semant :> SEMANT = struct
     let 
       fun recordtys(fields)= map (fn{name, escape, typ, pos}=>
             (case SOME(typelookup tenv typ pos) of 
-               SOME typ => (name, typ)
+               SOME t => (name, t)
              | NONE => (name, Types.UNIT))) fields
+      fun checkdups(h::l) = 
+            (List.exists (fn {name, escape, typ, pos}=> 
+                if (#name h)=name then
+                  (err pos ("duplicate field: " ^ Symbol.name name);
+                  true)
+                else
+                  false) l;
+            checkdups(l))
+        | checkdups(_) = ()
       in
         case t of
           A.NameTy (n, pos) => typelookup tenv n pos
-        | A.RecordTy fields => Types.RECORD (recordtys fields, ref())
+        | A.RecordTy fields => (checkdups(fields);Types.RECORD (recordtys fields, ref()))
         | A.ArrayTy (n,pos) => Types.ARRAY(typelookup tenv n pos, ref())
       end
   
