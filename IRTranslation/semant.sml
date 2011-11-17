@@ -368,9 +368,9 @@ structure Semant :> SEMANT = struct
           let 
             val venv'' = (foldl enterparam venv' (#params fundec))
             val {exp, ty} = transExp(venv'',tenv,break,level) (#body fundec)
-            val clevel = hd((!levels))
-            val _ = (levels := tl((!levels)))
-            val _ = Tr.procEntryExit({level=clevel, body=exp})
+            val check_level = hd ((!levels))
+            val _ = (levels := tl ((!levels)))
+            val _ = Tr.procEntryExit({level=check_level, body=exp})
           in
             fundef := (!fundef)@[exp]
           end
