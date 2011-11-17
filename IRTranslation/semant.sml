@@ -131,7 +131,7 @@ structure Semant :> SEMANT = struct
             then 
               (err pos "wrong amount of arguments"; {exp=Tr.nilExp(), ty=result})
             else
-              (map compare_tys (formals, map #ty args'), pos;
+              (compare_tys (formals, map #ty args', pos);
               {exp=Tr.callExp(level,label,map #exp (map trexp args)),ty=actual_ty result})
             )
           end
