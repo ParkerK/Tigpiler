@@ -32,7 +32,8 @@ sig
   val stringOpExp : Absyn.oper * exp * exp -> exp
   val whileExp : exp * exp * Tree.label -> exp
   val forExp : exp * Tree.label * exp * exp * exp -> exp
-
+  val callExp : level * Tree.label * exp list  -> exp
+  
   val simpleVar : access * level -> exp
   val subscriptExp : exp * exp -> exp
   val fieldVar : exp * exp -> exp
