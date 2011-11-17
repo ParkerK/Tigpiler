@@ -335,11 +335,11 @@ structure Semant :> SEMANT = struct
                 ty=typelookup tenv typ pos})
                 (#params fundec))
                 
-              val escs = (map (fn ({name,escape,typ,pos}) => (!escape)) (#params fundec))
+              val formals = (map (fn ({name,escape,typ,pos}) => (!escape)) (#params fundec))
               val funlabel = Temp.newlabel()
               val new_level = Tr.newLevel{parent=level,
                 name=funlabel,
-                formals=escs}
+                formals=formals}
               val _ = levels := new_level::(!levels)
 
             in
