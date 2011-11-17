@@ -304,7 +304,7 @@ structure Semant :> SEMANT = struct
         in
             ( case Symbol.look (tenv,s) of
                 NONE => (err pos ("type not defined: " ^ Symbol.name s))
-                | SOME ty2=>  if ty<>ty2 then (err pos "type mismatch") else ();
+                | SOME ty2=>  if compare_ty (ty,ty2,pos) then () else ();
                 ({tenv=tenv,
                 venv=Symbol.enter(venv, name, Env.VarEntry{access=access,ty=ty})}, explist, level))
         end
