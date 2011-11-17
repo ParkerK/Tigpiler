@@ -105,7 +105,7 @@ structure Semant :> SEMANT = struct
 
     | trexp   (A.CallExp {func, args, pos}) = 
       (case Symbol.look (venv, func) of
-        SOME (E.FunEntry {formals, result}) =>
+        SOME (E.FunEntry {formals, result, level, label}) =>
           (*if
             length(args') <> length(args)
           then (err pos "wrong amount of arguments";    {exp=Tr.nilExp(), ty=result})
@@ -300,24 +300,74 @@ structure Semant :> SEMANT = struct
                 ({tenv=tenv', venv=venv}, explist, level)
             end
 
-    | transDec(venv, tenv, A.FunctionDec[{name, params, body, pos, result=SOME(rt,pos1)}], break, explist, level) =
-        let val result_ty = case Symbol.look(tenv, rt) of 
-                              SOME(res) => res
-                            | NONE => Types.UNIT
-          fun transparam {name, escape, typ, pos} = 
-            case Symbol.look(tenv, typ) of
-               SOME t => {name=name, typ=t}
-            |  NONE => (err pos "type undefined"; {name=name, typ=Types.UNIT})
-          val params' = map transparam params
-          val venv' = Symbol.enter(venv, name, 
-              E.FunEntry{formals = map #typ params', result = result_ty})
-          fun enterparam ({name, typ}, venv, access) = 
-              Symbol.enter (venv, name, E.VarEntry{access=access,ty=typ})
-          val venv'' = foldr enterparam venv' params'
-          val label = Temp.newlabel()
-        in transExp(venv'', tenv, break, level) body;
-          ({venv=venv', tenv=tenv}, explist, level)
+    | transDec(venv, tenv, A.FunctionDec(fundecs), break, explist, level) =
+      let
+
+        val fundef = ref []
+        val levels = ref []
+
+        fun makeheader (fundec:A.fundec,env) = 
+          let
+              val r_ty = 
+                (case (#result fundec) of
+                NONE => Types.UNIT
+                | SOME(rt,pos) => typelookup tenv rt pos)
+
+              val params' = (map (fn ({name,escape,typ,pos}) => {name=name,
+                ty=typelookup tenv typ pos})
+                (#params fundec))
+
+              val f = Temp.newlabel()
+
+              val escs = (map (fn ({name,escape,typ,pos}) => (!escape)) (#params fundec))
+
+              val nlevel = Tr.newLevel{parent=level,
+                name=f,
+                formals=escs}
+
+              val _ = levels := nlevel::(!levels)
+
+            in
+              Symbol.enter(env,
+                (#name fundec),
+                E.FunEntry({formals=(map #ty params'),
+                result=r_ty,
+                label=f,
+                level=nlevel}))
         end
+
+        val venv' = (foldl makeheader venv fundecs)
+
+        fun enterparam (param:A.field,venv) =
+        let
+          val access = Tr.allocLocal (hd(!levels)) (!(#escape param))
+          val ty = typelookup tenv (#typ param) (#pos param)
+        in
+          Symbol.enter(venv,
+            (#name param),
+            E.VarEntry{
+            access=access,
+            ty=ty})
+        end
+
+        fun check (fundec:A.fundec) = 
+          let 
+            val venv'' = (foldl enterparam venv' (#params fundec))
+            val {exp, ty} = transExp(venv'',tenv,break,level) (#body fundec)
+            val clevel = hd((!levels))
+            val _ = (levels := tl((!levels)))
+            val _ = Tr.procEntryExit({level=clevel, body=exp})
+          in
+            fundef := (!fundef)@[exp]
+          end
+
+        val checkbodies = (map check fundecs)
+        val explist' = explist@(!fundef)
+        
+        in
+          ({venv=venv',tenv=tenv}, explist=explist', level=level)
+        end
+        
     | transDec(venv, tenv, _, break, explist, level) = ({venv=venv, tenv=tenv}, explist, level)
 
     and transDecs (venv, tenv, decs, break, explist, level) =
