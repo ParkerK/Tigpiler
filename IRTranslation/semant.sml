@@ -140,10 +140,10 @@ structure Semant :> SEMANT = struct
 
       | trexp (A.WhileExp {test, body, pos}) =
         let
-          (*nestLevel := !nestLevel + 1*)
+          nestLevel := !nestLevel + 1
           val body' = transExp (venv,tenv,break,level) body
           val test' = transExp (venv,tenv,break,level) body
-          (*nestLevel := !nestLevel - 1*)
+          nestLevel := !nestLevel - 1
         
           val test'' = checkInt (test', pos);
           val body'' = checkUnit (body', pos);
