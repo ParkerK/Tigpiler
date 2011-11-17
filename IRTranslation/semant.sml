@@ -13,13 +13,13 @@ structure Semant :> SEMANT = struct
   val nestLevel = ref 0
 
   fun typelookup tenv n pos= 
-  let 
-    val result=Symbol.look (tenv, n)
-  in  
-    (case result of
-      SOME ty2 => ty2
-    | NONE => (err pos ("type is not defined: " ^ Symbol.name n) ; Types.UNIT))
-  end
+    let 
+      val result=Symbol.look (tenv, n)
+    in  
+      (case result of
+        SOME ty2 => ty2
+      | NONE => (err pos ("type is not defined: " ^ Symbol.name n) ; Types.UNIT))
+    end
 
   fun transTy (tenv, t)=
     let 
@@ -169,13 +169,13 @@ structure Semant :> SEMANT = struct
                         (fn (ty1, ty2) => compare_ty (ty1, ty2, pos))
                         (types, dftypes))
                     then
-                        {exp=Tr.nilExp(), ty=Types.RECORD(s,u)} 
+                        {exp=Tr.nilExp(), ty=result} 
                     else 
-                        (err pos ("field types not consistant: " ^ Symbol.name typ);
-                        {exp=Tr.nilExp(),ty=Types.RECORD(s,u)})
+                        (err pos ("field types not consistent: " ^ Symbol.name typ);
+                        {exp=Tr.nilExp(),ty=result})
                   else
-                    (err pos ("field types not consistant: " ^ Symbol.name typ);
-                    {exp=Tr.nilExp(),ty=Types.RECORD(s,u)})
+                    (err pos ("field types not consistent: " ^ Symbol.name typ);
+                    {exp=Tr.nilExp(),ty=result})
                 end
             | _ => (err pos ("not a valid record type: " ^ Symbol.name typ);
                     {exp=Tr.nilExp(), ty=Types.UNIT})
