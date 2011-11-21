@@ -14,6 +14,13 @@ struct
   
   val wordsize = 4 (*bytes*)
   
+  (* Register Lists - Page 208 *)
+  val specialregs = [ZERO,FP, SP, RA, RV]
+  (* Create Regs *)
+  val argregs = List.tabulate (4, (fn _ => Temp.newTemp ()))      (* [a0,a1,a2,a3] *)
+  val calleesaves = List.tabulate (8, (fn _ => Temp.newTemp ()))  (* [s0,...,s7] *)
+  val callersaves = List.tabulate (10, (fn _ => Temp.newTemp()))  (* [t0,...,t9] *)
+  
   fun newFrame({name, formals}) = {name=name, formals=formals, locals=ref 0}
   
   fun name(f:frame) = #name f
