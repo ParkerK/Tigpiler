@@ -54,5 +54,12 @@ struct
   
   fun externalCall (str, left, right) = Tree.TEMP (Temp.newtemp()) (*todo*)
   fun procEntryExit1 (frame, stm) = stm (*later*)
+  
+  (* Pg 209 *)
+  fun procEntryExit2 (frame,body) =
+      body @ 
+      [A.OPER{assem="",
+              src=specialregs@calleesaves,
+              dst=[],jump=SOME[]}]
   fun procEntryExit3 () = () (*later*)
 end
