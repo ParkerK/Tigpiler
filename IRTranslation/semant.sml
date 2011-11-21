@@ -209,19 +209,19 @@ structure Semant :> SEMANT = struct
         
       | trexp (A.SeqExp []) = {exp=Tr.empty, ty=Types.UNIT}
       | trexp (A.SeqExp exps) =
-      let
-           val (exps', ty) =
-             foldl (fn ((exp, _), (exps', _)) =>
-                     let
-                       val {exp=newExp, ty} = (transExp(venv, tenv, break, level) exp)
-                     in
-                       (exps' @ [newExp], ty)
-                     end)
-                   ([], Types.UNIT)
-              exps
-      in
-           {exp=Tr.seqExp exps', ty=ty}
-      end
+        let
+             val (exps', ty) =
+               foldl (fn ((exp, _), (exps', _)) =>
+                       let
+                         val {exp=newExp, ty} = (transExp(venv, tenv, break, level) exp)
+                       in
+                         (exps' @ [newExp], ty)
+                       end)
+                     ([], Types.UNIT)
+                exps
+        in
+             {exp=Tr.seqExp exps', ty=ty}
+        end
          
       | trexp (A.AssignExp {var, exp, pos}) =
         let
