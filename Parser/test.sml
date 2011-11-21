@@ -35,4 +35,4 @@ fun test (dir,outdir) =
     testList(listDir(dir)))
   end
 ;
-test ("../TestPrograms","../out");
+test ("../TestPrograms","../Parser");
