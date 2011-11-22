@@ -108,7 +108,7 @@ struct
                r::munchArgs(i+1,et))
           end       
       else
-        munchArgs(i+1,es)
+        munchArgs(i+1,et)
     
     and munchExp(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i))) =
         result(fn r => emit(A.OPER
