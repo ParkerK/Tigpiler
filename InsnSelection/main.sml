@@ -1,14 +1,14 @@
 structure Main = struct
 
   structure Tr = Translate
-  structure F = Frame
-  structure R = RegAlloc
+  structure Frame : FRAME = MipsFrame
+  (*structure R = RegAlloc*)
 
   fun getsome (SOME x) = x
 
-  fun emitproc out (F.PROC{body,frame}) =
+  fun emitproc out (Frame.PROC{body,frame}) =
     let 
-      val _ = print ("emit " ^ Frame.name frame ^ "\n")
+      val _ = print ("emit " ^ (Frame.name frame) ^ "\n")
       (*val _ = Printtree.printtree(out,body); *)
       val stms = Canon.linearize body
       (*val _ = app (fn s => Printtree.printtree(out,s)) stms; *)
@@ -18,7 +18,7 @@ structure Main = struct
     in  
       app (fn i => TextIO.output(out,format0 i)) instrs
     end
-  | emitproc out (F.STRING(lab,s)) = TextIO.output(out,F.string(lab,s))
+  | emitproc out (Frame.STRING(lab,s)) = TextIO.output(out,Frame.STRING(lab,s))
 
   fun withOpenFile fname f = 
     let 
