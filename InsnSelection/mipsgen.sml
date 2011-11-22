@@ -15,7 +15,7 @@ struct
   let 
     val ilist = ref (nil: A.instr list)
     fun emit x = ilist := x :: (!ilist)
-    result(gen) = 
+    fun result(gen) = 
       let
         val t = Temp.newtemp()
       in
