@@ -116,6 +116,37 @@ struct
            {assem="DIV `d0 <- `s0+`s1\n",
             src=[munchExp e1, munchExp e2], dst=[r], jump=NONE}))
            
+      (* AND *)
+      | munchExp(T.BINOP(T.AND,e1,T.CONST i)) =
+        result(fn r => emit(A.OPER
+          {assem="ANDI `d0 <- `s0 +" ^ int i ^ "\n",
+          src=[munchExp e1], dst=[r], jump=NONE}))
+
+      | munchExp(T.BINOP(T.AND,T.CONST i,e1)) =
+        result(fn r => emit(A.OPER
+        {assem="ANDI `d0 <- `s0 +" ^ int i ^ "\n",
+        src=[munchExp e1], dst=[r], jump=NONE}))
+
+      | munchExp(T.BINOP(T.AND,e1,e2)) =
+        result(fn r => emit(A.OPER
+          {assem="AND `d0 <- `s0+`s1\n",
+           src=[munchExp e1, munchExp e2], dst=[r], jump=NONE}))
+           
+     (* OR *)
+     | munchExp(T.BINOP(T.OR,e1,T.CONST i)) =
+       result(fn r => emit(A.OPER
+         {assem="ORI `d0 <- `s0 +" ^ int i ^ "\n",
+         src=[munchExp e1], dst=[r], jump=NONE}))
+
+     | munchExp(T.BINOP(T.OR,T.CONST i,e1)) =
+       result(fn r => emit(A.OPER
+       {assem="ORI `d0 <- `s0 +" ^ int i ^ "\n",
+       src=[munchExp e1], dst=[r], jump=NONE}))
+
+     | munchExp(T.BINOP(T.OR,e1,e2)) =
+       result(fn r => emit(A.OPER
+         {assem="OR `d0 <- `s0+`s1\n",
+          src=[munchExp e1, munchExp e2], dst=[r], jump=NONE}))
            
      | munchExp(T.CONST i) =
        result(fn r => emit(A.OPER
