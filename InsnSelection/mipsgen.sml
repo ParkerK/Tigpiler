@@ -97,13 +97,14 @@ struct
       | munchExp(T.BINOP(T.MINUS,T.CONST i,e1)) =
         result(fn r => emit(A.OPER
         {assem="ADDI `d0 <- `s0 +" ^ int i ^ "\n",
-        src=[munchExp ((T.BINOP(T.MINUS,T.CONST 0,e1))], dst=[r], jump=NONE}))
+        src=[munchExp ((T.BINOP(T.MINUS,T.CONST 0,e1)))], dst=[r], jump=NONE}))
 
       | munchExp(T.BINOP(T.MINUS,e1,e2)) =
         result(fn r => emit(A.OPER
           {assem="SUB `d0 <- `s0+`s1\n",
            src=[munchExp e1, munchExp e2], dst=[r], jump=NONE}))
            
+
       (* MULTIPLY *)
       | munchExp(T.BINOP(T.MUL,e1,e2)) =
         result(fn r => emit(A.OPER
