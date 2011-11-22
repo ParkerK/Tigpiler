@@ -33,7 +33,7 @@ struct
   fun munchStm(T.SEQ(a,b)) = (mumchStm a; munchStm b)
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i)),e2)) =
         emit(A.OPER{assem="STORE M[`s0+" ^ int i ^ "] <- `s1\n",
-                    src=[munchExp e1, munchExp e2],
+                    src=[munchExp e2, munchExp e3],
                     dst=[],jump=NONE})
 
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,T.CONST i,e1)),e2)) =
@@ -198,10 +198,10 @@ struct
       rev(!ilist)
     end
     
-  fun getTempName(t:Temp.temp) = 
-    case Symbol.look(Frame.tempMap, t) of
-      SOME(str) => str
-    | NONE => Temp.makestring(t) (*handle fp?*)
-
+    (*  fun getTempName(t:Temp.temp) = 
+        case Symbol.look(Frame.tempMap, t) of
+          SOME(str) => str
+        | NONE => Temp.makestring(t) (*handle fp?*)*)
+    
     
 end
