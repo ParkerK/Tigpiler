@@ -16,6 +16,14 @@ struct
     fun emit x = ilist := x :: !ilist
     result(gen) = let val t = Temp.newtemp() in gen t; t end
 
+   fun operToJump oper = case oper of
+      T.EQ => "BEQ"
+    | T.NE => "BNE"
+    | T.LT => "BLT"
+    | T.GT => "BGT"
+    | T.LE => "BLE"
+    | T.GE => "BGE"
+    
   fun munchStm(T.SEQ(a,b)) = (mumchStm a; munchStm b)
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i)),e2)) =
         emit(A.OPER{assem="STORE M[`s0+" ^ int i ^ "] <- `s1\n",
@@ -55,6 +63,23 @@ struct
                   src=munchExp(e)::munchArgs(0,args),
                   dst=calldefs,
                   jump=NONE})
+    
+    (* JUMP *)
+     | munchStm(T.CJUMP(oper, T.CONST i, e1, lab1, lab2)) =
+      emit(A.OPER{assem=((operToJump (oper)) ^ " `s0," ^ int i ^ "," ^ Symbol.name(lab1) ^ "\n" ^ "j " ^ (Symbol.name lab2) ^ "\n"),
+        src=[munchExp e1], dst=[], jump=SOME([lab1,lab2])})
+
+    | munchStm(T.CJUMP(oper, e1, T.CONST i, lab1, lab2)) =
+            emit(A.OPER{assem=((operToJump oper) ^ " `s0," ^ int i ^ "," ^ Symbol.name(lab1) ^ "\n" ^ "j " ^ (Symbol.name lab2) ^ "\n"),
+                        src=[munchExp e1], dst=[], jump=SOME([lab1,lab2])})
+
+    | munchStm(T.CJUMP(oper, e1, e2, lab1, lab2)) =
+      emit(A.OPER{assem=((operToJump oper) ^ " `s0,`s1," ^ Symbol.name(lab1) ^ "\n" ^ "j " ^ (Symbol.name lab2) ^ "\n"),
+        src=[munchExp e1, munchExp e2], dst=[], jump=SOME([lab1,lab2])})
+
+    | munchStm(T.JUMP(T.NAME(lab), llst)) =
+      emit(A.OPER{assem = "j " ^ (Symbol.name lab) ^ "\n",
+        src=[], dst=[], jump=SOME[Temp.namedlabel(Symbol.name lab)]})
   
     and munchExp(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i))) =
         result(fn r => emit(A.OPER
