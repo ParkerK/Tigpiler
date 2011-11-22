@@ -22,5 +22,5 @@ sig
   datatype frag = PROC of {body: Tree.stm, frame: frame}
                 | STRING of Temp.label * string
                 
-  val tempMap: register Temp.Table
+  (*val tempMap: register Temp.Table.table*)
 end

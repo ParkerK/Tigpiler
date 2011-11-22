@@ -6,8 +6,8 @@ struct
                   | InReg of Temp.temp (*value held in register*)
   datatype frag = PROC of {body: Tree.stm, frame: frame}
                 | STRING of Temp.label * string
-  val tempMap = register Temp.Table
   
+  (*val tempMap = Temp.Table.table*)
   
   val ZERO = Temp.newtemp() (* r0, zero *)
   val FP = Temp.newtemp()   (* Framepointer *)
