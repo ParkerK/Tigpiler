@@ -24,7 +24,11 @@ let
           val infile = dir ^ "/" ^ (valOf(head))
           val outfile = outdir ^ "/" ^ (valOf(head)) ^ ".s"
         in
-          Main.compile(infile, outfile)
+          (
+            print (infile ^ "\n");
+            Main.compile(infile, outfile);
+            testList(rest)
+          )
         end
     in
       (checkDir(outdir); (* to make sure that out exists or create an empty dir *)

@@ -37,6 +37,7 @@ struct
     | T.GT => "BGT"
     | T.LE => "BLE"
     | T.GE => "BGE"
+    | _ => "WTF"
     
   fun munchStm(T.SEQ(a,b)) = (munchStm a; munchStm b)
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i)),e2)) =
@@ -94,21 +95,21 @@ struct
     | munchStm(T.JUMP(T.NAME(lab), llst)) =
       emit(A.OPER{assem = "j " ^ (Symbol.name lab) ^ "\n",
         src=[], dst=[], jump=SOME[Temp.namedlabel(Symbol.name lab)]})
-    
+    | munchStm(_) = emit(A.OPER{assem="WTF", src=[], dst=[], jump=NONE})
     and munchArgs(i,[]) = []
       | munchArgs(i,eh::et) =
-      if(i > 0 andalso i < 5)
-      then
-          let
-              val reg = "`a" ^ int (i-1)
-              val r = List.nth(F.argregs,(i-1))
-          in            
-              (emit(A.OPER{assem="ADDI " ^ reg ^ " <- `s0+0\n",
-               src=[munchExp eh], dst=[r], jump=NONE});
-               r::munchArgs(i+1,et))
-          end       
-      else
-        munchArgs(i+1,et)
+        if(i > 0 andalso i < 5)
+        then
+            let
+                val reg = "`a" ^ int (i-1)
+                val r = List.nth(F.argregs,(i-1))
+            in            
+                (emit(A.OPER{assem="ADDI " ^ reg ^ " <- `s0+0\n",
+                 src=[munchExp eh], dst=[r], jump=NONE});
+                 r::munchArgs(i+1,et))
+            end       
+        else
+          munchArgs(i+1,et)
     
     and munchExp(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i))) =
         result(fn r => emit(A.OPER
@@ -214,8 +215,9 @@ struct
          {assem="ADDI `d0 <- r0+" ^ int i ^ "\n",
           src=[], dst=[r], jump=NONE}))
         
-      | munchExp(T.TEMP t) = t
-    
+     | munchExp(T.TEMP t) = t
+     | munchExp(_) = result(fn _ => emit(A.OPER{assem="WTF", src=[], dst=[], jump=NONE}))
+      
     in
       munchStm stm;
       rev(!ilist)
