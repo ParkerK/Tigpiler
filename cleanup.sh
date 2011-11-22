@@ -1,5 +1,5 @@
 #/bin/sh
-rm -r IR/
+rm -r IR-Out/
 rm -r IRTranslation/.cm/
 rm IRTranslation/tiger.grm.desc
 rm IRTranslation/tiger.grm.sml
@@ -18,3 +18,8 @@ rm SemanticAnalysis/tiger.grm.desc
 rm SemanticAnalysis/tiger.grm.sig
 rm SemanticAnalysis/tiger.grm.sml
 rm SemanticAnalysis/tiger.lex.sml
+rm -r InsnSelection-Out/
+rm -r InsnSelection/.cm/
+rm InsnSelection/tiger.grm.desc
+rm InsnSelection/tiger.grm.sml
+rm InsnSelection/tiger.lex.sml
