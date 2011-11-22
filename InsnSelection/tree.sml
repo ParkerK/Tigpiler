@@ -2,7 +2,7 @@ signature TREE =
 sig 
   type label = Temp.label
   type size
-
+ 
   datatype stm  = SEQ of stm * stm
                 | LABEL of label
                 | JUMP of exp * label list
@@ -23,6 +23,8 @@ sig
 
       and relop = EQ | NE | LT | GT | LE | GE 
                 | ULT | ULE | UGT | UGE
+
+   val notRel : relop -> relop
   
 
 end
@@ -52,4 +54,15 @@ struct
 
        and relop = EQ | NE | LT | GT | LE | GE 
                  | ULT | ULE | UGT | UGE
+      
+      fun notRel EQ = NE 
+         | notRel NE = EQ
+         | notRel LT = GE
+         | notRel GT = LE 
+         | notRel LE = GT
+         | notRel GE = LT
+         | notRel ULT = UGE
+         | notRel ULE = UGT 
+         | notRel UGT = ULE
+         | notRel UGE = ULT
 end
