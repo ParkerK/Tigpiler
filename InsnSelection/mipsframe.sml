@@ -15,7 +15,7 @@ struct
   val wordsize = 4 (*bytes*)
   
   (* Register Lists - Page 208 *)
-  val specialregs = [ZERO,FP, SP, RA, RV]
+  val specialregs = [ZERO, FP, SP, RA, RV]
   (* Create Regs *)
   val argregs = List.tabulate (4, (fn _ => Temp.newTemp ()))      (* [a0,a1,a2,a3] *)
   val calleesaves = List.tabulate (8, (fn _ => Temp.newTemp ()))  (* [s0,...,s7] *)
@@ -59,7 +59,7 @@ struct
   fun procEntryExit2 (frame,body) =
       body @ 
       [A.OPER{assem="",
-              src=specialregs@calleesaves,
+              src=specialregs @ calleesaves,
               dst=[],jump=SOME[]}]
   
   (* Pg 209 *)           
@@ -68,5 +68,4 @@ struct
       body = body,
        epilog = "END " ^ Symbol.name name ^ "\n"}
 
-    
 end
