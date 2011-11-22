@@ -97,7 +97,6 @@ struct
         src=[], dst=[], jump=SOME[Temp.namedlabel(Symbol.name lab)]})
         
     | munchStm(_) = emit(A.OPER{assem="WTF", src=[], dst=[], jump=NONE})
-    | munchStm(T.EXP(e)) = (munchExp(e); ())
 
     and munchArgs(i,[]) = []
       | munchArgs(i,eh::et) =
