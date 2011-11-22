@@ -10,6 +10,13 @@ struct
   structure T = Tree
   structure A = Assem
   
+  fun int (i) =
+    if
+      i >= 0
+    then
+      Int.toString i
+    else
+      "-" ^ Int.toString(~i)
   
   fun codegen(frame) (stm: Tree.stm) : Assem.instr list = 
   let 
@@ -99,7 +106,7 @@ struct
 
       | munchExp(T.MEM(T.CONST i)) = 
         result(fn r => emit(A.OPER
-          {assem="LOAD `d0 <- M[`r0" ^ int i ^ "]\n",
+          {assem="LOAD `d0 <- M[r0" ^ int i ^ "]\n",
            src=[], dst=[r], jump=NONE}))
 
       | munchExp(T.MEM(e1)) = 
@@ -198,10 +205,10 @@ struct
       rev(!ilist)
     end
     
-    (*  fun getTempName(t:Temp.temp) = 
-        case Symbol.look(Frame.tempMap, t) of
-          SOME(str) => str
-        | NONE => Temp.makestring(t) (*handle fp?*)*)
-    
+  fun getTempName(t:Temp.temp) = 
+    case Symbol.look(Frame.tempMap, t) of
+      SOME(str) => str
+    | NONE => Temp.makestring(t) (*handle fp?*)
+
     
 end
