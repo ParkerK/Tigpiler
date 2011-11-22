@@ -6,6 +6,9 @@ struct
                   | InReg of Temp.temp (*value held in register*)
   datatype frag = PROC of {body: Tree.stm, frame: frame}
                 | STRING of Temp.label * string
+  val tempMap = register Temp.Table
+  
+  
   val ZERO = Temp.newtemp() (* r0, zero *)
   val FP = Temp.newtemp()   (* Framepointer *)
   val SP = Temp.newtemp()   (* Stackpointer *)
@@ -64,7 +67,8 @@ struct
               dst=[],jump=SOME[]}]
   
   (* Pg 209 *)           
-  fun procEntryExit3 ({name,params,locals}, body) =
+  fun procEntryExit3 ({name=name, formals=formals, locals=locals}:frame, 
+                      body : Assem.instr list) =
       {prolog = "PROCEDURE " ^ Symbol.name name ^ "\n",
        body = body,
        epilog = "END " ^ Symbol.name name ^ "\n"}
