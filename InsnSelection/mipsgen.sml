@@ -55,11 +55,6 @@ struct
           {assem="LOAD `d0 <- M[`s0+" ^ int i ^ "]\n",
            src=[munchExp e1], dst=[r], jump=NONE}))
 
-      | munchExp(T.MEM(T.BINOP(T.PLUS,T.CONST i,e1))) =
-              result(fn r => emit(A.OPER
-              {assem="LOAD `d0 <- M[`s0" ^ int i"]\n",
-                src=[munchExp e1], dst=[r], jump=NONE}))
-
       | munchExp(T.MEM(T.CONST i)) = 
         result(fn r => emit(A.OPER
           {assem="LOAD `d0 <- M[r0" ^ int i ^ "]\n",
