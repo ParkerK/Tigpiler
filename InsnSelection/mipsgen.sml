@@ -95,11 +95,6 @@ struct
     | munchStm(T.JUMP(T.NAME(lab), llst)) =
       emit(A.OPER{assem = "j " ^ (Symbol.name lab) ^ "\n",
         src=[], dst=[], jump=SOME[Temp.namedlabel(Symbol.name lab)]})
-        
-        
-    | munchStm(T.EXP(T.CALL(T.NAME(lab),args))) = 
-        emit(A.OPER{assem="JAL " ^ Symbol.name(lab) ^ "\n",
-        src=munchArgs(0,args), dst=F.RA::F.v0::F.callersaves, jump=NONE})
     
     | munchStm (T.EXP exp) = (munchExp exp; ())
     
