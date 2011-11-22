@@ -9,6 +9,7 @@ struct
   structure Frame : FRAME = MipsFrame
   structure T = Tree
   structure A = Assem
+  structure F = Frame
   
   fun int (i) =
     if
@@ -93,7 +94,22 @@ struct
     | munchStm(T.JUMP(T.NAME(lab), llst)) =
       emit(A.OPER{assem = "j " ^ (Symbol.name lab) ^ "\n",
         src=[], dst=[], jump=SOME[Temp.namedlabel(Symbol.name lab)]})
-  
+    
+    and munchArgs(i,[]) = []
+      | munchArgs(i,eh::et) =
+      if(i > 0 andalso i < 5)
+      then
+          let
+              val reg = "`a" ^ int (i-1)
+              val r = List.nth(F.argregs,(i-1))
+          in            
+              (emit(A.OPER{assem="ADDI " ^ reg ^ " <- `s0+0\n",
+               src=[munchExp eh], dst=[r], jump=NONE});
+               r::munchArgs(i+1,et))
+          end       
+      else
+        munchArgs(i+1,et)
+    
     and munchExp(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i))) =
         result(fn r => emit(A.OPER
           {assem="LOAD `d0 <- M[`s0+" ^ int i ^ "]\n",
