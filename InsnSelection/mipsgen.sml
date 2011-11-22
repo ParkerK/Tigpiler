@@ -10,6 +10,13 @@ struct
   structure T = Tree
   structure A = Assem
   
+  fun int (i) =
+    if
+      i >= 0
+    then
+      Int.toString i
+    else
+      "-" ^ Int.toString(~i)
   
   fun codegen(frame) (stm: Tree.stm) : Assem.instr list = 
   let 
