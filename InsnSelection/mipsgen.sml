@@ -74,7 +74,7 @@ struct
     | munchStm (T.EXP(T.CALL(e,args))) =
       emit (A.OPER{assem="CALL `s0\n",
                   src=munchExp(e)::munchArgs(0,args),
-                  dst=calldefs,
+                  dst=Frame.calldefs,
                   jump=NONE})
     
     (* JUMP *)
