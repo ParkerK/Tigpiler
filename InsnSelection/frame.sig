@@ -4,6 +4,8 @@ sig
   type access
   type register
   val FP : Temp.temp
+  val ZERO : Temp.temp
+  val RA : Temp.temp  
   val RV : Temp.temp (*as seen by callee*)
   val wordsize : int
   val argregs: Temp.temp list
