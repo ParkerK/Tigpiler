@@ -75,7 +75,7 @@ struct
     | munchStm (T.EXP(T.CALL(e,args))) =
       emit (A.OPER{assem="CALL `s0\n",
                   src=munchExp(e)::munchArgs(0,args),
-                  dst=calldefs,
+                  dst=Frame.calldefs,
                   jump=NONE})
     
     (* JUMP *)
@@ -117,7 +117,7 @@ struct
 
       | munchExp(T.MEM(T.BINOP(T.PLUS,T.CONST i,e1))) =
               result(fn r => emit(A.OPER
-              {assem="LOAD `d0 <- M[`s0" ^ int i"]\n",
+              {assem="LOAD `d0 <- M[`s0" ^ int i ^ "]\n",
                 src=[munchExp e1], dst=[r], jump=NONE}))
 
       | munchExp(T.MEM(T.CONST i)) = 
@@ -221,10 +221,10 @@ struct
       rev(!ilist)
     end
     
-  fun getTempName(t:Temp.temp) = 
+  (*fun getTempName(t:Temp.temp) = 
     case Symbol.look(Frame.tempMap, t) of
       SOME(str) => str
-    | NONE => Temp.makestring(t) (*handle fp?*)
+    | NONE => Temp.makestring(t) (*handle fp?*)*)
 
     
 end
