@@ -14,7 +14,7 @@ struct
   fun codegen(frame) (stm: Tree.stm) : Assem.instr list = 
   let val ilist = ref (nil: A.instr list)
     fun emit x = ilist := x :: !ilist
-    result(gen) = let val t = Temp.newtemp()
+    result(gen) = let val t = Temp.newtemp() in gen t; t end
 
   fun munchStm(T.SEQ(a,b)) = (mumchStm a; munchStm b)
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i)),e2)) =
