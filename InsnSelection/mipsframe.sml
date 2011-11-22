@@ -61,5 +61,12 @@ struct
       [A.OPER{assem="",
               src=specialregs@calleesaves,
               dst=[],jump=SOME[]}]
-  fun procEntryExit3 () = () (*later*)
+  
+  (* Pg 209 *)           
+  fun procEntryExit3 (FRAME{name,params,locals}, body) =
+      {prolog = "PROCEDURE " ^ Symbol.name name ^ "\n",
+      body = body,
+       epilog = "END " ^ Symbol.name name ^ "\n"}
+
+    
 end
