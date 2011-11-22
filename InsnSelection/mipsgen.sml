@@ -10,6 +10,12 @@ struct
   structure T = Tree
   structure A = Assem
   
+  
+  fun codegen(frame) (stm: Tree.stm) : Assem.instr list = 
+  let val ilist = ref (nil: A.instr list)
+    fun emit x = ilist := x :: !ilist
+    result(gen) = let val t = Temp.newtemp()
+
   fun munchStm(T.SEQ(a,b)) = (mumchStm a; munchStm b)
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i)),e2)) =
         emit(A.OPER{assem="STORE M[`s0+" ^ int i ^ "] <- `s1\n",
@@ -155,12 +161,16 @@ struct
           src=[], dst=[r], jump=NONE}))
         
       | munchExp(T.TEMP t) = t
-
+    
+    in
+      munchStm stm;
+      rev(!ilist)
+    end
+    
   fun getTempName(t:Temp.temp) = 
     case Symbol.look(Frame.tempMap, t) of
       SOME(str) => str
     | NONE => Temp.makestring(t) (*handle fp?*)
 
-  fun codegen(frame) = fn(stm) => []
     
 end
