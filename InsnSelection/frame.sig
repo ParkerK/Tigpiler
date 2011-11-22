@@ -6,7 +6,7 @@ sig
   val FP : Temp.temp
   val RV : Temp.temp (*as seen by callee*)
   val wordsize : int
-
+  val argregs: Temp.temp list
   val calldefs : register list
   val newFrame : {name: Temp.label, formals: bool list} -> frame
   val name : frame -> Temp.label
