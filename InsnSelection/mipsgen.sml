@@ -70,6 +70,8 @@ struct
           {assem="LOAD `d0 <- M[`s0+0]\n",
           src=[munchExp e1], dst=[r], jump=NONE}))
 
+      (* PLUS *)
+
       | munchExp(T.BINOP(T.PLUS,e1,T.CONST i)) =
         result(fn r => emit(A.OPER
           {assem="ADDI `d0 <- `s0 +" ^ int i ^ "\n",
@@ -80,16 +82,34 @@ struct
         {assem="ADDI `d0 <- `s0 +" ^ int i ^ "\n",
         src=[munchExp e1], dst=[r], jump=NONE}))
 
-      | munchExp(T.CONST i) =
-        result(fn r => emit(A.OPER
-          {assem="ADDI `d0 <- r0+" ^ int i ^ "\n",
-           src=[], dst=[r], jump=NONE}))
-
       | munchExp(T.BINOP(T.PLUS,e1,e2)) =
         result(fn r => emit(A.OPER
           {assem="ADD `d0 <- `s0+`s1\n",
            src=[munchExp e1, munchExp e2], dst=[r], jump=NONE}))
+      
+      (* MINUS *)
+      
+      | munchExp(T.BINOP(T.PLUS,e1,T.CONST i)) =
+        result(fn r => emit(A.OPER
+          {assem="ADDI `d0 <- `s0 +" ^ int (~i) ^ "\n",
+          src=[munchExp e1], dst=[r], jump=NONE}))
 
+      | munchExp(T.BINOP(T.PLUS,T.CONST i,e1)) =
+        result(fn r => emit(A.OPER
+        {assem="ADDI `d0 <- `s0 +" ^ int i ^ "\n",
+        src=[munchExp ((T.BINOP(T.MINUS,T.CONST 0,e1))], dst=[r], jump=NONE}))
+
+      | munchExp(T.BINOP(T.PLUS,e1,e2)) =
+        result(fn r => emit(A.OPER
+          {assem="SUB `d0 <- `s0+`s1\n",
+           src=[munchExp e1, munchExp e2], dst=[r], jump=NONE}))
+           
+           
+     | munchExp(T.CONST i) =
+       result(fn r => emit(A.OPER
+         {assem="ADDI `d0 <- r0+" ^ int i ^ "\n",
+          src=[], dst=[r], jump=NONE}))
+        
       | munchExp(T.TEMP t) = t
 
   fun getTempName(t:Temp.temp) = 
