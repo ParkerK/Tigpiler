@@ -42,7 +42,7 @@ struct
           dst=[i], jump=NONE})
 
     | munchStm(T.LABEL lab) =
-      emit(A.LABEL{assem=lab ^ ":\n", lab=;lab})
+      emit(A.LABEL{assem=lab ^ ":\n", lab=lab})
       
     | munchStm (T.EXP(T.CALL(e,args))) =
       emit (A.OPER{assem="CALL `s0\n",

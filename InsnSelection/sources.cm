@@ -15,15 +15,12 @@ mipsframe.sml
 mipsgen.sml
 parse.sml
 printtree.sml
-runtime.c
 semant.sml
-sources.cm
 symbol.sml
 table.sig
 table.sml
 temp.sig
 temp.sml
-test.sml
 tiger.grm.sig
 tiger.lex
 translate.sml
