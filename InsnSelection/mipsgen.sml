@@ -95,7 +95,10 @@ struct
     | munchStm(T.JUMP(T.NAME(lab), llst)) =
       emit(A.OPER{assem = "j " ^ (Symbol.name lab) ^ "\n",
         src=[], dst=[], jump=SOME[Temp.namedlabel(Symbol.name lab)]})
+        
     | munchStm(_) = emit(A.OPER{assem="WTF", src=[], dst=[], jump=NONE})
+    | munchStm(T.EXP(e)) = (munchExp(e); ())
+
     and munchArgs(i,[]) = []
       | munchArgs(i,eh::et) =
         if(i > 0 andalso i < 5)
