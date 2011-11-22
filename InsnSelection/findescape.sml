@@ -5,7 +5,7 @@ struct
   
   fun traverseVar(env:escEnv, d:depth, s:Absyn.var) : unit = ()
   and traverseExp(env:escEnv, d:depth, s:Absyn.var) : unit = ()
-  and traverseDecs(env, d, s: Absyn.dec list) : escEnv = ()
+  and traverseDecs(env, d, s: Absyn.dec list) : escEnv = env
   
   fun findEscape(prog: Absyn.exp) : unit = ()
 end
