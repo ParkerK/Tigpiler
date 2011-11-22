@@ -1,11 +1,11 @@
 structure MipsFrame : FRAME =
 struct
   type frame = {name: Temp.label, formals: bool list, locals: int ref}
+  type register = Temp.temp
   datatype access = InFrame of int (*a memory location at offset x from FP*)
                   | InReg of Temp.temp (*value held in register*)
   datatype frag = PROC of {body: Tree.stm, frame: frame}
                 | STRING of Temp.label * string
-
   val ZERO = Temp.newtemp() (* r0, zero *)
   val FP = Temp.newtemp()   (* Framepointer *)
   val SP = Temp.newtemp()   (* Stackpointer *)
@@ -17,9 +17,9 @@ struct
   (* Register Lists - Page 208 *)
   val specialregs = [ZERO, FP, SP, RA, RV]
   (* Create Regs *)
-  val argregs = List.tabulate (4, (fn _ => Temp.newTemp ()))      (* [a0,a1,a2,a3] *)
-  val calleesaves = List.tabulate (8, (fn _ => Temp.newTemp ()))  (* [s0,...,s7] *)
-  val callersaves = List.tabulate (10, (fn _ => Temp.newTemp()))  (* [t0,...,t9] *)
+  val argregs = List.tabulate (4, (fn _ => Temp.newtemp ()))      (* [a0,a1,a2,a3] *)
+  val calleesaves = List.tabulate (8, (fn _ => Temp.newtemp ()))  (* [s0,...,s7] *)
+  val callersaves = List.tabulate (10, (fn _ => Temp.newtemp()))  (* [t0,...,t9] *)
   
   fun newFrame({name, formals}) = {name=name, formals=formals, locals=ref 0}
   
@@ -55,6 +55,7 @@ struct
   fun externalCall (str, left, right) = Tree.TEMP (Temp.newtemp()) (*todo*)
   fun procEntryExit1 (frame, stm) = stm (*later*)
   
+  structure A = Assem
   (* Pg 209 *)
   fun procEntryExit2 (frame,body) =
       body @ 
@@ -63,9 +64,9 @@ struct
               dst=[],jump=SOME[]}]
   
   (* Pg 209 *)           
-  fun procEntryExit3 (FRAME{name,params,locals}, body) =
+  fun procEntryExit3 ({name,params,locals}, body) =
       {prolog = "PROCEDURE " ^ Symbol.name name ^ "\n",
-      body = body,
+       body = body,
        epilog = "END " ^ Symbol.name name ^ "\n"}
 
 end
