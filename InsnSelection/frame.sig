@@ -2,6 +2,7 @@ signature FRAME =
 sig
   type frame
   type access
+  type register
   val FP : Temp.temp
   val RV : Temp.temp (*as seen by callee*)
   val wordsize : int
