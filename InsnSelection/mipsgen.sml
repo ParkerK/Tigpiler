@@ -10,13 +10,6 @@ struct
   structure T = Tree
   structure A = Assem
   
-  fun int (i) =
-    if
-      i >= 0
-    then
-      Int.toString i
-    else
-      "-" ^ Int.toString(~i)
   
   fun codegen(frame) (stm: Tree.stm) : Assem.instr list = 
   let 
@@ -37,7 +30,7 @@ struct
     | T.LE => "BLE"
     | T.GE => "BGE"
     
-  fun munchStm(T.SEQ(a,b)) = (munchStm a; munchStm b)
+  fun munchStm(T.SEQ(a,b)) = (mumchStm a; munchStm b)
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i)),e2)) =
         emit(A.OPER{assem="STORE M[`s0+" ^ int i ^ "] <- `s1\n",
                     src=[munchExp e2, munchExp e3],
@@ -106,7 +99,7 @@ struct
 
       | munchExp(T.MEM(T.CONST i)) = 
         result(fn r => emit(A.OPER
-          {assem="LOAD `d0 <- M[r0" ^ int i ^ "]\n",
+          {assem="LOAD `d0 <- M[`r0" ^ int i ^ "]\n",
            src=[], dst=[r], jump=NONE}))
 
       | munchExp(T.MEM(e1)) = 
