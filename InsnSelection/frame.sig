@@ -4,6 +4,8 @@ sig
   type access
   type register
   val FP : Temp.temp
+  val ZERO : Temp.temp
+  val RA : Temp.temp  
   val RV : Temp.temp (*as seen by callee*)
   val wordsize : int
   val argregs: Temp.temp list
@@ -12,6 +14,7 @@ sig
   val name : frame -> Temp.label
   val formals : frame -> access list
   val allocLocal : frame -> bool -> access
+  val callersaves : Temp.temp list
   
   val exp : access -> Tree.exp -> Tree.exp
   
