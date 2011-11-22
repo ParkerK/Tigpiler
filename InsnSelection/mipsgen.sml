@@ -37,7 +37,7 @@ struct
     | T.LE => "BLE"
     | T.GE => "BGE"
     
-  fun munchStm(T.SEQ(a,b)) = (mumchStm a; munchStm b)
+  fun munchStm(T.SEQ(a,b)) = (munchStm a; munchStm b)
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i)),e2)) =
         emit(A.OPER{assem="STORE M[`s0+" ^ int i ^ "] <- `s1\n",
                     src=[munchExp e2, munchExp e3],
