@@ -104,6 +104,18 @@ struct
           {assem="SUB `d0 <- `s0+`s1\n",
            src=[munchExp e1, munchExp e2], dst=[r], jump=NONE}))
            
+      (* MULTIPLY *)
+      | munchExp(T.BINOP(T.MUL,e1,e2)) =
+        result(fn r => emit(A.OPER
+          {assem="MULT `d0 <- `s0+`s1\n",
+           src=[munchExp e1, munchExp e2], dst=[r], jump=NONE}))
+           
+       (* DIVIDE *)
+       | munchExp(T.BINOP(T.DIV,e1,e2)) =
+         result(fn r => emit(A.OPER
+           {assem="DIV `d0 <- `s0+`s1\n",
+            src=[munchExp e1, munchExp e2], dst=[r], jump=NONE}))
+           
            
      | munchExp(T.CONST i) =
        result(fn r => emit(A.OPER
