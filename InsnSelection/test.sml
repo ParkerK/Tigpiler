@@ -22,15 +22,9 @@ let
       | testList (head::rest) = 
         let 
           val infile = dir ^ "/" ^ (valOf(head))
-          val outfile = TextIO.openOut (outdir ^ "/" ^ (valOf(head)) ^ ".out")
-          val absyn = Parse.parse infile
-          val tree = Semant.transProg(absyn);
+          val outfile = outdir ^ "/" ^ (valOf(head)) ^ ".s"
         in
-          (
-            print (infile ^ "\n");
-            Printtree.printtree(outfile, tree);
-            testList(rest)
-          )
+          Main.compile(infile, outfile)
         end
     in
       (checkDir(outdir); (* to make sure that out exists or create an empty dir *)
