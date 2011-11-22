@@ -40,7 +40,7 @@ struct
   fun munchStm(T.SEQ(a,b)) = (munchStm a; munchStm b)
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i)),e2)) =
         emit(A.OPER{assem="STORE M[`s0+" ^ int i ^ "] <- `s1\n",
-                    src=[munchExp e2, munchExp e3],
+                    src=[munchExp e1, munchExp e2],
                     dst=[],jump=NONE})
 
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,T.CONST i,e1)),e2)) =
