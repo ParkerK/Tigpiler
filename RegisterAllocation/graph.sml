@@ -13,9 +13,9 @@ struct
     | isBogus _ = false
 
   structure A = DynamicArrayFn(struct open Array
-				    type elem = noderep
-				    type vector = noderep vector
-				    type array = noderep array
+            type elem = noderep
+            type vector = noderep vector
+            type array = noderep array
                              end)
 
   type graph = A.array
@@ -29,16 +29,16 @@ struct
 
   fun nodes g = let val b = A.bound g
                     fun f i = if isBogus( A.sub(g,i)) then nil
-			           else (g,i)::f(i+1)
-		 in f 0			     
+                 else (g,i)::f(i+1)
+     in f 0          
                 end
 
   fun succ(g,i) = let val NODE{succ=s,...} = A.sub(g,i) 
-		   in map (augment g) s 
-		  end
+       in map (augment g) s 
+      end
   fun pred(g,i) = let val NODE{pred=p,...} = A.sub(g,i)
                      in map (augment g) p 
-		  end
+      end
   fun adj gi = pred gi @ succ gi
 
   fun newNode g = (* binary search for unused node *)
@@ -71,7 +71,7 @@ struct
   val rm_edge = diddle_edge delete
 
   structure Table = IntMapTable(type key = node
-				fun getInt(g,n) = n)
+        fun getInt(g,n) = n)
 
 
   fun nodename(g,i:int) = "n" ^ Int.toString(i)
