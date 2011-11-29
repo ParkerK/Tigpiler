@@ -6,6 +6,7 @@ canon.sml
 env.sml
 errormsg.sml
 findescape.sml
+flow.sml
 flowgraph.sml
 frame.sig
 graph.sig
@@ -26,7 +27,6 @@ tiger.lex
 translate.sml
 tree.sml
 types.sml
-
 
 tiger.grm : shell (target: tiger.grm.sml ml-yacc %s)
 $/smlnj-lib.cm
