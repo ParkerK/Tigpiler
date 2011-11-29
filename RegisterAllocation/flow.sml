@@ -1,4 +1,4 @@
-signature FLOW =
+structure FLOW:
 sig
     structure Graph
     datatype flowgraph =
