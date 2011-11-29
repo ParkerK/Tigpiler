@@ -23,3 +23,8 @@ rm -r InsnSelection/.cm/
 rm InsnSelection/tiger.grm.desc
 rm InsnSelection/tiger.grm.sml
 rm InsnSelection/tiger.lex.sml
+rm -r RegisterAllocation-Out/
+rm -r RegisterAllocation/.cm/
+rm RegisterAllocation/tiger.grm.desc
+rm RegisterAllocation/tiger.grm.sml
+rm RegisterAllocation/tiger.lex.sml
