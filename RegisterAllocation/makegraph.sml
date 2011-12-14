@@ -14,6 +14,7 @@ struct
   let
     val g = G.newGraph()
     val nodelist = []
+    
     fun initInstr([]) =
       | initInstr(inst_h::inst_t) = 
       
@@ -54,24 +55,27 @@ struct
       
       fun makeEdges (control, a::(b::c)) =
         let
-		  (* Get each instrucion *)
+          (* Get each instrucion *)
           val inst = G.Table.look(control, a)
         in
-		 (* Make edge for follow through *)	
+         (* Make edge for follow through *) 
           G.mk_edge {from=a, to=b}
-		  (* Check for a jump instr *)
-		  ( case inst of SOME (A.OPER {assem, dst, src, jump}) =>
-		  	(case jump of SOME label => 
-				| NONE => ())
-			| NONE => () 
-			| SOME(_) => ())
-			
-		  
+          (* Check for a jump instr *)
+          ( case inst of SOME (A.OPER {assem, dst, src, jump}) =>
+            (case jump of SOME label => 
+                | NONE => ())
+            | NONE => () 
+            | SOME(_) => ())
+            
+          
         end
       
         | makeEdges (_) = ()
 
+
       val {control, def, use, ismove} = initInstr(instrs)
+
+
   in
     (
       makeEdges(control, nodelist);
