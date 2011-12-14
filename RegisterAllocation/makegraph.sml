@@ -16,7 +16,7 @@ struct
   let
     val g = G.newGraph()
     
-    fun initInstr([]) = 
+    fun initInstr([]) = 	
       | initInstr(inst_h::inst_t) = 
       
       let
@@ -32,7 +32,7 @@ struct
               use = (G.Table.Enter (use, node, src)),
               ismove = (G.Table.Enter (use, node, false)),       
             }
-      
+						  
           | A.LABEL {assem, label} =>
             {
               control = (G.Table.Enter (control, node, inst_h)),
@@ -55,9 +55,12 @@ struct
       fun makeEdges (a::(b::c)) =
         
         let
-          val node = G.look(control, a)
+		  (* Get each node *)
+          val node = G.Table.look(control, a)
         in
+		 (* Make edge for follow through *)	
           G.mk_edge {from=a, to=b}
+		  
         end
       
         | makeEdges (_) = ()
