@@ -14,7 +14,7 @@ struct
   let
     val g = G.newGraph()
     val nodelist = []
-    fun initInstr([]) = 
+    fun initInstr([]) =
       | initInstr(inst_h::inst_t) = 
       
       let
@@ -40,7 +40,7 @@ struct
                 use = (G.Table.Enter (use, node, nil)),
                 ismove = (G.Table.Enter (use, node, false)),
               }
-
+              
             | A.MOVE {assem,dst,src} =>
               {
                 control = (G.Table.Enter (control, node, inst_h)),
@@ -54,9 +54,12 @@ struct
       
       fun makeEdges (a::(b::c)) =
         let
-          val node = G.look(control, a)
+		  (* Get each instrucion *)
+          val inst = G.Table.look(control, a)
         in
+		 (* Make edge for follow through *)	
           G.mk_edge {from=a, to=b}
+		  
         end
       
         | makeEdges (_) = ()
