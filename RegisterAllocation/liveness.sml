@@ -27,8 +27,9 @@ struct
       val tnode = IGraph.node Temp.Table.table
       val gtemp = Temp.temp Temp.Table.table
       val moves = []
-      fun livein()
-      fun liveout()
+      fun livein(node)
+        
+      fun liveout(node)
     in
       
     end
