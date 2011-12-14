@@ -45,7 +45,7 @@ struct
             | A.MOVE {assem,dst,src} =>
               {
                 control = g,
-                def =  (G.Table.Enter (def, net, dst)),
+                def =  (G.Table.Enter (def, node, dst)),
                 use =  (G.Table.Enter (use, node, src)),
                 ismove = (G.Table.Enter (use, node, true))
               }
