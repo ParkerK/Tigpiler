@@ -28,7 +28,6 @@ struct
           (case inst_h of 
             A.OPER {assem,dst,src,jump} =>
               {
-                control = g,
                 instn = (G.Table.Enter (instn, node, inst_h)),
                 def = (G.Table.Enter (def, node, dst)),
                 use = (G.Table.Enter (use, node, src)),
@@ -37,7 +36,6 @@ struct
       
             | A.LABEL {assem, label} =>
               {
-                control = g,
                 instn = (G.Table.Enter (instn, node, inst_h)),
                 def = (G.Table.Enter (def, node, [])),
                 use = (G.Table.Enter (use, node, [])),
@@ -46,7 +44,6 @@ struct
               
             | A.MOVE {assem,dst,src} =>
               {
-                control = g,
                 instn = (G.Table.Enter (instn, node, inst_h)),
                 def =  (G.Table.Enter (def, node, [dst])),
                 use =  (G.Table.Enter (use, node, [src])),
@@ -56,10 +53,10 @@ struct
         )
       end
       
-      fun makeEdges (control, a::(b::c)) =
+      fun makeEdges (instn, a::(b::c)) =
         let
           (* Get each instrucion *)
-          val inst = G.Table.look(control, a)
+          val inst = G.Table.look(instn, a)
         in
          (* Make edge for follow through *) 
           G.mk_edge {from=a, to=b}
@@ -70,15 +67,15 @@ struct
             )
             | NONE => () 
             | SOME(_) => ())
-            makeEdges(control, (b::c))
+            makeEdges(instn, (b::c))
           
         end
       
         | makeEdges (_) = ()
         
-        fun label2node (control, a::b) =
+        fun label2node (instn, a::b) =
           let
-            val inst = G.Table.look(control, a)
+            val inst = G.Table.look(instn, a)
           in
             (case inst of SOME (A.LABEL {assem, lab}) => a
               | NONE => ()
@@ -87,11 +84,11 @@ struct
           end
             
 
-      val {control, def, use, ismove} = initInstr(instrs)
+      val {instn, def, use, ismove} = initInstr(instrs)
   in
     (
-      makeEdges(control, nodelist);
-      (FGRAPH {control, def, use, ismove}, nodelist)
+      makeEdges(instn, nodelist);
+      (FGRAPH {g, def, use, ismove}, nodelist)
     )
   end
 end
