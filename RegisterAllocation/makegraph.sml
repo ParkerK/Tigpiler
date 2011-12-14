@@ -5,7 +5,7 @@ sig
                         Flow.flowgraph * Flow.Graph.node list
 end
 
-structure MAKEGRAPH :> MAKEGRAPH =
+structure Makegraph :> MAKEGRAPH =
 struct
   structure G = FLOW.Graph
   structure A = Assem    

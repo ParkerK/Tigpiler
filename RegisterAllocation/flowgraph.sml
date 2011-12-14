@@ -1,4 +1,4 @@
-structure Flow =
+structure Flow : FLOW =
 struct
     datatype flowgraph = FGRAPH of {control: Graph.graph,
 				    def: Temp.temp list Graph.Table.table,
