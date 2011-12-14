@@ -38,6 +38,7 @@ struct
             | A.LABEL {assem, label} =>
               {
                 control = g,
+                instn = (G.Table.Enter (instn, node, inst_h)),
                 def = (G.Table.Enter (def, node, [])),
                 use = (G.Table.Enter (use, node, [])),
                 ismove = (G.Table.Enter (use, node, false)),
@@ -46,6 +47,7 @@ struct
             | A.MOVE {assem,dst,src} =>
               {
                 control = g,
+                instn = (G.Table.Enter (instn, node, inst_h)),
                 def =  (G.Table.Enter (def, node, [dst])),
                 use =  (G.Table.Enter (use, node, [src])),
                 ismove = (G.Table.Enter (use, node, true))
