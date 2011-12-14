@@ -55,8 +55,8 @@ struct
       fun makeEdges (a::(b::c)) =
         
         let
-		  (* Get each node *)
-          val node = G.Table.look(control, a)
+		  (* Get each instrucion *)
+          val inst = G.Table.look(control, a)
         in
 		 (* Make edge for follow through *)	
           G.mk_edge {from=a, to=b}
