@@ -21,7 +21,8 @@ struct
   type liveMap = liveSet Flow.Graph.Table.table
   
   fun interferenceGraph (flowgraph) = igraph * (Flow.Graph.node -> Temp.temp list)
-
+  
+        
   fun show (outstream * igraph) = ()
   
 end
