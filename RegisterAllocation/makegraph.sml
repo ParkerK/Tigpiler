@@ -28,7 +28,7 @@ struct
           (case inst_h of 
             A.OPER {assem,dst,src,jump} =>
               {
-                control = (G.Table.Enter (control, node, inst_h)),
+                control = g,
                 def = (G.Table.Enter (def, node, dst)),
                 use = (G.Table.Enter (use, node, src)),
                 ismove = (G.Table.Enter (use, node, false)),       
@@ -36,7 +36,7 @@ struct
       
             | A.LABEL {assem, label} =>
               {
-                control = (G.Table.Enter (control, node, inst_h)),
+                control = g,
                 def = (G.Table.Enter (def, node, nil)),
                 use = (G.Table.Enter (use, node, nil)),
                 ismove = (G.Table.Enter (use, node, false)),
@@ -44,7 +44,7 @@ struct
               
             | A.MOVE {assem,dst,src} =>
               {
-                control = (G.Table.Enter (control, node, inst_h)),
+                control = g,
                 def =  (G.Table.Enter (def, net, dst)),
                 use =  (G.Table.Enter (use, node, src)),
                 ismove = (G.Table.Enter (use, node, true))
@@ -74,12 +74,10 @@ struct
 
 
       val {control, def, use, ismove} = initInstr(instrs)
-
-
   in
     (
       makeEdges(control, nodelist);
-      (g, nodelist)
+      (FGRAPH{control, def, use, ismove}, nodelist)
     )
   end
 end
