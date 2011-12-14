@@ -64,8 +64,8 @@ struct
           ( case inst of SOME (A.OPER {assem, dst, src, jump}) =>
             (case jump of SOME labellist => label2node (label)
                 | NONE => ())
-            | NONE => () 
-            | SOME(_) => ())
+                | NONE => () 
+                | SOME(_) => ())
             makeEdges(control, (b::c))
           
         end
