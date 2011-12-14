@@ -15,7 +15,7 @@ structure Main = struct
       val stms' = Canon.traceSchedule(Canon.basicBlocks stms)
       val instrs = List.concat(map (MipsGen.codegen frame) stms') 
       val (fgraph, nodelist) = Makegraph.instrs2graph(instrs)
-      val (igraph, liveoutmapping) = Liveness.interferenceGraph(fgraph)
+      val (igraph, liveoutmapping) = Liveness.interferenceGraph(fgraph, nodelist)
       val _ = Liveness.show(igraph)
       val format0 = Assem.format(Temp.makestring)
     in  
