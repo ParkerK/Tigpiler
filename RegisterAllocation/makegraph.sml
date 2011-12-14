@@ -66,7 +66,7 @@ struct
                 | NONE => ())
             | NONE => () 
             | SOME(_) => ())
-            
+            makeEdges(control, (b::c))
           
         end
       
