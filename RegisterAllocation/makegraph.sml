@@ -60,6 +60,13 @@ struct
         in
 		 (* Make edge for follow through *)	
           G.mk_edge {from=a, to=b}
+		  (* Check for a jump instr *)
+		  ( case inst of SOME (A.OPER {assem, dst, src, jump}) =>
+		  	(case jump of SOME label => 
+				| NONE => ())
+			| NONE => () 
+			| SOME(_) => ())
+			
 		  
         end
       
