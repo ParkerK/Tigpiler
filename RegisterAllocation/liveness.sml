@@ -17,7 +17,7 @@ struct
                                gtemp: IGraph.node -> Temp.temp,
                                moves: (IGraph.node * IGraph.node) list}
                                
-  type liveSet = unit Temp.Table.table * temp list
+  type liveSet = Temp.Table.table * temp list
   type liveMap = liveSet Flow.Graph.Table.table
   
   fun interferenceGraph (flowgraph) = igraph * (Flow.Graph.node -> Temp.temp list)
