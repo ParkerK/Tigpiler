@@ -29,6 +29,7 @@ struct
             A.OPER {assem,dst,src,jump} =>
               {
                 control = g,
+                instn = (G.Table.Enter (instn, node, inst_h)),
                 def = (G.Table.Enter (def, node, dst)),
                 use = (G.Table.Enter (use, node, src)),
                 ismove = (G.Table.Enter (use, node, false)),       
@@ -37,16 +38,18 @@ struct
             | A.LABEL {assem, label} =>
               {
                 control = g,
-                def = (G.Table.Enter (def, node, nil)),
-                use = (G.Table.Enter (use, node, nil)),
+                instn = (G.Table.Enter (instn, node, inst_h)),
+                def = (G.Table.Enter (def, node, [])),
+                use = (G.Table.Enter (use, node, [])),
                 ismove = (G.Table.Enter (use, node, false)),
               }
               
             | A.MOVE {assem,dst,src} =>
               {
                 control = g,
-                def =  (G.Table.Enter (def, net, dst)),
-                use =  (G.Table.Enter (use, node, src)),
+                instn = (G.Table.Enter (instn, node, inst_h)),
+                def =  (G.Table.Enter (def, node, [dst])),
+                use =  (G.Table.Enter (use, node, [src])),
                 ismove = (G.Table.Enter (use, node, true))
               }
           )
@@ -63,7 +66,8 @@ struct
           (* Check for a jump instr *)
           ( case inst of SOME (A.OPER {assem, dst, src, jump}) =>
             (case jump of SOME labellist => label2node (label)
-                | NONE => ())
+                | NONE => ()
+            )
             | NONE => () 
             | SOME(_) => ())
             makeEdges(control, (b::c))
