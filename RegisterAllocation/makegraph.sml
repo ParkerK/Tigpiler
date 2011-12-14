@@ -52,7 +52,7 @@ struct
         )
       end
       
-      fun makeEdges (a::(b::c)) =
+      fun makeEdges (control, a::(b::c)) =
         let
 		  (* Get each instrucion *)
           val inst = G.Table.look(control, a)
@@ -70,10 +70,11 @@ struct
         end
       
         | makeEdges (_) = ()
+
+      val {control, def, use, ismove} = initInstr(instrs)
   in
     (
-      initInstr(instrs); 
-      makeEdges(nodelist);
+      makeEdges(control, nodelist);
       (g, nodelist)
     )
   end
