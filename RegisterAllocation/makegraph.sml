@@ -11,49 +11,48 @@ struct
   structure A = Assem    
   
   fun instrs2graph instrs = 
-  
-  
   let
     val g = G.newGraph()
-    
+    val nodelist = []
     fun initInstr([]) = 
       | initInstr(inst_h::inst_t) = 
       
       let
         val {control, def, use, ismove} = initInstr(inst_t) (* Do for each instruction *)   
-        val node = G.newNode(g) 
+        val node = G.newNode(g)
       in
-        (* OPER, LABEL, MOVE *) 
-        (case inst_h of 
-          A.OPER {assem,dst,src,jump} =>
-            {
-              control = (G.Table.Enter (control, node, inst_h)),
-              def = (G.Table.Enter (def, node, dst)),
-              use = (G.Table.Enter (use, node, src)),
-              ismove = (G.Table.Enter (use, node, false)),       
-            }
+        (
+          nodelist := nodelist @ node;
+          (* OPER, LABEL, MOVE *) 
+          (case inst_h of 
+            A.OPER {assem,dst,src,jump} =>
+              {
+                control = (G.Table.Enter (control, node, inst_h)),
+                def = (G.Table.Enter (def, node, dst)),
+                use = (G.Table.Enter (use, node, src)),
+                ismove = (G.Table.Enter (use, node, false)),       
+              }
       
-          | A.LABEL {assem, label} =>
-            {
-              control = (G.Table.Enter (control, node, inst_h)),
-              def = (G.Table.Enter (def, node, nil)),
-              use = (G.Table.Enter (use, node, nil)),
-              ismove = (G.Table.Enter (use, node, false)),
-            }
+            | A.LABEL {assem, label} =>
+              {
+                control = (G.Table.Enter (control, node, inst_h)),
+                def = (G.Table.Enter (def, node, nil)),
+                use = (G.Table.Enter (use, node, nil)),
+                ismove = (G.Table.Enter (use, node, false)),
+              }
 
-          | A.MOVE {assem,dst,src} =>
-            {
-              control = (G.Table.Enter (control, node, inst_h)),
-              def =  (G.Table.Enter (def, net, dst)),
-              use =  (G.Table.Enter (use, node, src)),
-              ismove = (G.Table.Enter (use, node, true))
-            }
+            | A.MOVE {assem,dst,src} =>
+              {
+                control = (G.Table.Enter (control, node, inst_h)),
+                def =  (G.Table.Enter (def, net, dst)),
+                use =  (G.Table.Enter (use, node, src)),
+                ismove = (G.Table.Enter (use, node, true))
+              }
           )
-    
+        )
       end
       
       fun makeEdges (a::(b::c)) =
-        
         let
           val node = G.look(control, a)
         in
@@ -61,5 +60,11 @@ struct
         end
       
         | makeEdges (_) = ()
-  
+  in
+    (
+      initInstr(instrs); 
+      makeEdges(nodelist);
+      (g, nodelist)
+    )
+  end
 end
