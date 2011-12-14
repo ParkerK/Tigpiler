@@ -18,12 +18,17 @@ struct
                                moves: (IGraph.node * IGraph.node) list}
 
                 (* node to *)
-  type liveSet = Temp.Table.table * temp list
+  type liveSet = unit Temp.Table.table * temp list
   type liveMap = liveSet Flow.Graph.Table.table
   
-  fun interferenceGraph ({control, def, use, ismove}, nodelist) = 
+  fun interferenceGraph ({control, def, use, ismove}, node::nodelist) = 
     let
-      
+      val igraph = Graph.newGraph()
+      val tnode = IGraph.node Temp.Table.table
+      val gtemp = Temp.temp Temp.Table.table
+      val moves = []
+      fun livein()
+      fun liveout()
     in
       
     end
