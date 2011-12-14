@@ -62,7 +62,7 @@ struct
           G.mk_edge {from=a, to=b}
           (* Check for a jump instr *)
           ( case inst of SOME (A.OPER {assem, dst, src, jump}) =>
-            (case jump of SOME label => 
+            (case jump of SOME labellist => label2node (label)
                 | NONE => ())
             | NONE => () 
             | SOME(_) => ())
@@ -71,7 +71,17 @@ struct
         end
       
         | makeEdges (_) = ()
-
+        
+        fun label2node (control, a::b) =
+          let
+            val inst = G.Table.look(control, a)
+          in
+            (case inst of SOME (A.LABEL {assem, lab}) => a
+              | NONE => ()
+              | SOME(_) => label2node (b)
+            )
+          end
+            
 
       val {control, def, use, ismove} = initInstr(instrs)
   in
