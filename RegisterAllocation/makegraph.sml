@@ -87,7 +87,7 @@ struct
   in
     (
       makeEdges(control, nodelist);
-      (FGRAPH{control, def, use, ismove}, nodelist)
+      (FGRAPH {control, def, use, ismove}, nodelist)
     )
   end
 end
