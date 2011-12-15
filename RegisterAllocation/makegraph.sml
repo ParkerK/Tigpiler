@@ -66,13 +66,14 @@ struct
          (* Make edge for follow through *) 
           (G.mk_edge {from=a, to=b};
           (* Check for a jump instr *)
-          ( case inst of 
-              NONE => ()
-            | SOME(_) => ()
-            | SOME (A.OPER {assem, dst, src, jump}) =>  (case jump of 
+            (case inst of 
+              SOME (A.OPER {assem, dst, src, jump}) =>
+              (case jump of 
                 SOME labellist =>
                       app (fn label => G.mk_edge({from=a, to=label2node(label)})) labellist
                 | NONE => () )
+            | SOME(_) => ()
+            | NONE => ()
             );
             makeEdges(instn, (b::c));
             ())
