@@ -1,9 +1,9 @@
 signature LIVENESS =
 sig
-  datatype igraph = IGRAPH of {graph: IGraph.graph, 
-                               tnode: Temp.temp -> IGraph.node,
-                               gtemp: IGraph.node -> Temp.temp,
-                               moves: (IGraph.node * IGraph.node) list}
+  datatype igraph = IGRAPH of {graph: Graph.graph, 
+                               tnode: Temp.temp -> Graph.node,
+                               gtemp: Graph.node -> Temp.temp,
+                               moves: (Graph.node * Graph.node) list}
   
   val interferenceGraph : Flow.flowgraph * Flow.Graph.node list -> 
                             igraph * (Flow.Graph.node -> Temp.temp list)
@@ -12,10 +12,10 @@ sig
 end
 structure Liveness : LIVENESS =
 struct
-  datatype igraph = IGRAPH of {graph: IGraph.graph, 
-                               tnode: Temp.temp -> IGraph.node,
-                               gtemp: IGraph.node -> Temp.temp,
-                               moves: (IGraph.node * IGraph.node) list}
+  datatype igraph = IGRAPH of {graph: Graph.graph, 
+                               tnode: Temp.temp -> Graph.node,
+                               gtemp: Graph.node -> Temp.temp,
+                               moves: (Graph.node * Graph.node) list}
 
   type liveSet = unit Temp.Table.table * temp list
   type liveMap = liveSet Flow.Graph.Table.table
