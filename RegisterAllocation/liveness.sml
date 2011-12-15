@@ -33,6 +33,9 @@ struct
       val gtemp = Temp.temp Temp.Table.table
       val moves = []
       
+      fun makeSet(SOME(list)) = tempSet.addList(tempSet.empty, list)
+        | makeSet (NONE) = tempSet.empty
+        
       fun livein(node)
       let
         val usedTemps = G.Table.look(use, node)
@@ -42,7 +45,13 @@ struct
          
       in 
         (case usedTemps of NONE => ()
-          | SOME (temp list) => usedTemps @ (min)
+          | SOME (temp list) =>
+            (
+              tempSet.union(
+                makeSet(usedTemps),
+                tempSet.difference( makeSet(outTemps), makeSet(defTemps) )
+              )
+            )
           )
       end
       
