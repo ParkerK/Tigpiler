@@ -89,10 +89,10 @@ struct
       fun calcLive(inlist, outlist) =
         let
           val newstuff = foldr (fn (n, ins, outs) => (n, live(n, ins, outs))) 
-                                [] List.zip(nodelist, List.zip(inlist, outlist))
-          val (_,(newinlist, newoutlist)) = List.unzip(List.unzip(newstuff))
-          fun listlistcomp(l1, l2) = List.all (fn (i1, i2) => listcomp(i1, i2)) List.zip(l1,l2)
-          fun listcomp(i1, i2) = List.all (fn (a, b) => a=b) List.zip(i1, i2)
+                                [] ListPair.zip(nodelist, ListPair.zip(inlist, outlist))
+          val (_,(newinlist, newoutlist)) = ListPair.unzip(ListPair.unzip(newstuff))
+          fun listcomp(i1, i2) = List.all (fn (a, b) => a=b) ListPair.zip(i1, i2)
+          fun listlistcomp(l1, l2) = List.all (fn (i1, i2) => listcomp(i1, i2)) ListPair.zip(l1,l2)
           val continue = (listlistcomp(inlist, newinlist) andalso listlistcomp(outlist, newoutlist))
         in
           if continue then
