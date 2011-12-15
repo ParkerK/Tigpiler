@@ -86,8 +86,11 @@ struct
     in
       (
         app (fn node => 
-              G.Table.enter(fnodeToTemps, node, liveout(node));
-              G.Table.enter(globalliveMap, node, makeLiveSet(livein(node)))) nodelist;
+              (
+                G.Table.enter(fnodeToTemps, node, liveout(node));
+                G.Table.enter(globalliveMap, node, makeLiveSet(livein(node)))
+              )
+            ) nodelist;
         IGRAPH {
                 graph = igraph, 
                 tnode = fn _ => Graph.newNode(igraph), 
