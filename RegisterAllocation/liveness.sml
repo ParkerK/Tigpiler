@@ -26,7 +26,7 @@ struct
                                   type ord_key = Temp.temp
                                   val compare  = Int.compare
                                   end)  
-  fun interferenceGraph ({control, def, use, ismove} : Flow.flowgraph, nodelist:G.node list) = 
+  fun interferenceGraph (Flow.FGRAPH {control, def, use, ismove}, nodelist:G.node list) = 
     let
       val igraph = G.newGraph()
       val tnode = Temp.Table.empty : G.node Temp.Table.table
@@ -34,10 +34,8 @@ struct
       val moves = []
       
       fun makeSet(list : Temp.temp list) = tempSet.addList(tempSet.empty, list)
-        | makeSet (_) = tempSet.empty
       
-      fun makeLiveSet(_) = (Temp.Table.empty, [])
-        | makeLiveSet(livetemplist : Temp.temp list) = 
+      fun makeLiveSet(livetemplist : Temp.temp list) = 
             let
               fun genLiveSet(ttbl, tlist, []) = (ttbl, tlist)
                 | genLiveSet(ttbl, tlist, temp::templist) =
