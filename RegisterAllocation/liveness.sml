@@ -41,12 +41,20 @@ struct
       end
       
       
-      fun liveout(node)
+      and fun liveout(node)
       let
         val outTemps = []
         val sucTemps = G.succ(control, node)
       in
-        app (fn node => outTemps := outTemps @ node) 
+        (
+          app (fn suc =>
+            (app (fn outtemp => 
+                    if (List.exists (fn item => G.eq(item, outtemp)) outTemps) ()
+                      else outTemps := outTemps @ outtemp) 
+                  livein(suc)))
+            sucTemps;
+          outTemps
+        )
       end
     in
       
