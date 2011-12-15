@@ -29,12 +29,27 @@ struct
     let
       val igraph = Graph.newGraph()
       val tnode = IGraph.node Temp.Table.table
-      val gtemp = Temp.temp Temp.Table.table
+      val gtemp = Temp.temp Graph.Table.table
       val fnodeToTemps = Temp.temp list Graph.Table.table
+      
+      val globalliveMap = G.Table.empty : liveSet G.Table.table
       val moves = []
       
       fun makeSet(SOME(list)) = tempSet.addList(tempSet.empty, list)
         | makeSet (NONE) = tempSet.empty
+      
+      fun makeLiveSet(livetemplist) = 
+            let
+              val tempTable = Temp.Table.empty
+              val tempList = []
+            in
+              app (fn livetemp =>
+                    (Temp.Table.enter(tempTable, temp, ());
+                    tempList := tempList @ livetemp)
+                  ) livetemplist;
+              (tempTable, tempList)
+            end
+        | makeLiveSet() = (Temp.Table.empty, [])
         
       fun livein(node)
       let
@@ -69,7 +84,10 @@ struct
       end
     in
       (
-        app (fn node => G.Table.enter(fnodeToTemps, node, liveout(node)) nodelist;
+        app (fn node => 
+              G.Table.enter(fnodeToTemps, node, liveout(node);
+              G.Table.enter(globalliveMap, node, makeLiveSet(livein(node))) nodelist;
+        
       )
     end
   
