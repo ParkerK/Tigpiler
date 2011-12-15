@@ -6,3 +6,4 @@ end
 structure RegAlloc :> REGALLOC = 
 struct
 
+end
