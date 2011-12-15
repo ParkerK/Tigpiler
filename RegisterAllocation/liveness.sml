@@ -128,7 +128,9 @@ struct
                 gtemp = fn _ => Temp.newtemp(),
                 moves = []
                 },
-        fn _ => []
+        fn n => case G.Table.look(fnodeToTemps, n) of 
+                  SOME (l) => l
+                | NONE => ErrorMsg.impossible ("can't find label!")
       )
     end
   
