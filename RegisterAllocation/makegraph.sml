@@ -24,7 +24,7 @@ struct
 		
       in
         (
-          nodelist := nodelist @ node;
+          nodelist := nodelist @ [node];
           (* OPER, LABEL, MOVE *) 
           (case inst_h of 
             A.OPER {assem,dst,src,jump} =>
