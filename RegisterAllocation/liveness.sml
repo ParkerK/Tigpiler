@@ -71,7 +71,7 @@ struct
       and liveout(node) = 
       let
         val outTemps = []
-        val sucTemps = G.succ(control, node)
+        val sucTemps = G.succ(node)
       in
         (
           app (fn suc =>
