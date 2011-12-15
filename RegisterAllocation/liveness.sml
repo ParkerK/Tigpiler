@@ -43,12 +43,17 @@ struct
             let
               val tempTable = Temp.Table.empty
               val tempList = []
+              
+              fun genLiveSet(ttbl, tlist, temp::templist) =
+                let
+                  val ttbl' = Temp.Table.enter(ttbl, temp, ())
+                  val tlist' = temp::tlist
+                in
+                  genLiveSet(ttbl', tlist', templist)
+                end
+              |  genLiveSet(ttbl, tlist, []) = (ttbl, tlist)
             in
-              app (fn livetemp =>
-                    (Temp.Table.enter(tempTable, livetemp, ());
-                    tempList := tempList @ [livetemp])
-                  ) livetemplist;
-              (tempTable, tempList)
+              genLiveSet(tempTable, tempList, livetemplist)
             end
         | makeLiveSet(_) = (Temp.Table.empty, [])
         
