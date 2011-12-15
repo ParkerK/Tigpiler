@@ -37,7 +37,7 @@ struct
                     instn = (G.Table.enter (instn, node, inst_h)),
                     def = (G.Table.enter (def, node, dst)),
                     use = (G.Table.enter (use, node, src)),
-                    ismove = (G.Table.enter (use, node, false))       
+                    ismove = (G.Table.enter (ismove, node, false))       
                   }
       
                 | A.LABEL {assem, label} =>
@@ -45,7 +45,7 @@ struct
                     instn = (G.Table.enter (instn, node, inst_h)),
                     def = (G.Table.enter (def, node, [])),
                     use = (G.Table.enter (use, node, [])),
-                    ismove = (G.Table.enter (use, node, false))
+                    ismove = (G.Table.enter (ismove, node, false))
                   }
               
                 | A.MOVE {assem,dst,src} =>
@@ -53,7 +53,7 @@ struct
                     instn = (G.Table.enter (instn, node, inst_h)),
                     def =  (G.Table.enter (def, node, [dst])),
                     use =  (G.Table.enter (use, node, [src])),
-                    ismove = (G.Table.enter (use, node, true))
+                    ismove = (G.Table.enter (ismove, node, true))
                   }
               )
             )
