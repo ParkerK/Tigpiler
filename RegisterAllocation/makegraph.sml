@@ -31,28 +31,31 @@ struct
               (* OPER, LABEL, MOVE *) 
               (case inst_h of 
                 A.OPER {assem,dst,src,jump} =>
+                  (print "-------------is oper\n";
                   {
                     instmap = (G.Table.enter (instmap, node, inst_h)),
                     def = (G.Table.enter (def, node, dst)),
                     use = (G.Table.enter (use, node, src)),
                     ismove = (G.Table.enter (ismove, node, false))       
-                  }
+                  })
       
                 | A.LABEL {assem, lab} =>
+                  (print "-------------is label\n";
                   {
                     instmap = (G.Table.enter (instmap, node, inst_h)),
                     def = (G.Table.enter (def, node, [])),
                     use = (G.Table.enter (use, node, [])),
                     ismove = (G.Table.enter (ismove, node, false))
-                  }
+                  })
               
                 | A.MOVE {assem,dst,src} =>
+                  (print "-------------is move\n";
                   {
                     instmap = (G.Table.enter (instmap, node, inst_h)),
                     def =  (G.Table.enter (def, node, [dst])),
                     use =  (G.Table.enter (use, node, [src])),
                     ismove = (G.Table.enter (ismove, node, true))
-                  }
+                  })
               ), 
               nodelist @ [node]
             )
