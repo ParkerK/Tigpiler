@@ -133,7 +133,10 @@ struct
               ) 
               (Temp.Table.empty : G.node Temp.Table.table,
                G.Table.empty : Temp.temp G.Table.table)
-              templist 
+              templist
+              
+      fun makeEdges()=
+        
     in
       (
         IGRAPH {
