@@ -6,7 +6,6 @@ canon.sml
 env.sml
 errormsg.sml
 findescape.sml
-flow.sml
 flowgraph.sml
 frame.sig
 graph.sig
