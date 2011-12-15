@@ -40,7 +40,7 @@ struct
                     ismove = (G.Table.enter (ismove, node, false))       
                   }
       
-                | A.LABEL {assem, label} =>
+                | A.LABEL {assem, lab} =>
                   {
                     instn = (G.Table.enter (instn, node, inst_h)),
                     def = (G.Table.enter (def, node, [])),
