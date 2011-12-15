@@ -143,10 +143,10 @@ struct
                 app (fn livetemp => 
                   case (Temp.Table.look(tnode, d), Temp.Table.look(tnode, livetemp)) of
                     (SOME(inode1), SOME(inode2)) => G.mk_edge({from=inode1, to=inode2})
-                  | (_,_) => ErrorMsg.impossible("can't find nodes in tnode map!")
+                  | (_,_) => print "can't find nodes in tnode map!\n"
                 ) livelist
               ) (getList(def, n))
-          | NONE => ErrorMsg.impossible("can't find node in live map!")
+          | NONE => print "can't find node in live map!\n"
         ) nodelist
       
       val _ = makeEdges()
