@@ -26,7 +26,7 @@ struct
                                   type ord_key = Temp.temp
                                   val compare  = Int.compare
                                   end)  
-  fun interferenceGraph ({control, def, use, ismove}, nodelist) = 
+  fun interferenceGraph ({control, def, use, ismove} : Flow.flowgraph, nodelist:G.node list) = 
     let
       val igraph = G.newGraph()
       val tnode = Temp.Table.empty : G.node Temp.Table.table
@@ -104,7 +104,8 @@ struct
                 tnode = fn _ => Graph.newNode(igraph), 
                 gtemp = fn _ => Temp.newtemp(),
                 moves = []
-                }
+                },
+        fn _ => []
       )
     end
   
