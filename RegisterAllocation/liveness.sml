@@ -138,21 +138,44 @@ struct
                G.Table.empty : Temp.temp G.Table.table)
               templist
               
-      fun makeEdges() =
-        app (fn n => 
-          case G.Table.look(globalLiveMap, n) of
-            SOME (livetable,livelist) => 
-              app (fn d => 
-                app (fn livetemp => 
-                  case (Temp.Table.look(tnode, d), Temp.Table.look(tnode, livetemp)) of
-                    (SOME(inode1), SOME(inode2)) => G.mk_edge({from=inode1, to=inode2})
+      fun genEdgesAndMoves() =
+        foldr (fn (n, moves) => 
+          let
+            val nodedef = getList(def, n)
+            val nodeuse = getList(use, n)
+            val nodemove = case G.Table.look(ismove, n) of
+                            SOME b => b
+                          | NONE => false
+          in
+            (
+              (* Make edges for the current node n *)
+              (case G.Table.look(globalLiveMap, n) of
+                SOME (livetable,livelist) => 
+                  app (fn d => 
+                    app (fn livetemp => 
+                      case (Temp.Table.look(tnode, d), Temp.Table.look(tnode, livetemp)) of
+                        (SOME(inode1), SOME(inode2)) => G.mk_edge({from=inode1, to=inode2})
+                      | (_,_) => ErrorMsg.impossible ("can't find node in tnode map!")
+                    ) livelist
+                  ) (getList(def, n))
+              | NONE => ErrorMsg.impossible ("can't find node in live map!"));
+              (* if n is a move, then add to the moves list *)
+              if nodemove then
+                (* Error checking for move instructions *)
+                if List.length(nodeuse) <> 1 orelse List.length(nodedef) <> 1 then
+                  ErrorMsg.impossible ("invalid move instruction")
+                else
+                  case (Temp.Table.look(tnode, List.nth(nodedef, 0)), 
+                        Temp.Table.look(tnode, List.nth(nodeuse, 0))) of
+                    (SOME(n1), SOME(n2)) => (n1, n2)::moves
                   | (_,_) => ErrorMsg.impossible ("can't find node in tnode map!")
-                ) livelist
-              ) (getList(def, n))
-          | NONE => ErrorMsg.impossible ("can't find node in live map!")
-        ) nodelist
+              else
+                moves
+            )
+          end
+        ) [] nodelist
       
-      val _ = makeEdges()
+      val moves = genEdgesAndMoves()
     in
       (
         IGRAPH {
@@ -165,7 +188,7 @@ struct
                           case G.Table.look(gtemp, node) of
                             SOME t => t
                           | NONE => ErrorMsg.impossible ("can't find node"),
-                moves = []
+                moves = moves
                 },
         fn n => case G.Table.look(fnodeToTemps, n) of 
                   SOME (l) => l
