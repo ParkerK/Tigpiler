@@ -60,7 +60,7 @@ struct
         (
           app (fn suc =>
             (app (fn outtemp => 
-                    if (List.exists (fn item => G.eq(item, outtemp)) outTemps) ()
+                    if (List.exists (fn item => G.eq(item, outtemp)) outTemps) then ()
                       else outTemps := outTemps @ outtemp) 
                   livein(suc)))
             sucTemps;
