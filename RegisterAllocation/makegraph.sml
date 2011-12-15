@@ -7,7 +7,7 @@ end
 
 structure Makegraph :> MAKEGRAPH =
 struct
-  structure G = FLOW.Graph
+  structure G = Flow.Graph
   structure A = Assem    
   
   fun instrs2graph instrs = 
