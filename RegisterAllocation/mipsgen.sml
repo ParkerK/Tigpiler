@@ -41,32 +41,32 @@ struct
     
   fun munchStm(T.SEQ(a,b)) = (munchStm a; munchStm b)
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i)),e2)) =
-        emit(A.OPER{assem="STORE M[`s0+" ^ int i ^ "],  `s1\n",
+        emit(A.OPER{assem="sw `s1, M[`s0+" ^ int i ^ "]\n",
                     src=[munchExp e1, munchExp e2],
                     dst=[],jump=NONE})
 
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,T.CONST i,e1)),e2)) =
-      emit(A.OPER{assem="STORE M[`s0+" ^ int i ^ "],  `s1\n",
+      emit(A.OPER{assem="sw `s1, M[`s0+" ^ int i ^ "]\n",
                   src=[munchExp e1, munchExp e2],
                          dst=[],jump=NONE})
 
     | munchStm(T.MOVE(T.MEM(e1),T.MEM(e2))) =
-        emit(A.OPER{assem="MOVE M[`s0],  M[`s1]\n",
+        emit(A.OPER{assem="move M[`s0],  M[`s1]\n",
                     src=[munchExp e1, munchExp e2],
                     dst=[], jump=NONE})
       
     | munchStm(T.MOVE(T.MEM(T.CONST i),e2)) =
-        emit(A.OPER{assem="STORE M[r0+" ^ int i ^ "],  `s0\n",
+        emit(A.OPER{assem="sw `s0, M[r0+" ^ int i ^ "]\n",
                     src=[munchExp e2],
                     dst=[], jump=NONE})
       
     | munchStm(T.MOVE(T.MEM(e1),e2)) =
-        emit(A.OPER{assem="STORE M[`s0],  `s1\n",
+        emit(A.OPER{assem="sw `s1, M[`s0]\n",
                     src=[munchExp e1, munchExp e2],
                     dst=[], jump=NONE})
 
     | munchStm(T.MOVE(T.TEMP i, e2)) =
-        emit(A.OPER{assem="ADD  `d0,  `s + r0\n",
+        emit(A.OPER{assem="add  `d0, `s, r0\n",
           src=[munchExp e2],
           dst=[i], jump=NONE})
 
@@ -74,7 +74,7 @@ struct
       emit(A.LABEL{assem=Symbol.name(lab) ^ ":\n", lab=lab})
       
     | munchStm (T.EXP(T.CALL(e,args))) =
-      emit (A.OPER{assem="CALL `s0\n",
+      emit (A.OPER{assem="call `s0\n",
                   src=munchExp(e)::munchArgs(0,args),
                   dst=Frame.calldefs,
                   jump=NONE})
@@ -145,12 +145,12 @@ struct
 
       | munchExp(T.BINOP(T.PLUS,e1,T.CONST i)) =
         result(fn r => emit(A.OPER
-          {assem="addi `d0, `s0," ^ int i ^ "\n",
+          {assem="addi `d0, `s0, " ^ int i ^ "\n",
           src=[munchExp e1], dst=[r], jump=NONE}))
 
       | munchExp(T.BINOP(T.PLUS,T.CONST i,e1)) =
         result(fn r => emit(A.OPER
-        {assem="addi `d0, `s0," ^ int i ^ "\n",
+        {assem="addi `d0, `s0, " ^ int i ^ "\n",
         src=[munchExp e1], dst=[r], jump=NONE}))
 
       | munchExp(T.BINOP(T.PLUS,e1,e2)) =
