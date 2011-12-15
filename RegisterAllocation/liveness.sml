@@ -31,31 +31,25 @@ struct
       val igraph = G.newGraph()
       val tnode = Temp.Table.empty : G.node Temp.Table.table
       val gtemp = G.Table.empty : Temp.temp G.Table.table
-      val fnodeToTemps = G.Table.empty : Temp.temp list G.Table.table
-      
-      val globalliveMap = G.Table.empty : liveSet G.Table.table
       val moves = []
       
       fun makeSet(list : Temp.temp list) = tempSet.addList(tempSet.empty, list)
         | makeSet (_) = tempSet.empty
       
-      fun makeLiveSet(livetemplist : Temp.temp list) = 
-        let
-          val tempTable = Temp.Table.empty
-          val tempList = []
-          
-          fun genLiveSet(ttbl, tlist, temp::templist) =
+      fun makeLiveSet(_) = (Temp.Table.empty, [])
+        | makeLiveSet(livetemplist : Temp.temp list) = 
             let
-              val ttbl' = Temp.Table.enter(ttbl, temp, ())
-              val tlist' = temp::tlist
+              fun genLiveSet(ttbl, tlist, []) = (ttbl, tlist)
+                | genLiveSet(ttbl, tlist, temp::templist) =
+                let
+                  val ttbl' = Temp.Table.enter(ttbl, temp, ())
+                  val tlist' = temp::tlist
+                in
+                  genLiveSet(ttbl', tlist', templist)
+                end
             in
-              genLiveSet(ttbl', tlist', templist)
+              genLiveSet(Temp.Table.empty, [], livetemplist)
             end
-          |  genLiveSet(ttbl, tlist, []) = (ttbl, tlist)
-        in
-          genLiveSet(tempTable, tempList, livetemplist)
-        end
-      | makeLiveSet(_) = (Temp.Table.empty, [])
         
       fun livein(node) : Temp.temp list =
         let
@@ -89,14 +83,23 @@ struct
             outTemps
           )
         end
+        
+      fun fillMappings(fnodemap, livemap, []) = (fnodemap, livemap)
+        | fillMappings(fnodemap, livemap, n::nlist) = 
+            let
+              val fnodemap' = G.Table.enter(fnodemap, n, liveout(n))
+              val livemap' = G.Table.enter(livemap, n, makeLiveSet(livein(n)))
+            in
+              fillMappings(fnodemap', livemap', nlist)
+            end
+        
+      val (fnodeToTemps, globalLiveMap) = 
+        fillMappings(G.Table.empty : Temp.temp list G.Table.table,
+                     G.Table.empty : liveSet G.Table.table,
+                     nodelist)
+  
     in
       (
-        app (fn node => 
-              (
-                fnodeToTemps := G.Table.enter(fnodeToTemps, node, liveout(node));
-                globalliveMap := G.Table.enter(globalliveMap, node, makeLiveSet(livein(node)))
-              )
-            ) nodelist;
         IGRAPH {
                 graph = igraph, 
                 tnode = fn _ => Graph.newNode(igraph), 
