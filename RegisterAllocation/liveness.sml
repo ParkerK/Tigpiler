@@ -78,7 +78,7 @@ struct
             (app (fn outtemp => 
                     if (List.exists (fn item => G.eq(item, outtemp)) outTemps) then ()
                       else outTemps := outTemps @ outtemp) 
-                  livein(suc)))
+                  (livein(suc))))
             sucTemps;
           outTemps
         )
@@ -87,8 +87,8 @@ struct
       (
         app (fn node => 
               (
-                G.Table.enter(fnodeToTemps, node, liveout(node));
-                G.Table.enter(globalliveMap, node, makeLiveSet(livein(node)))
+                fnodeToTemps := G.Table.enter(fnodeToTemps, node, liveout(node));
+                globalliveMap := G.Table.enter(globalliveMap, node, makeLiveSet(livein(node)))
               )
             ) nodelist;
         IGRAPH {
@@ -101,6 +101,6 @@ struct
     end
   
         
-  fun show (outstream * igraph) = ()
+  fun show (outstream, igraph) = ()
   
 end
