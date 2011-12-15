@@ -95,7 +95,7 @@ struct
      
     | munchStm (T.EXP exp) = (munchExp exp; ())
 	| munchStm (T.JUMP a) =   emit(A.OPER{assem="JUMP : bad munch stm! line 107", src=[], dst=[], jump=NONE})
-	| munchStm (T.MOVE a) =	emit(A.OPER{assem="MOVE : bad munch stm! line 107", src=[], dst=[], jump=NONE})
+	| munchStm (T.MOVE a) =	emit(A.MOVE{assem="MOVE : bad munch stm! line 107", src=Temp.newtemp (), dst=Temp.newtemp ()})
     (*| munchStm(_) = emit(A.OPER{assem="bad munch stm! line 107", src=[], dst=[], jump=NONE})*)
 
     and munchArgs(i,[]) = []
@@ -228,10 +228,6 @@ struct
       rev(!ilist)
     end
     
-  (*fun getTempName(t:Temp.temp) = 
-    case Symbol.look(Frame.tempMap, t) of
-      SOME(str) => str
-    | NONE => Temp.makestring(t) (*handle fp?*)*)
 
     
 end
