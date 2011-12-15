@@ -118,9 +118,11 @@ struct
       val igraph = G.newGraph()
       val moves = []
       val templist = foldr (fn (node, list) => 
-        list @ tempSet.listItems(tempSet.union(makeSet(getList(def, node)), 
-                                               makeSet(getList(use, node))))
+        (list @ tempSet.listItems(tempSet.union(makeSet(getList(def, node)), 
+                                               makeSet(getList(use, node))));
+        tempSet.listItems(makeSet(list)))
       ) [] nodelist
+
       val (tnode, gtemp) = foldr (fn (temp, (temptonode, nodetotemp)) => 
                 let 
                   val inode = G.newNode(igraph)
@@ -153,13 +155,6 @@ struct
     end
   
         
-  fun show (outstream, IGRAPH{graph=igraph,tnode=tnode,gtemp=gtemp,moves=moves}) = 
-  let 
-	  val nodelist = Graph.nodes igraph
-	  val nodestrings = (fn (n) => Temp.makestring (gtemp(n)))
-	  fun node2string(n) = (nodestrings n) ^ "-->" ^ (String.concatWith "," (map nodestrings (Graph.adj(n))))
-  in
-	  TextIO.output(outstream, String.concatWith "\n" (map nodestrings nodelist) ^ "\n" )
-  end
+  fun show (outstream, igraph) = ()
   
 end
