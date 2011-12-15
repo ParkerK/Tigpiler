@@ -36,10 +36,10 @@ struct
       val globalliveMap = G.Table.empty : liveSet G.Table.table
       val moves = []
       
-      fun makeSet(SOME(list)) = tempSet.addList(tempSet.empty, list)
+      fun makeSet(list : Temp.temp list) = tempSet.addList(tempSet.empty, list)
         | makeSet (NONE) = tempSet.empty
       
-      fun makeLiveSet(livetemplist) = 
+      fun makeLiveSet(livetemplist : Temp.temp list) = 
             let
               val tempTable = Temp.Table.empty
               val tempList = []
@@ -50,25 +50,26 @@ struct
                   ) livetemplist;
               (tempTable, tempList)
             end
-        | makeLiveSet() = (Temp.Table.empty, [])
+        | makeLiveSet(_) = (Temp.Table.empty, [])
         
-      fun livein(node) =
+      fun livein(node) : Temp.temp list =
       let
-        val usedTemps = G.Table.look(use, node)
-        val defTemps = G.Table.look(def, node)
+        val usedTemps = case G.Table.look(use, node) of 
+                          SOME templist => templist
+                        | NONE => []
+        val defTemps = case G.Table.look(def, node) of 
+                          SOME templist => templist
+                        | NONE => []
         val outTemps = liveout(node)
       in 
-        (case usedTemps of NONE => []
-          | SOME templist =>
-            (tempSet.listItems(
-              tempSet.union(
-                makeSet(templist),
-                tempSet.difference( makeSet(outTemps), makeSet(defTemps) )
-              )))
-          )
+        tempSet.listItems(
+          tempSet.union(
+            makeSet(usedTemps),
+            tempSet.difference( makeSet(outTemps), makeSet(defTemps) )
+          ))
       end
       
-      and liveout(node) = 
+      and liveout(node) : Temp.temp list = 
       let
         val outTemps = []
         val sucTemps = G.succ(node)
@@ -77,10 +78,12 @@ struct
           app (fn suc =>
             (app (fn outtemp => 
                     if (List.exists (fn item => G.eq(item, outtemp)) outTemps) then ()
-                      else outTemps := outTemps @ outtemp) 
+                      else outTemps := outTemps @ [outtemp]) 
                   (livein(suc))))
             sucTemps;
-          outTemps
+          case outTemps of 
+            [] => NONE
+          | _ => SOME(outTemps)
         )
       end
     in
