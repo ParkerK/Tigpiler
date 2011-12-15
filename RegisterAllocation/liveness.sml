@@ -81,9 +81,7 @@ struct
                       else outTemps := outTemps @ [outtemp]) 
                   (livein(suc))))
             sucTemps;
-          case outTemps of 
-            [] => NONE
-          | _ => SOME(outTemps)
+          outTemps
         )
       end
     in
