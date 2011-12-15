@@ -28,26 +28,26 @@ struct
           (case inst_h of 
             A.OPER {assem,dst,src,jump} =>
               {
-                instn = (G.Table.Enter (instn, node, inst_h)),
-                def = (G.Table.Enter (def, node, dst)),
-                use = (G.Table.Enter (use, node, src)),
-                ismove = (G.Table.Enter (use, node, false))       
+                instn = (G.Table.enter (instn, node, inst_h)),
+                def = (G.Table.enter (def, node, dst)),
+                use = (G.Table.enter (use, node, src)),
+                ismove = (G.Table.enter (use, node, false))       
               }
       
             | A.LABEL {assem, label} =>
               {
-                instn = (G.Table.Enter (instn, node, inst_h)),
-                def = (G.Table.Enter (def, node, [])),
-                use = (G.Table.Enter (use, node, [])),
-                ismove = (G.Table.Enter (use, node, false))
+                instn = (G.Table.enter (instn, node, inst_h)),
+                def = (G.Table.enter (def, node, [])),
+                use = (G.Table.enter (use, node, [])),
+                ismove = (G.Table.enter (use, node, false))
               }
               
             | A.MOVE {assem,dst,src} =>
               {
-                instn = (G.Table.Enter (instn, node, inst_h)),
-                def =  (G.Table.Enter (def, node, [dst])),
-                use =  (G.Table.Enter (use, node, [src])),
-                ismove = (G.Table.Enter (use, node, true))
+                instn = (G.Table.enter (instn, node, inst_h)),
+                def =  (G.Table.enter (def, node, [dst])),
+                use =  (G.Table.enter (use, node, [src])),
+                ismove = (G.Table.enter (use, node, true))
               }
           )
         )
