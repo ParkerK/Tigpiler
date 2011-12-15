@@ -72,7 +72,7 @@ struct
           
         end
       
-        | makeEdges (_) = ()
+        | makeEdges (_,_) = ()
         
         fun label2node (instn, a::b) =
           let
@@ -89,7 +89,7 @@ struct
   in
     (
       makeEdges(instn, nodelist);
-      (Flow.FGRAPH {g, def, use, ismove}, nodelist)
+      (Flow.FGRAPH {control=g, def=def, use=use, ismove=ismove}, nodelist)
     )
   end
 end
