@@ -50,10 +50,6 @@ struct
                   src=[munchExp e1, munchExp e2],
                          dst=[],jump=NONE})
 
-    | munchStm(T.MOVE(T.MEM(e1),T.MEM(e2))) =
-        emit(A.OPER{assem="move (`s0),  (`s1)\n",
-                    src=[munchExp e1, munchExp e2],
-                    dst=[], jump=NONE})
       
     | munchStm(T.MOVE(T.MEM(T.CONST i),e2)) =
         emit(A.OPER{assem="sw `s0, (r0+" ^ int i ^ ")\n",
