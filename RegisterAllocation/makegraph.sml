@@ -67,7 +67,7 @@ struct
               (
               case jump of 
                 SOME labellist =>
-                         app ( fn label => mk_edge(a, label2node (label))) labellist
+                         app ( fn label => G.mk_edge(a, label2node (label))) labellist
               | NONE => ()
               )
               | SOME(_) => ()
@@ -78,7 +78,7 @@ struct
       
         | makeEdges (_,_) = ()
         
-      fun label2node (instn, a::b) =
+      and  label2node (instn, a::b) =
         let
           val inst = G.Table.look(instn, a)
         in
