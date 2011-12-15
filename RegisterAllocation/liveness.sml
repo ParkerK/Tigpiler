@@ -118,9 +118,12 @@ struct
       val igraph = G.newGraph()
       val moves = []
       val templist = foldr (fn (node, list) => 
-        (list @ tempSet.listItems(tempSet.union(makeSet(getList(def, node)), 
-                                               makeSet(getList(use, node))));
-        tempSet.listItems(makeSet(list)))
+        let
+          val defuse = tempSet.union(makeSet(getList(def, node)),
+                                     makeSet(getList(use, node)))
+        in
+          tempSet.listItems(tempSet.union(makeSet(list), defuse))
+        end
       ) [] nodelist
 
       val (tnode, gtemp) = foldr (fn (temp, (temptonode, nodetotemp)) => 
@@ -143,10 +146,10 @@ struct
                 app (fn livetemp => 
                   case (Temp.Table.look(tnode, d), Temp.Table.look(tnode, livetemp)) of
                     (SOME(inode1), SOME(inode2)) => G.mk_edge({from=inode1, to=inode2})
-                  | (_,_) => print "can't find nodes in tnode map!\n"
+                  | (_,_) => ErrorMsg.impossible ("can't find node in tnode map!")
                 ) livelist
               ) (getList(def, n))
-          | NONE => print "can't find node in live map!\n"
+          | NONE => ErrorMsg.impossible ("can't find node in live map!")
         ) nodelist
       
       val _ = makeEdges()
