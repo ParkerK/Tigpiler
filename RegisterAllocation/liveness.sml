@@ -28,7 +28,7 @@ struct
   fun interferenceGraph ({control, def, use, ismove}, nodelist) = 
     let
       val igraph = Graph.newGraph()
-      val tnode = IGraph.node Temp.Table.table
+      val tnode = Graph.node Temp.Table.table
       val gtemp = Temp.temp Graph.Table.table
       val fnodeToTemps = Temp.temp list Graph.Table.table
       
