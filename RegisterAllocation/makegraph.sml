@@ -16,50 +16,48 @@ struct
     val nodelist = []
     val emptyT = Graph.Table.empty
     fun initInstr([]) = 
-		{
-      instn = emptyT,
-      def = emptyT,
-      use = emptyT,
-      ismove = emptyT       
-    }
-	
+          {
+            instn = emptyT,
+            def = emptyT,
+            use = emptyT,
+            ismove = emptyT       
+          }
       | initInstr(inst_h::inst_t) = 
+          let
+            (* Do for each instruction *)
+            val {instn, def, use, ismove} = initInstr(inst_t)
+            val node = G.newNode(g)
+          in
+            (
+              nodelist := nodelist @ [node];
+              (* OPER, LABEL, MOVE *) 
+              (case inst_h of 
+                A.OPER {assem,dst,src,jump} =>
+                  {
+                    instn = (G.Table.enter (instn, node, inst_h)),
+                    def = (G.Table.enter (def, node, dst)),
+                    use = (G.Table.enter (use, node, src)),
+                    ismove = (G.Table.enter (use, node, false))       
+                  }
       
-      let
-        val {instn, def, use, ismove} = initInstr(inst_t) (* Do for each instruction *)   
-        val node = G.newNode(g)
-		
-      in
-        (
-          nodelist := nodelist @ [node];
-          (* OPER, LABEL, MOVE *) 
-          (case inst_h of 
-            A.OPER {assem,dst,src,jump} =>
-              {
-                instn = (G.Table.enter (instn, node, inst_h)),
-                def = (G.Table.enter (def, node, dst)),
-                use = (G.Table.enter (use, node, src)),
-                ismove = (G.Table.enter (use, node, false))       
-              }
-      
-            | A.LABEL {assem, label} =>
-              {
-                instn = (G.Table.enter (instn, node, inst_h)),
-                def = (G.Table.enter (def, node, [])),
-                use = (G.Table.enter (use, node, [])),
-                ismove = (G.Table.enter (use, node, false))
-              }
+                | A.LABEL {assem, label} =>
+                  {
+                    instn = (G.Table.enter (instn, node, inst_h)),
+                    def = (G.Table.enter (def, node, [])),
+                    use = (G.Table.enter (use, node, [])),
+                    ismove = (G.Table.enter (use, node, false))
+                  }
               
-            | A.MOVE {assem,dst,src} =>
-              {
-                instn = (G.Table.enter (instn, node, inst_h)),
-                def =  (G.Table.enter (def, node, [dst])),
-                use =  (G.Table.enter (use, node, [src])),
-                ismove = (G.Table.enter (use, node, true))
-              }
-          )
-        )
-      end
+                | A.MOVE {assem,dst,src} =>
+                  {
+                    instn = (G.Table.enter (instn, node, inst_h)),
+                    def =  (G.Table.enter (def, node, [dst])),
+                    use =  (G.Table.enter (use, node, [src])),
+                    ismove = (G.Table.enter (use, node, true))
+                  }
+              )
+            )
+          end
       
       fun makeEdges (instn, a::(b::c)) =
         let
