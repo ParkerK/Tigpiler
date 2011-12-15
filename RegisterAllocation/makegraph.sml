@@ -91,10 +91,8 @@ struct
         end
 
       val ({instn, def, use, ismove}, nodelist) = initInstr(instrs)
+      val _ = makeEdges(instn, nodelist)
   in
-    (
-      makeEdges(instn, nodelist);
-      (Flow.FGRAPH {control=g, def=def, use=use, ismove=ismove}, nodelist)
-    )
+    (Flow.FGRAPH {control=g, def=def, use=use, ismove=ismove}, nodelist)
   end
 end
