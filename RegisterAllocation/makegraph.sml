@@ -19,8 +19,9 @@ struct
       | initInstr(inst_h::inst_t) = 
       
       let
-        val {control, def, use, ismove} = initInstr(inst_t) (* Do for each instruction *)   
+        val {instn, def, use, ismove} = initInstr(inst_t) (* Do for each instruction *)   
         val node = G.newNode(g)
+		
       in
         (
           nodelist := nodelist @ node;
