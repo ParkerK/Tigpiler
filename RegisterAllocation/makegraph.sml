@@ -70,7 +70,7 @@ struct
               SOME (A.OPER {assem, dst, src, jump}) =>
               (case jump of 
                 SOME labellist =>
-                      app (fn label => G.mk_edge({from=a, to=label2node(label)})) labellist
+                      app (fn label => G.mk_edge({from=a, to=label2node(instn, label)})) labellist
                 | NONE => () )
             | SOME(_) => ()
             | NONE => ()
