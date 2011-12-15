@@ -36,7 +36,7 @@ struct
       fun makeSet(SOME(list)) = tempSet.addList(tempSet.empty, list)
         | makeSet (NONE) = tempSet.empty
         
-      fun livein(node)
+      fun livein(node) =
       let
         val usedTemps = G.Table.look(use, node)
         val defTemps = G.Table.look(def, node)
@@ -52,7 +52,7 @@ struct
           )
       end
       
-      and fun liveout(node)
+      and fun liveout(node) = 
       let
         val outTemps = []
         val sucTemps = G.succ(control, node)
