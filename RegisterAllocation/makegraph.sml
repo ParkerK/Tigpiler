@@ -15,7 +15,14 @@ struct
     val g = G.newGraph()
     val nodelist = []
     val emptyT = Graph.Table.empty
-    fun initInstr([]) = {}
+    fun initInstr([]) = 
+    {
+      instn = emptyT,
+      def = emptyT,
+      use = emptyT,
+      ismove = emptyT       
+    }
+	
       | initInstr(inst_h::inst_t) = 
       
       let
