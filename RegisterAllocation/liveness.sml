@@ -58,7 +58,7 @@ struct
         val defTemps = G.Table.look(def, node)
         val outTemps = liveout(node)
       in 
-        (case usedTemps of NONE => ()
+        (case usedTemps of NONE => []
           | SOME templist =>
             (tempSet.listItems(
               tempSet.union(
