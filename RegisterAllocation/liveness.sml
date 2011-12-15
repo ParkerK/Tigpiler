@@ -48,38 +48,59 @@ struct
             in
               genLiveSet(Temp.Table.empty, [], livetemplist)
             end
-        
-      fun livein(node, outTemps) : Temp.temp list =
+
+      fun getList(table, node) = case G.Table.look(table, node) of 
+                        SOME templist => templist
+                      | NONE => []
+      fun live(node, ins, outs) =
         let
-          val usedTemps = case G.Table.look(use, node) of 
-                            SOME templist => templist
-                          | NONE => []
-          val defTemps = case G.Table.look(def, node) of 
-                            SOME templist => templist
-                          | NONE => []
-        in 
-          tempSet.listItems(
+          val defTemps = getList(def, node)
+          val usedTemps = getList(use, node)
+          val ins' = tempSet.listItems(
             tempSet.union(
               makeSet(usedTemps),
-              tempSet.difference( makeSet(outTemps), makeSet(defTemps) )
+              tempSet.difference( makeSet(outs), makeSet(defTemps) )
             ))
+          
+          val sucNodes = G.succ(node)
+          val outs' = 
+            let 
+              fun find(n, list, baseindex) =
+                if baseindex >= List.length(list) then NONE
+                else
+                  if G.eq(n, List.nth(nodelist, baseindex)) then SOME(baseindex)
+                  else find(n, list, baseindex+1)
+            in
+              foldr (fn (sucnode, list) => 
+                      case find(sucnode, nodelist, 0) of
+                        SOME index => 
+                          tempSet.listItems(tempSet.union (makeSet(list), makeSet(List.nth(ins, index))))
+                      | NONE => list
+                    ) sucNodes []
+            end
+        
+        in
+          (ins', outs')
         end
       
-      and liveout(node, inTemps) : Temp.temp list = 
+      val liveins = map (fn _ => []) nodelist
+      val liveouts = map (fn _ => []) nodelist
+      
+      fun calcLive(inlist, outlist) =
         let
-          val sucTemps = G.succ(node)
-          
-          fun genLiveOut(outlist, []) = outlist
-            | genLiveOut(outlist, suc::suclist) =
-                let
-                  val outlist' = tempSet.listItems(tempSet.union (makeSet(outlist), makeSet(inTemps)))
-                in
-                  genLiveOut(outlist', suclist)
-                end
+          val newstuff = foldr (fn (n, ins, outs) => (n, live(n, ins, outs))) 
+                                [] List.zip(nodelist, List.zip(inlist, outlist))
+          val (_,(newinlist, newoutlist)) = List.unzip(List.unzip(newstuff))
+          fun listlistcomp(l1, l2) = List.all (fn (i1, i2) => listcomp(i1, i2)) List.zip(l1,l2)
+          fun listcomp(i1, i2) = List.all (fn (a, b) => a=b) List.zip(i1, i2)
+          val continue = (listlistcomp(inlist, newinlist) andalso listlistcomp(outlist, newoutlist))
         in
-          genLiveOut([], sucTemps)
+          if continue then
+            calcLive(newinlist, newoutlist)
+          else
+            (newinlist, newoutlist)
         end
-        
+      
       fun fillMappings(fnodemap, livemap, []) = (fnodemap, livemap)
         | fillMappings(fnodemap, livemap, n::nlist) = 
             let
