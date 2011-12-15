@@ -69,19 +69,20 @@ struct
     val RR = seq (ListPair.mapEq move (saved, temps))
     val stm' = seq [RS, stm, RR]
 
-    fun moveArg (arg, access) =
+    fun moveargs (arg, access) =
       let
 	      val access' = exp access
 	    in
         Tree.MOVE (access' (Tree.TEMP FP), Tree.TEMP arg)
   	  end
     
-	val funFormals = formals frame
-    val viewShift = seq (ListPair.map moveArg (argregs, funFormals))
+	  val funFormals = formals frame
+    val viewShift = seq (ListPair.map moveargs (argregs, funFormals))
+    
   in
-    case funFormals of
-         [] => stm'
-       | _  => Tree.SEQ (viewShift, stm')
+    (case funFormals of
+      [] => stm'
+      | _  => Tree.SEQ (viewShift, stm'))
   end
   
   structure A = Assem

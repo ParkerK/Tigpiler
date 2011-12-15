@@ -17,6 +17,7 @@ mipsframe.sml
 mipsgen.sml
 parse.sml
 printtree.sml
+regalloc.sml
 semant.sml
 symbol.sml
 table.sig
