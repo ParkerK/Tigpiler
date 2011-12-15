@@ -17,7 +17,6 @@ struct
                                gtemp: IGraph.node -> Temp.temp,
                                moves: (IGraph.node * IGraph.node) list}
 
-                (* node to *)
   type liveSet = unit Temp.Table.table * temp list
   type liveMap = liveSet Flow.Graph.Table.table
   structure G = FLOW.Graph
@@ -26,11 +25,12 @@ struct
                                   type ord_key = Temp.temp
                                   val compare  = Int.compare
                                   end)  
-  fun interferenceGraph ({control, def, use, ismove}, node::nodelist) = 
+  fun interferenceGraph ({control, def, use, ismove}, nodelist) = 
     let
       val igraph = Graph.newGraph()
       val tnode = IGraph.node Temp.Table.table
       val gtemp = Temp.temp Temp.Table.table
+      val fnodeToTemps = Temp.temp list Graph.Table.table
       val moves = []
       
       fun makeSet(SOME(list)) = tempSet.addList(tempSet.empty, list)
@@ -41,8 +41,6 @@ struct
         val usedTemps = G.Table.look(use, node)
         val defTemps = G.Table.look(def, node)
         val outTemps = liveout(node)
-
-         
       in 
         (case usedTemps of NONE => ()
           | SOME (temp list) =>
@@ -53,7 +51,6 @@ struct
               )))
           )
       end
-      
       
       and fun liveout(node)
       let
@@ -71,7 +68,9 @@ struct
         )
       end
     in
-      
+      (
+        app (fn node => G.Table.enter(fnodeToTemps, node, liveout(node)) nodelist;
+      )
     end
   
         
