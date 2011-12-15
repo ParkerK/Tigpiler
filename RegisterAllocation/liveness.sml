@@ -153,6 +153,13 @@ struct
     end
   
         
-  fun show (outstream, igraph) = ()
+  fun show (outstream, IGRAPH{graph=igraph,tnode=tnode,gtemp=gtemp,moves=moves}) = 
+  let 
+	  val nodelist = Graph.nodes igraph
+	  val nodestrings = (fn (n) => Temp.makestring (gtemp(n)))
+	  fun node2string(n) = (nodestrings n) ^ "-->" ^ (String.concatWith "," (map nodestrings (Graph.adj(n))))
+  in
+	  TextIO.output(outstream, String.concatWith "\n" (map nodestrings nodelist) ^ "\n" )
+  end
   
 end
