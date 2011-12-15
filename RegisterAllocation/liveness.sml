@@ -49,7 +49,7 @@ struct
               genLiveSet(Temp.Table.empty, [], livetemplist)
             end
         
-      fun livein(node) : Temp.temp list =
+      fun livein(node, outTemps) : Temp.temp list =
         let
           val usedTemps = case G.Table.look(use, node) of 
                             SOME templist => templist
@@ -57,7 +57,6 @@ struct
           val defTemps = case G.Table.look(def, node) of 
                             SOME templist => templist
                           | NONE => []
-          val outTemps = liveout(node)
         in 
           tempSet.listItems(
             tempSet.union(
@@ -66,14 +65,14 @@ struct
             ))
         end
       
-      and liveout(node) : Temp.temp list = 
+      and liveout(node, inTemps) : Temp.temp list = 
         let
           val sucTemps = G.succ(node)
           
           fun genLiveOut(outlist, []) = outlist
             | genLiveOut(outlist, suc::suclist) =
                 let
-                  val outlist' = tempSet.listItems(tempSet.union (makeSet(outlist), makeSet(livein(suc))))
+                  val outlist' = tempSet.listItems(tempSet.union (makeSet(outlist), makeSet(inTemps)))
                 in
                   genLiveOut(outlist', suclist)
                 end
