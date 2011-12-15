@@ -135,8 +135,19 @@ struct
                G.Table.empty : Temp.temp G.Table.table)
               templist
               
-      fun makeEdges()=
-        
+      fun makeEdges() =
+        app (fn n => 
+          case G.Table.look(globalLiveMap, n) of
+            SOME (livetable,livelist) => 
+              app (fn d => 
+                app (fn livetemp => 
+                  case (Temp.Table.look(tnode, d), Temp.Table.look(tnode, livetemp)) of
+                    (SOME(inode1), SOME(inode2)) => G.mk_edge({from=inode1, to=inode2})
+                  | (_,_) => ErrorMsg.impossible("can't find nodes in tnode map!")
+                ) livelist
+              ) (getList(def, n))
+          | NONE => ErrorMsg.impossible("can't find node in live map!")
+        ) nodelist
     in
       (
         IGRAPH {
