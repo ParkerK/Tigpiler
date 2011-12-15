@@ -74,11 +74,7 @@ struct
           val sucTemps = G.succ(node)
         in
           (
-            app (fn suc =>
-              (app (fn outtemp => 
-                      if (List.exists (fn item => G.eq(item, outtemp)) outTemps) then ()
-                        else outTemps := outTemps @ [outtemp]) 
-                    (livein(suc))))
+            app (fn suc => outTemps := tempSet.listItems(tempSet.union (makeSet(outTemps), makeSet(livein(suc) ))))
               sucTemps;
             outTemps
           )
