@@ -60,31 +60,33 @@ struct
           val inst = G.Table.look(instn, a)
         in
          (* Make edge for follow through *) 
-          G.mk_edge {from=a, to=b}
+          (G.mk_edge {from=a, to=b};
           (* Check for a jump instr *)
-          ( case inst of SOME (A.OPER {assem, dst, src, jump}) =>
-            (case jump of SOME labellist =>
-                       app ( fn label => mk_edge(a, label2node (label))) labellist
-                | NONE => ()
-            )
-            | NONE => () 
-            | SOME(_) => ())
-            makeEdges(instn, (b::c))
-          
+          ( case inst of 
+            SOME (A.OPER {assem, dst, src, jump}) =>
+              (
+              case jump of 
+                SOME labellist =>
+                         app ( fn label => mk_edge(a, label2node (label))) labellist
+              | NONE => ()
+              )
+              | SOME(_) => ()
+              | NONE => ());
+            makeEdges(instn, (b::c));
+            ())
         end
       
         | makeEdges (_,_) = ()
         
-        fun label2node (instn, a::b) =
-          let
-            val inst = G.Table.look(instn, a)
-          in
-            (case inst of SOME (A.LABEL {assem, lab}) => a
-              | NONE => ()
-              | SOME(_) => label2node (b)
-            )
-          end
-            
+      fun label2node (instn, a::b) =
+        let
+          val inst = G.Table.look(instn, a)
+        in
+          (case inst of SOME (A.LABEL {assem, lab}) => a
+            | SOME(_) => label2node (instn, b)
+            | NONE => raise ErrMsg ("can't find label!")
+          )
+        end
 
       val {instn, def, use, ismove} = initInstr(instrs)
   in
