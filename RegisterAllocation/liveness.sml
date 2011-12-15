@@ -107,7 +107,7 @@ struct
             (newinlist, newoutlist)
         end
       
-      (*fun fillMappings(fnodemap, livemap, []) = (fnodemap, livemap)
+      fun fillMappings(fnodemap, livemap, []) = (fnodemap, livemap)
         | fillMappings(fnodemap, livemap, n::nlist) = 
             let
               val fnodemap' = G.Table.enter(fnodemap, n, liveout(n))
@@ -120,7 +120,7 @@ struct
         fillMappings(G.Table.empty : Temp.temp list G.Table.table,
                      G.Table.empty : liveSet G.Table.table,
                      nodelist)
-  *)
+  
     in
       (
         IGRAPH {
