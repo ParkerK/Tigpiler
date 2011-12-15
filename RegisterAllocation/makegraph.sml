@@ -74,16 +74,15 @@ struct
       
         | makeEdges (_,_) = ()
         
-        fun label2node (instn, a::b) =
-          let
-            val inst = G.Table.look(instn, a)
-          in
-            (case inst of SOME (A.LABEL {assem, lab}) => a
-              | NONE => ()
-              | SOME(_) => label2node (b)
-            )
-          end
-            
+      fun label2node (instn, a::b) =
+        let
+          val inst = G.Table.look(instn, a)
+        in
+          (case inst of SOME (A.LABEL {assem, lab}) => a
+            | SOME(_) => label2node (instn, b)
+            | NONE => raise ErrMsg ("can't find label!")
+          )
+        end
 
       val {instn, def, use, ismove} = initInstr(instrs)
   in
