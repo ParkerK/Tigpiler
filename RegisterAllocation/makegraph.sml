@@ -68,22 +68,20 @@ struct
           (G.mk_edge {from=a, to=b};
           (* Check for a jump instr *)
           ( case inst of 
-            SOME (A.OPER {assem, dst, src, jump}) =>
-              (
-              case jump of 
-                SOME labellist =>
-                         app ( fn label => G.mk_edge(a, label2node (label))) labellist
-              | NONE => ()
-              )
-              | SOME(_) => ()
-              | NONE => ());
+              SOME (A.OPER {assem, dst, src, jump}) =>
+                (case jump of 
+                  SOME labellist =>
+                           app (fn label => G.mk_edge({from=a, to=label2node(label)})) labellist
+                | NONE => ())
+            | SOME(_) => ()
+            | NONE => ());
             makeEdges(instn, (b::c));
             ())
         end
       
         | makeEdges (_,_) = ()
         
-      and  label2node (instn, a::b) =
+      and label2node (instn, a::b): G.node =
         let
           val inst = G.Table.look(instn, a)
         in
