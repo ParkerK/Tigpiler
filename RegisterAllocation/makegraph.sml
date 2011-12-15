@@ -13,23 +13,21 @@ struct
   fun instrs2graph instrs = 
   let
     val g = G.newGraph()
-    val nodelist = []
     val emptyT = Graph.Table.empty
     fun initInstr([]) = 
-          {
+          ({
             instn = emptyT,
             def = emptyT,
             use = emptyT,
             ismove = emptyT       
-          }
+          }, [])
       | initInstr(inst_h::inst_t) = 
           let
             (* Do for each instruction *)
-            val {instn, def, use, ismove} = initInstr(inst_t)
+            val ({instn, def, use, ismove},nodelist) = initInstr(inst_t)
             val node = G.newNode(g)
           in
             (
-              nodelist := nodelist @ [node];
               (* OPER, LABEL, MOVE *) 
               (case inst_h of 
                 A.OPER {assem,dst,src,jump} =>
@@ -55,7 +53,8 @@ struct
                     use =  (G.Table.enter (use, node, [src])),
                     ismove = (G.Table.enter (ismove, node, true))
                   }
-              )
+              ), 
+              nodelist @ [node]
             )
           end
       
@@ -91,7 +90,7 @@ struct
           )
         end
 
-      val {instn, def, use, ismove} = initInstr(instrs)
+      val ({instn, def, use, ismove}, nodelist) = initInstr(instrs)
   in
     (
       makeEdges(instn, nodelist);
