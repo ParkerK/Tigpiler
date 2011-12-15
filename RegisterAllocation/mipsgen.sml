@@ -31,12 +31,12 @@ struct
       end
 
    fun operToJump oper = case oper of
-      T.EQ => "BEQ"
-    | T.NE => "BNE"
-    | T.LT => "BLT"
-    | T.GT => "BGT"
-    | T.LE => "BLE"
-    | T.GE => "BGE"
+      T.EQ => "beq"
+    | T.NE => "bne"
+    | T.LT => "blt"
+    | T.GT => "bgt"
+    | T.LE => "ble"
+    | T.GE => "bge"
     | _ => "WTF"
     
   fun munchStm(T.SEQ(a,b)) = (munchStm a; munchStm b)
