@@ -110,8 +110,9 @@ struct
       fun fillMappings(fnodemap, livemap, []) = (fnodemap, livemap)
         | fillMappings(fnodemap, livemap, n::nlist) = 
             let
-              val fnodemap' = G.Table.enter(fnodemap, n, liveout(n))
-              val livemap' = G.Table.enter(livemap, n, makeLiveSet(livein(n)))
+              val (inl, outl) = calcLive(liveins, liveouts)
+              val fnodemap' = G.Table.enter(fnodemap, n, outl)
+              val livemap' = G.Table.enter(livemap, n, makeLiveSet(inl))
             in
               fillMappings(fnodemap', livemap', nlist)
             end
