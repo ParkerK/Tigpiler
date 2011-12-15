@@ -46,12 +46,12 @@ struct
       in 
         (case usedTemps of NONE => ()
           | SOME (temp list) =>
-            (
+            (tempSet.listItems(
               tempSet.union(
                 makeSet(usedTemps),
                 tempSet.difference( makeSet(outTemps), makeSet(defTemps) )
               )
-            )
+            ))
           )
       end
       
