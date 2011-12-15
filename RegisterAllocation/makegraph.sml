@@ -16,7 +16,7 @@ struct
     val nodelist = []
     val emptyT = Graph.Table.empty
     fun initInstr([]) = 
-    {
+		{
       instn = emptyT,
       def = emptyT,
       use = emptyT,
