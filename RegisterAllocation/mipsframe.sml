@@ -55,9 +55,34 @@ struct
       (Symbol.name label  ^ ": .asciiz \"" ^ str ^ "\"\n")
     
   fun move (reg, var) = Tree.MOVE (Tree.TEMP reg, Tree.TEMP var)
-  
+  fun seq [] = Tree.EXP (Tree.CONST 0)
+    | seq [exp] = exp
+    | seq (exp :: exps) = (Tree.SEQ (exp, (seq exps)))
+	
   fun externalCall (str, left, right) = Tree.TEMP (Temp.newtemp()) (*todo*)
-  fun procEntryExit1 (frame, stm) = stm (*later*)
+  
+  fun procEntryExit1 (frame, stm) =
+  let
+    val saved = [RA] @ calleesaves
+    val temps = map (fn temp => Temp.newtemp ()) saved
+    val RS = seq (ListPair.mapEq move (temps, saved))
+    val RR = seq (ListPair.mapEq move (saved, temps))
+    val stm' = seq [RS, stm, RR]
+
+    fun moveArg (arg, access) =
+      let
+	      val access' = exp access
+	    in
+        Tree.MOVE (access' (Tree.TEMP FP), Tree.TEMP arg)
+  	  end
+    
+	val funFormals = formals frame
+    val viewShift = seq (ListPair.map moveArg (argregs, funFormals))
+  in
+    case funFormals of
+         [] => stm'
+       | _  => Tree.SEQ (viewShift, stm')
+  end
   
   structure A = Assem
   (* Pg 209 *)
