@@ -8,7 +8,7 @@ sig
   val interferenceGraph : Flow.flowgraph * Flow.Graph.node list -> 
                             igraph * (Flow.Graph.node -> Temp.temp list)
   
-  val show : outstream * igraph -> unit
+  val show : TextIO.outstream * igraph -> unit
 end
 structure Liveness : LIVENESS =
 struct
