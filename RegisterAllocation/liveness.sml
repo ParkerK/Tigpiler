@@ -70,14 +70,17 @@ struct
       
       and liveout(node) : Temp.temp list = 
         let
-          val outTemps = []
           val sucTemps = G.succ(node)
+          
+          fun genLiveOut(outlist, []) = outlist
+            | genLiveOut(outlist, suc::suclist) =
+                let
+                  val outlist' = tempSet.listItems(tempSet.union (makeSet(outlist), makeSet(livein(suc))))
+                in
+                  genLiveOut(outlist', suclist)
+                end
         in
-          (
-            app (fn suc => outTemps := tempSet.listItems(tempSet.union (makeSet(outTemps), makeSet(livein(suc) ))))
-              sucTemps;
-            outTemps
-          )
+          genLiveOut([], sucTemps)
         end
         
       fun fillMappings(fnodemap, livemap, []) = (fnodemap, livemap)
