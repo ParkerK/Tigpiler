@@ -37,7 +37,7 @@ struct
       val moves = []
       
       fun makeSet(list : Temp.temp list) = tempSet.addList(tempSet.empty, list)
-        | makeSet (NONE) = tempSet.empty
+        | makeSet (_) = tempSet.empty
       
       fun makeLiveSet(livetemplist : Temp.temp list) = 
             let
