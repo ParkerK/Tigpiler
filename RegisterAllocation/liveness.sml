@@ -1,4 +1,4 @@
-structure LIVENESS =
+signature LIVENESS =
 sig
   datatype igraph = IGRAPH of {graph: IGraph.graph, 
                                tnode: Temp.temp -> IGraph.node,
@@ -51,7 +51,7 @@ struct
             end
         | makeLiveSet() = (Temp.Table.empty, [])
         
-      fun livein(node)
+      fun livein(node) =
       let
         val usedTemps = G.Table.look(use, node)
         val defTemps = G.Table.look(def, node)
@@ -67,7 +67,7 @@ struct
           )
       end
       
-      and fun liveout(node)
+      and fun liveout(node) = 
       let
         val outTemps = []
         val sucTemps = G.succ(control, node)
@@ -75,7 +75,7 @@ struct
         (
           app (fn suc =>
             (app (fn outtemp => 
-                    if (List.exists (fn item => G.eq(item, outtemp)) outTemps) ()
+                    if (List.exists (fn item => G.eq(item, outtemp)) outTemps) then ()
                       else outTemps := outTemps @ outtemp) 
                   livein(suc)))
             sucTemps;

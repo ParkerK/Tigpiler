@@ -1,6 +1,6 @@
-structure FLOW:
+signature FLOW=
 sig
-    structure Graph
+    structure Graph : GRAPH
     datatype flowgraph =
       FGRAPH of { control: Graph.graph,
                   def: Temp.temp list Graph.Table.table,

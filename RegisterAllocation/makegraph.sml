@@ -7,7 +7,7 @@ end
 
 structure Makegraph :> MAKEGRAPH =
 struct
-  structure G = FLOW.Graph
+  structure G = Flow.Graph
   structure A = Assem    
   
   fun instrs2graph instrs = 
@@ -31,7 +31,7 @@ struct
                 instn = (G.Table.Enter (instn, node, inst_h)),
                 def = (G.Table.Enter (def, node, dst)),
                 use = (G.Table.Enter (use, node, src)),
-                ismove = (G.Table.Enter (use, node, false)),       
+                ismove = (G.Table.Enter (use, node, false))       
               }
       
             | A.LABEL {assem, label} =>
@@ -39,7 +39,7 @@ struct
                 instn = (G.Table.Enter (instn, node, inst_h)),
                 def = (G.Table.Enter (def, node, [])),
                 use = (G.Table.Enter (use, node, [])),
-                ismove = (G.Table.Enter (use, node, false)),
+                ismove = (G.Table.Enter (use, node, false))
               }
               
             | A.MOVE {assem,dst,src} =>
@@ -72,7 +72,7 @@ struct
           
         end
       
-        | makeEdges (_) = ()
+        | makeEdges (_,_) = ()
         
         fun label2node (instn, a::b) =
           let
@@ -89,7 +89,7 @@ struct
   in
     (
       makeEdges(instn, nodelist);
-      (FGRAPH {g, def, use, ismove}, nodelist)
+      (Flow.FGRAPH {control=g, def=def, use=use, ismove=ismove}, nodelist)
     )
   end
 end

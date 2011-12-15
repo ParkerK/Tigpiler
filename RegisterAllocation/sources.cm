@@ -12,6 +12,8 @@ frame.sig
 graph.sig
 graph.sml
 main.sml
+makegraph.sml
+liveness.sml
 mipsframe.sml
 mipsgen.sml
 parse.sml
