@@ -37,7 +37,7 @@ struct
     | T.GT => "bgt"
     | T.LE => "ble"
     | T.GE => "bge"
-    | _ => "WTF"
+    | _ => "bad branch operator!"
     
   fun munchStm(T.SEQ(a,b)) = (munchStm a; munchStm b)
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i)),e2)) =
@@ -104,7 +104,7 @@ struct
     | munchStm (T.EXP exp) = (munchExp exp; ())
     
     
-    | munchStm(_) = emit(A.OPER{assem="WTF", src=[], dst=[], jump=NONE})
+    | munchStm(_) = emit(A.OPER{assem="bad munch stm! line 107", src=[], dst=[], jump=NONE})
 
     and munchArgs(i,[]) = []
       | munchArgs(i,eh::et) =
@@ -226,7 +226,7 @@ struct
           src=[], dst=[r], jump=NONE}))
         
      | munchExp(T.TEMP t) = t
-     | munchExp(_) = result(fn _ => emit(A.OPER{assem="WTF", src=[], dst=[], jump=NONE}))
+     | munchExp(_) = result(fn _ => emit(A.OPER{assem="bad munch exp! line 299", src=[], dst=[], jump=NONE}))
       
     in
       munchStm stm;
