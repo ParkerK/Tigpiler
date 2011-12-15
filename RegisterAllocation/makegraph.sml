@@ -7,7 +7,7 @@ end
 
 structure Makegraph :> MAKEGRAPH =
 struct
-  structure G = Flowsml tes	.Graph
+  structure G = Flow.Graph
   structure A = Assem    
   
   fun instrs2graph instrs = 
@@ -89,7 +89,7 @@ struct
   in
     (
       makeEdges(instn, nodelist);
-      (FGRAPH {g, def, use, ismove}, nodelist)
+      (Flow.FGRAPH {g, def, use, ismove}, nodelist)
     )
   end
 end
