@@ -73,11 +73,6 @@ struct
     | munchStm(T.LABEL lab) =
       emit(A.LABEL{assem=Symbol.name(lab) ^ ":\n", lab=lab})
       
-    | munchStm (T.EXP(T.CALL(e,args))) =
-      emit (A.OPER{assem="call `s0\n",
-                  src=munchExp(e)::munchArgs(0,args),
-                  dst=Frame.calldefs,
-                  jump=NONE})
     
     (* JUMP *)
      | munchStm(T.CJUMP(oper, T.CONST i, e1, lab1, lab2)) =
@@ -97,10 +92,10 @@ struct
         src=[], dst=[], jump=SOME[Temp.namedlabel(Symbol.name lab)]})
         
         
-    (*| munchStm(T.EXP(T.CALL(T.NAME(lab),args))) = 
-         emit(A.OPER{assem="JAL " ^ Symbol.name(lab) ^ "\n",
+    | munchStm(T.EXP(T.CALL(T.NAME(lab),args))) = 
+         emit(A.OPER{assem="jal " ^ Symbol.name(lab) ^ "\n",
          src=munchArgs(0,args), dst=F.RA::F.ZERO::F.callersaves, jump=NONE})
-     *)
+     
     | munchStm (T.EXP exp) = (munchExp exp; ())
     
     
@@ -226,7 +221,10 @@ struct
           src=[], dst=[r], jump=NONE}))
         
      | munchExp(T.TEMP t) = t
-     | munchExp(_) = result(fn _ => emit(A.OPER{assem="bad munch exp! line 299", src=[], dst=[], jump=NONE}))
+     | munchExp(T.NAME n) =  result(fn r => emit(A.OPER
+		{assem="addi `d0, r0, " ^ (Symbol.name n) ^ "\n",
+		src=[],dst=[r], jump=NONE}))
+	 | munchExp(_) = result(fn _ => emit(A.OPER{assem="bad munch exp! line 299", src=[], dst=[], jump=NONE}))
       
     in
       munchStm stm;
