@@ -27,12 +27,7 @@ struct
                                   val compare  = Int.compare
                                   end)  
   fun interferenceGraph (Flow.FGRAPH {control, def, use, ismove}, nodelist:G.node list) = 
-    let
-      val igraph = G.newGraph()
-      val tnode = Temp.Table.empty : G.node Temp.Table.table
-      val gtemp = G.Table.empty : Temp.temp G.Table.table
-      val moves = []
-      
+    let      
       fun makeSet(list : Temp.temp list) = tempSet.addList(tempSet.empty, list)
       
       fun makeLiveSet(livetemplist : Temp.temp list) = 
@@ -119,13 +114,36 @@ struct
         end
         
       val (fnodeToTemps, globalLiveMap) = fillMappings()
-  
+    
+      val igraph = G.newGraph()
+      val moves = []
+      val templist = foldr (fn (node, list) => 
+        list @ tempSet.listItems(tempSet.union(makeSet(getList(def, node)), 
+                                               makeSet(getList(use, node))))
+      ) [] nodelist
+      val (tnode, gtemp) = foldr (fn (temp, (temptonode, nodetotemp)) => 
+                let 
+                  val inode = G.newNode(igraph)
+                in
+                  (Temp.Table.enter(temptonode, temp, inode),
+                   G.Table.enter(nodetotemp, inode, temp))
+                end
+              ) 
+              (Temp.Table.empty : G.node Temp.Table.table,
+               G.Table.empty : Temp.temp G.Table.table)
+              templist
     in
       (
         IGRAPH {
                 graph = igraph, 
-                tnode = fn _ => Graph.newNode(igraph), 
-                gtemp = fn _ => Temp.newtemp(),
+                tnode = fn temp => 
+                          case Temp.Table.look(tnode, temp) of
+                            SOME n => n
+                          | NONE => ErrorMsg.impossible ("can't find temp"), 
+                gtemp = fn node => 
+                          case G.Table.look(gtemp, node) of
+                            SOME t => t
+                          | NONE => ErrorMsg.impossible ("can't find node"),
                 moves = []
                 },
         fn n => case G.Table.look(fnodeToTemps, n) of 
