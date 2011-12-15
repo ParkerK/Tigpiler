@@ -16,7 +16,7 @@ struct
     val emptyT = Graph.Table.empty
     fun initInstr([]) = 
           ({
-            instn = emptyT,
+            instmap = emptyT,
             def = emptyT,
             use = emptyT,
             ismove = emptyT       
@@ -24,7 +24,7 @@ struct
       | initInstr(inst_h::inst_t) = 
           let
             (* Do for each instruction *)
-            val ({instn, def, use, ismove},nodelist) = initInstr(inst_t)
+            val ({instmap, def, use, ismove},nodelist) = initInstr(inst_t)
             val node = G.newNode(g)
           in
             (
@@ -32,7 +32,7 @@ struct
               (case inst_h of 
                 A.OPER {assem,dst,src,jump} =>
                   {
-                    instn = (G.Table.enter (instn, node, inst_h)),
+                    instmap = (G.Table.enter (instmap, node, inst_h)),
                     def = (G.Table.enter (def, node, dst)),
                     use = (G.Table.enter (use, node, src)),
                     ismove = (G.Table.enter (ismove, node, false))       
@@ -40,7 +40,7 @@ struct
       
                 | A.LABEL {assem, lab} =>
                   {
-                    instn = (G.Table.enter (instn, node, inst_h)),
+                    instmap = (G.Table.enter (instmap, node, inst_h)),
                     def = (G.Table.enter (def, node, [])),
                     use = (G.Table.enter (use, node, [])),
                     ismove = (G.Table.enter (ismove, node, false))
@@ -48,7 +48,7 @@ struct
               
                 | A.MOVE {assem,dst,src} =>
                   {
-                    instn = (G.Table.enter (instn, node, inst_h)),
+                    instmap = (G.Table.enter (instmap, node, inst_h)),
                     def =  (G.Table.enter (def, node, [dst])),
                     use =  (G.Table.enter (use, node, [src])),
                     ismove = (G.Table.enter (ismove, node, true))
@@ -58,7 +58,19 @@ struct
             )
           end
       
-      val ({instn, def, use, ismove}, nodelist) = initInstr(instrs)
+      val ({instmap, def, use, ismove}, nodelist) = initInstr(instrs)
+      
+      fun label2node (instn, a::b, lbl): G.node =
+        let
+          val inst = G.Table.look(instn, a)
+        in
+          (case inst of SOME (A.LABEL {assem, lab}) =>
+              (if lbl = lab then a else label2node (instn, b, lbl))
+            | SOME(_) => label2node (instn, b, lbl)
+            | NONE => ErrorMsg.impossible ("can't find label!")
+          )
+        end
+       | label2node(_, [], _) = ErrorMsg.impossible ("can't find label!")
       
       fun makeEdges (instn, a::(b::c)) =
         let
@@ -80,22 +92,9 @@ struct
             makeEdges(instn, (b::c));
             ())
         end
-      
-        | makeEdges (_) = ()
+        | makeEdges (_,_) = ()
         
-      and label2node (instn, a::b, lbl): G.node =
-        let
-          val inst = G.Table.look(instn, a)
-        in
-          (case inst of SOME (A.LABEL {assem, lab}) =>
-              (if lbl = lab then a else label2node (instn, b, lbl))
-            | SOME(_) => label2node (instn, b, lbl)
-            | NONE => ErrorMsg.impossible ("can't find label!")
-          )
-        end
-       | label2node(_) = ErrorMsg.impossible ("can't find label!")
-
-      val _ = makeEdges(instn, nodelist)
+      val _ = makeEdges(instmap, nodelist)
   in
     (Flow.FGRAPH {control=g, def=def, use=use, ismove=ismove}, nodelist)
   end
