@@ -52,7 +52,11 @@ struct
       fun getList(table, node) = case G.Table.look(table, node) of 
                         SOME templist => templist
                       | NONE => []
-      fun live(node, ins, outs) =
+                      
+      val liveins = map (fn _ => []) nodelist
+      val liveouts = map (fn _ => []) nodelist
+      
+      fun live(node, ins : Temp.temp list, outs : Temp.temp list) =
         let
           val defTemps = getList(def, node)
           val usedTemps = getList(use, node)
@@ -74,24 +78,25 @@ struct
               foldr (fn (sucnode, list) => 
                       case find(sucnode, nodelist, 0) of
                         SOME index => 
-                          tempSet.listItems(tempSet.union (makeSet(list), makeSet(List.nth(ins, index))))
+                          tempSet.listItems(tempSet.union (makeSet(list), makeSet(List.nth(liveins, index))))
                       | NONE => list
-                    ) sucNodes []
+                    ) [] sucNodes
             end
         
         in
           (ins', outs')
         end
       
-      val liveins = map (fn _ => []) nodelist
-      val liveouts = map (fn _ => []) nodelist
-      
-      fun calcLive(inlist, outlist) =
+      fun calcLive(inlist: Temp.temp list list, outlist: Temp.temp list list) =
         let
-          val newstuff = foldr (fn (n, ins, outs) => (n, live(n, ins, outs))) 
-                                [] ListPair.zip(nodelist, ListPair.zip(inlist, outlist))
+          val inouts1 = ListPair.zip(inlist, outlist)
+          val oldlist: (G.node* (Temp.temp list* Temp.temp list)) list = ListPair.zip(nodelist, inouts1)
+          
+          val newstuff = List.foldr (fn ((n, (iii, ooo)), list) => (n, live(n, iii, ooo))::list)
+                                [] oldlist
           val (n, inouts) = ListPair.unzip(newstuff)
           val (newinlist, newoutlist) = ListPair.unzip(inouts)
+          
           fun listcomp(i1, i2) = List.all (fn (a, b) => a=b) (ListPair.zip(i1, i2))
           fun listlistcomp(l1, l2) = List.all (fn (i1, i2) => listcomp(i1, i2)) (ListPair.zip(l1,l2))
           val continue = (listlistcomp(inlist, newinlist) andalso listlistcomp(outlist, newoutlist))
@@ -102,7 +107,7 @@ struct
             (newinlist, newoutlist)
         end
       
-      fun fillMappings(fnodemap, livemap, []) = (fnodemap, livemap)
+      (*fun fillMappings(fnodemap, livemap, []) = (fnodemap, livemap)
         | fillMappings(fnodemap, livemap, n::nlist) = 
             let
               val fnodemap' = G.Table.enter(fnodemap, n, liveout(n))
@@ -115,7 +120,7 @@ struct
         fillMappings(G.Table.empty : Temp.temp list G.Table.table,
                      G.Table.empty : liveSet G.Table.table,
                      nodelist)
-  
+  *)
     in
       (
         IGRAPH {
