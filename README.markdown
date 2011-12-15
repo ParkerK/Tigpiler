@@ -59,6 +59,9 @@ To Fix:
 
 5. Instruction Selection (11/21)  
 --------------------------------
+To Fix:  
+
++ Incorrect instructions used, ie 'LOAD' instead of 'lw'  
 
 6. Register Allocation (12/5)  
 -----------------------------
