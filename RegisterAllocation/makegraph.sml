@@ -58,6 +58,8 @@ struct
             )
           end
       
+      val ({instn, def, use, ismove}, nodelist) = initInstr(instrs)
+      
       fun makeEdges (instn, a::(b::c)) =
         let
           (* Get each instrucion *)
@@ -70,7 +72,7 @@ struct
               SOME (A.OPER {assem, dst, src, jump}) =>
               (case jump of 
                 SOME labellist =>
-                      app (fn label => G.mk_edge({from=a, to=label2node(instn, label)})) labellist
+                      app (fn label => G.mk_edge({from=a, to=label2node(instn, nodelist, label)})) labellist
                 | NONE => () )
             | SOME(_) => ()
             | NONE => ()
@@ -79,19 +81,20 @@ struct
             ())
         end
       
-        | makeEdges (_,_) = ()
+        | makeEdges (_) = ()
         
-      and label2node (instn, a::b): G.node =
+      and label2node (instn, a::b, lbl): G.node =
         let
           val inst = G.Table.look(instn, a)
         in
-          (case inst of SOME (A.LABEL {assem, lab}) => a
-            | SOME(_) => label2node (instn, b)
+          (case inst of SOME (A.LABEL {assem, lab}) =>
+              (if lbl = lab then a else label2node (instn, b, lbl))
+            | SOME(_) => label2node (instn, b, lbl)
             | NONE => ErrorMsg.impossible ("can't find label!")
           )
         end
+       | label2node(_) = ErrorMsg.impossible ("can't find label!")
 
-      val ({instn, def, use, ismove}, nodelist) = initInstr(instrs)
       val _ = makeEdges(instn, nodelist)
   in
     (Flow.FGRAPH {control=g, def=def, use=use, ismove=ismove}, nodelist)
