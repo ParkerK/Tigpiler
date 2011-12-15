@@ -51,7 +51,7 @@ struct
                          dst=[],jump=NONE})
 
     | munchStm(T.MOVE(T.MEM(e1),T.MEM(e2))) =
-        emit(A.OPER{assem="move (`s0],  M[`s1)\n",
+        emit(A.OPER{assem="move (`s0),  (`s1)\n",
                     src=[munchExp e1, munchExp e2],
                     dst=[], jump=NONE})
       
@@ -66,11 +66,12 @@ struct
                     dst=[], jump=NONE})
 
     | munchStm(T.MOVE(T.TEMP i, e2)) =
-        emit(A.OPER{assem="add  `d0, `s, r0\n",
-          src=[munchExp e2],
-          dst=[i], jump=NONE})
+        emit(A.MOVE{assem="move `d0, `s0\n",
+          src=munchExp e2,
+          dst=i})
 
-    | munchStm(T.LABEL lab) =
+	
+	| munchStm(T.LABEL lab) =
       emit(A.LABEL{assem=Symbol.name(lab) ^ ":\n", lab=lab})
       
     
@@ -97,9 +98,9 @@ struct
          src=munchArgs(0,args), dst=F.RA::F.ZERO::F.callersaves, jump=NONE})
      
     | munchStm (T.EXP exp) = (munchExp exp; ())
-    
-    
-    | munchStm(_) = emit(A.OPER{assem="bad munch stm! line 107", src=[], dst=[], jump=NONE})
+	| munchStm (T.JUMP a) =   emit(A.OPER{assem="JUMP : bad munch stm! line 107", src=[], dst=[], jump=NONE})
+	| munchStm (T.MOVE a) =	emit(A.OPER{assem="MOVE : bad munch stm! line 107", src=[], dst=[], jump=NONE})
+    (*| munchStm(_) = emit(A.OPER{assem="bad munch stm! line 107", src=[], dst=[], jump=NONE})*)
 
     and munchArgs(i,[]) = []
       | munchArgs(i,eh::et) =
