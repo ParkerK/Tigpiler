@@ -99,28 +99,26 @@ struct
           
           fun listcomp(i1, i2) = List.all (fn (a, b) => a=b) (ListPair.zip(i1, i2))
           fun listlistcomp(l1, l2) = List.all (fn (i1, i2) => listcomp(i1, i2)) (ListPair.zip(l1,l2))
-          val continue = (listlistcomp(inlist, newinlist) andalso listlistcomp(outlist, newoutlist))
+          val stop = (listlistcomp(inlist, newinlist) andalso listlistcomp(outlist, newoutlist))
         in
-          if continue then
-            calcLive(newinlist, newoutlist)
-          else
+          if stop then
             (newinlist, newoutlist)
+          else
+            calcLive(newinlist, newoutlist)
         end
-      
-      fun fillMappings(fnodemap, livemap, []) = (fnodemap, livemap)
-        | fillMappings(fnodemap, livemap, n::nlist) = 
-            let
-              val (inl, outl) = calcLive(liveins, liveouts)
-              val fnodemap' = G.Table.enter(fnodemap, n, outl)
-              val livemap' = G.Table.enter(livemap, n, makeLiveSet(inl))
-            in
-              fillMappings(fnodemap', livemap', nlist)
-            end
+            
+      fun fillMappings() = 
+        let
+          val (inl, outl) = calcLive(liveins, liveouts)
+          val l1 = ListPair.zip(nodelist, inl)
+          val l2 = ListPair.zip(nodelist, outl)
+          val fnodemap = foldr (fn ((n,l),t)=> G.Table.enter(t, n, l)) G.Table.empty l2
+          val livemap = foldr (fn ((n,l),t)=> G.Table.enter(t, n, makeLiveSet(l))) G.Table.empty l1
+        in
+          (fnodemap, livemap)
+        end
         
-      val (fnodeToTemps, globalLiveMap) = 
-        fillMappings(G.Table.empty : Temp.temp list G.Table.table,
-                     G.Table.empty : liveSet G.Table.table,
-                     nodelist)
+      val (fnodeToTemps, globalLiveMap) = fillMappings()
   
     in
       (
