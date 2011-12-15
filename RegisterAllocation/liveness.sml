@@ -20,8 +20,12 @@ struct
                 (* node to *)
   type liveSet = unit Temp.Table.table * temp list
   type liveMap = liveSet Flow.Graph.Table.table
-  struct G = FLOW.Graph
-    
+  structure G = FLOW.Graph
+  (*http://www.smlnj.org/doc/smlnj-lib/Manual/list-set-fn.html*)
+  structure tempSet = ListSetFn(struct
+                                  type ord_key = Temp.temp
+                                  val compare  = Int.compare
+                                  end)  
   fun interferenceGraph ({control, def, use, ismove}, node::nodelist) = 
     let
       val igraph = Graph.newGraph()
@@ -34,9 +38,11 @@ struct
         val usedTemps = G.Table.look(use, node)
         val defTemps = G.Table.look(def, node)
         val outTemps = liveout(node)
+
+         
       in 
         (case usedTemps of NONE => ()
-          | SOME (temp list) => 
+          | SOME (temp list) => usedTemps @ (min)
           )
       end
       
