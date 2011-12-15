@@ -46,7 +46,7 @@ struct
             in
               app (fn livetemp =>
                     (Temp.Table.enter(tempTable, livetemp, ());
-                    tempList := tempList @ livetemp)
+                    tempList := tempList @ [livetemp])
                   ) livetemplist;
               (tempTable, tempList)
             end
