@@ -45,7 +45,7 @@ struct
               val tempList = []
             in
               app (fn livetemp =>
-                    (Temp.Table.enter(tempTable, temp, ());
+                    (Temp.Table.enter(tempTable, livetemp, ());
                     tempList := tempList @ livetemp)
                   ) livetemplist;
               (tempTable, tempList)
@@ -91,7 +91,7 @@ struct
         IGRAPH {
                 graph = igraph, 
                 tnode = fn _ => Graph.newNode(igraph), 
-                gtemp = fn _ => Temp.newTemp(),
+                gtemp = fn _ => Temp.newtemp(),
                 moves = []
                 }
       )
