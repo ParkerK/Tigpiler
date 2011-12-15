@@ -40,55 +40,55 @@ struct
         | makeSet (_) = tempSet.empty
       
       fun makeLiveSet(livetemplist : Temp.temp list) = 
+        let
+          val tempTable = Temp.Table.empty
+          val tempList = []
+          
+          fun genLiveSet(ttbl, tlist, temp::templist) =
             let
-              val tempTable = Temp.Table.empty
-              val tempList = []
-              
-              fun genLiveSet(ttbl, tlist, temp::templist) =
-                let
-                  val ttbl' = Temp.Table.enter(ttbl, temp, ())
-                  val tlist' = temp::tlist
-                in
-                  genLiveSet(ttbl', tlist', templist)
-                end
-              |  genLiveSet(ttbl, tlist, []) = (ttbl, tlist)
+              val ttbl' = Temp.Table.enter(ttbl, temp, ())
+              val tlist' = temp::tlist
             in
-              genLiveSet(tempTable, tempList, livetemplist)
+              genLiveSet(ttbl', tlist', templist)
             end
-        | makeLiveSet(_) = (Temp.Table.empty, [])
+          |  genLiveSet(ttbl, tlist, []) = (ttbl, tlist)
+        in
+          genLiveSet(tempTable, tempList, livetemplist)
+        end
+      | makeLiveSet(_) = (Temp.Table.empty, [])
         
       fun livein(node) : Temp.temp list =
-      let
-        val usedTemps = case G.Table.look(use, node) of 
-                          SOME templist => templist
-                        | NONE => []
-        val defTemps = case G.Table.look(def, node) of 
-                          SOME templist => templist
-                        | NONE => []
-        val outTemps = liveout(node)
-      in 
-        tempSet.listItems(
-          tempSet.union(
-            makeSet(usedTemps),
-            tempSet.difference( makeSet(outTemps), makeSet(defTemps) )
-          ))
-      end
+        let
+          val usedTemps = case G.Table.look(use, node) of 
+                            SOME templist => templist
+                          | NONE => []
+          val defTemps = case G.Table.look(def, node) of 
+                            SOME templist => templist
+                          | NONE => []
+          val outTemps = liveout(node)
+        in 
+          tempSet.listItems(
+            tempSet.union(
+              makeSet(usedTemps),
+              tempSet.difference( makeSet(outTemps), makeSet(defTemps) )
+            ))
+        end
       
       and liveout(node) : Temp.temp list = 
-      let
-        val outTemps = []
-        val sucTemps = G.succ(node)
-      in
-        (
-          app (fn suc =>
-            (app (fn outtemp => 
-                    if (List.exists (fn item => G.eq(item, outtemp)) outTemps) then ()
-                      else outTemps := outTemps @ [outtemp]) 
-                  (livein(suc))))
-            sucTemps;
-          outTemps
-        )
-      end
+        let
+          val outTemps = []
+          val sucTemps = G.succ(node)
+        in
+          (
+            app (fn suc =>
+              (app (fn outtemp => 
+                      if (List.exists (fn item => G.eq(item, outtemp)) outTemps) then ()
+                        else outTemps := outTemps @ [outtemp]) 
+                    (livein(suc))))
+              sucTemps;
+            outTemps
+          )
+        end
     in
       (
         app (fn node => 
