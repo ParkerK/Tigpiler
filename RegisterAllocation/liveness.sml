@@ -50,8 +50,7 @@ struct
               tempSet.union(
                 makeSet(usedTemps),
                 tempSet.difference( makeSet(outTemps), makeSet(defTemps) )
-              )
-            ))
+              )))
           )
       end
       
