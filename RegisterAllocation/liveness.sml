@@ -90,9 +90,10 @@ struct
         let
           val newstuff = foldr (fn (n, ins, outs) => (n, live(n, ins, outs))) 
                                 [] ListPair.zip(nodelist, ListPair.zip(inlist, outlist))
-          val (_,(newinlist, newoutlist)) = ListPair.unzip(ListPair.unzip(newstuff))
-          fun listcomp(i1, i2) = List.all (fn (a, b) => a=b) ListPair.zip(i1, i2)
-          fun listlistcomp(l1, l2) = List.all (fn (i1, i2) => listcomp(i1, i2)) ListPair.zip(l1,l2)
+          val (n, inouts) = ListPair.unzip(newstuff)
+          val (newinlist, newoutlist) = ListPair.unzip(inouts)
+          fun listcomp(i1, i2) = List.all (fn (a, b) => a=b) (ListPair.zip(i1, i2))
+          fun listlistcomp(l1, l2) = List.all (fn (i1, i2) => listcomp(i1, i2)) (ListPair.zip(l1,l2))
           val continue = (listlistcomp(inlist, newinlist) andalso listlistcomp(outlist, newoutlist))
         in
           if continue then
