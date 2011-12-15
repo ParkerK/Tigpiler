@@ -1,25 +1,26 @@
 signature LIVENESS =
 sig
-  datatype igraph = IGRAPH of {graph: Graph.graph, 
-                               tnode: Temp.temp -> Graph.node,
-                               gtemp: Graph.node -> Temp.temp,
-                               moves: (Graph.node * Graph.node) list}
+  structure G : GRAPH
+  datatype igraph = IGRAPH of {graph: G.graph, 
+                               tnode: Temp.temp -> G.node,
+                               gtemp: G.node -> Temp.temp,
+                               moves: (G.node * G.node) list}
   
-  val interferenceGraph : Flow.flowgraph * Flow.Graph.node list -> 
-                            igraph * (Flow.Graph.node -> Temp.temp list)
+  val interferenceGraph : Flow.flowgraph * G.node list -> 
+                            igraph * (G.node -> Temp.temp list)
   
   val show : TextIO.outstream * igraph -> unit
 end
 structure Liveness : LIVENESS =
 struct
-  datatype igraph = IGRAPH of {graph: Graph.graph, 
-                               tnode: Temp.temp -> Graph.node,
-                               gtemp: Graph.node -> Temp.temp,
-                               moves: (Graph.node * Graph.node) list}
+  structure G = Flow.Graph
+  datatype igraph = IGRAPH of {graph: G.graph, 
+                               tnode: Temp.temp -> G.node,
+                               gtemp: G.node -> Temp.temp,
+                               moves: (G.node * G.node) list}
 
   type liveSet = unit Temp.Table.table * Temp.temp list
-  type liveMap = liveSet Flow.Graph.Table.table
-  structure G = Flow.Graph
+  type liveMap = liveSet G.Table.table
   (*http://www.smlnj.org/doc/smlnj-lib/Manual/list-set-fn.html*)
   structure tempSet = ListSetFn(struct
                                   type ord_key = Temp.temp
@@ -27,10 +28,10 @@ struct
                                   end)  
   fun interferenceGraph ({control, def, use, ismove}, nodelist) = 
     let
-      val igraph = Graph.newGraph()
-      val tnode = Graph.node Temp.Table.table
-      val gtemp = Temp.temp Graph.Table.table
-      val fnodeToTemps = Temp.temp list Graph.Table.table
+      val igraph = G.newGraph()
+      val tnode = Temp.Table.empty : G.node Temp.Table.table
+      val gtemp = G.Table.empty : Temp.temp G.Table.table
+      val fnodeToTemps = G.Table.empty : Temp.temp list G.Table.table
       
       val globalliveMap = G.Table.empty : liveSet G.Table.table
       val moves = []
@@ -67,7 +68,7 @@ struct
           )
       end
       
-      fun liveout(node) = 
+      and liveout(node) = 
       let
         val outTemps = []
         val sucTemps = G.succ(control, node)
