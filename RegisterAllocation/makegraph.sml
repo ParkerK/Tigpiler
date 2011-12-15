@@ -91,7 +91,7 @@ struct
         in
           (case inst of SOME (A.LABEL {assem, lab}) => a
             | SOME(_) => label2node (instn, b)
-            | NONE => raise ErrMsg ("can't find label!")
+            | NONE => raise ErrorMsg.Error ("can't find label!")
           )
         end
 
