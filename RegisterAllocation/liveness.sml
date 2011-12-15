@@ -148,6 +148,8 @@ struct
               ) (getList(def, n))
           | NONE => ErrorMsg.impossible("can't find node in live map!")
         ) nodelist
+      
+      val _ = makeEdges()
     in
       (
         IGRAPH {
