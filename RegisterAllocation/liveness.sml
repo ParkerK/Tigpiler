@@ -17,9 +17,9 @@ struct
                                gtemp: IGraph.node -> Temp.temp,
                                moves: (IGraph.node * IGraph.node) list}
 
-  type liveSet = unit Temp.Table.table * temp list
+  type liveSet = unit Temp.Table.table * Temp.temp list
   type liveMap = liveSet Flow.Graph.Table.table
-  structure G = FLOW.Graph
+  structure G = Flow.Graph
   (*http://www.smlnj.org/doc/smlnj-lib/Manual/list-set-fn.html*)
   structure tempSet = ListSetFn(struct
                                   type ord_key = Temp.temp
@@ -58,10 +58,10 @@ struct
         val outTemps = liveout(node)
       in 
         (case usedTemps of NONE => ()
-          | SOME (temp list) =>
+          | SOME templist =>
             (tempSet.listItems(
               tempSet.union(
-                makeSet(usedTemps),
+                makeSet(templist),
                 tempSet.difference( makeSet(outTemps), makeSet(defTemps) )
               )))
           )
