@@ -19,7 +19,7 @@ struct
 
   type liveSet = unit Temp.Table.table * temp list
   type liveMap = liveSet Flow.Graph.Table.table
-  structure G = FLOW.Graph
+  structure G = Flow.Graph
   (*http://www.smlnj.org/doc/smlnj-lib/Manual/list-set-fn.html*)
   structure tempSet = ListSetFn(struct
                                   type ord_key = Temp.temp
