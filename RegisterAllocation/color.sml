@@ -33,13 +33,17 @@ struct
     val Liveness.IGRAPH {graph, tnode, gtemp, moves} = interference
     val nodes = G.nodes (graph)
     val nodeSet = Set.addList(Set.empty, (map gtemp (nodes)))
-    val colorables = Set.addList(Set.empty, 
-                (map gtemp (nodes)))
+    val colorPalette = Set.addList(Set.empty, Frame.colorable)
+    val colorTable = ref Temp.Table.empty
+    val coloredNodes = ref Set.empty
+  	val regColorMap = ref initial : allocation ref
+    
                 
-    fun numColorables () = Set.numItems(colorables)
+    fun numColorables () = Set.numItems(colorPalette)
                 
     fun neighbors(node) = List.length(G.adj(node))
-    
+  	fun temp2reg(temp) = valOf(Temp.Table.look(Frame.tempMap,temp))
+    fun finalRegs () = !regColorMap
     fun popNode(node) =
     let
       val preds = G.pred(node)
@@ -75,14 +79,32 @@ struct
     end
     
     fun colorNode (node) =
-    
-    let
-      val neighbors = G.adj (node)
-    in
-      ()
-    end
+      let
+        val validcolors = ref colorPalette
+        val neighbors = G.adj (node)      
+        fun rmC([]) = ()
+        | rmC(n::ns) = (
+          (if Set.member((!coloredNodes),n) then
+            (validcolors := Set.delete((!validcolors),valOf(Temp.Table.look((!colorTable),n))))
+          else ());
+          rmC(ns))
       
-    fun colorMap (ltk, gtk) =
+      in (
+        if Set.isEmpty((!validcolors)) then
+          (spill())
+        else
+          let
+            val color = hd((Set.listItems((!validcolors))))
+            val node' = gtemp node
+          in (
+            coloredNodes := Set.add((!coloredNodes),  node');
+            regColorMap := Temp.Table.enter((!regColorMap),  node', temp2reg(color));
+            colorTable := Temp.Table.enter((!colorTable),  node', color))
+          end
+          )
+      end
+      
+    fun colorTable (ltk, gtk) =
       let 
         fun isEmpty (s) = Set.isEmpty(s)
       in (
@@ -101,18 +123,16 @@ struct
               val remaining = Set.delete(remaining, head)
               val (newltk, newgtk) = sortNodes(remaining)
             in
-              colorMap(newltk,newgtk)
+              colorTable(newltk,newgtk)
             end )
             )
           )
         end
         
   val (under_k, above_k) = sortNodes (nodeSet) 
-   
+  val _ =  colorTable (under_k, above_k) 
   in
-    (*colorMap (under_k, above_k)*)
-    (initial, Set.listItems(colorables))
-    
+    (finalRegs(),[])    
   end 
   
 end
