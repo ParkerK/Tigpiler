@@ -103,8 +103,8 @@ struct
                 val reg = "`a" ^ int (i-1)
                 val r = List.nth(F.argregs,(i-1))
             in            
-                (emit(A.OPER{assem="addi " ^ reg ^ ", `s0, 0\n",
-                 src=[munchExp eh], dst=[r], jump=NONE});
+                (emit(A.MOVE{assem="move " ^ reg ^ ", (`s0+0)\n",
+                 src=munchExp eh, dst=r});
                  r::munchArgs(i+1,et))
             end       
         else
