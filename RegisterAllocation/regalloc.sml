@@ -8,7 +8,7 @@ sig
                   
 end
 
-structure RegAlloc :> REGALLOC = 
+structure RegAlloc :> REG_ALLOC = 
 struct
   structure Frame : FRAME = MipsFrame
   fun alloc(instrs, frame) = 
