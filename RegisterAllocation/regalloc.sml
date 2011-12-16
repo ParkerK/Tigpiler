@@ -19,7 +19,7 @@ struct
       val allocation = Frame.tempMap
       val reglist = Frame.registers
       val (newalloc, templist) = 
-        Color.color {intereference = igraph,
+        Color.color {interference = igraph,
                     initial = allocation,
                     spillCost = (fn node => 0),
                     registers = reglist}
