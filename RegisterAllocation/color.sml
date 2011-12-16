@@ -40,18 +40,17 @@ struct
       val succs = G.succ(node)
     in
       (
-      popPred(preds, node);
-      popSucc(succs, node)
+        popPred(preds, node);
+        popSucc(succs, node)
       )
     end
     
     and popPred (n::nt, node) =
-        (G.rm_egde{from=n, to=node}; popEdge(nt, node)) 
-    | popPred([], _) = ()
-    
+          (G.rm_egde{from=n, to=node}; popEdge(nt, node)) 
+        | popPred([], _) = ()
     and popSucc (n::nt, node) = 
-    (G.rm_edge{from=node, to=n}; popSucc(nt, node))
-    | popSucc([], _) = ()
+          (G.rm_edge{from=node, to=n}; popSucc(nt, node))
+        | popSucc([], _) = ()
     
     
   in
