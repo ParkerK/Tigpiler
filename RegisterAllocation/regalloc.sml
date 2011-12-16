@@ -11,6 +11,8 @@ end
 structure RegAlloc :> REG_ALLOC = 
 struct
   structure Frame : FRAME = MipsFrame
+  type allocation = Frame.register Temp.Table.table
+  
   fun alloc(instrs, frame) = 
     let
       val (fgraph, nodelist) = Makegraph.instrs2graph(instrs)
