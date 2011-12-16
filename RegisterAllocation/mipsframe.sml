@@ -66,9 +66,6 @@ struct
       (fn ((key, value), table) => Temp.Table.enter(table, key, value))
         Temp.Table.empty
           (ListPair.zip(registerTemps, registers))
-
-  fun string(l,s) = 
-      (Symbol.name(l) ^ ": .asciiz \"" ^ s ^ "\"\n")
       
   val calldefs = callersaves @ [RA, RV]
   fun newFrame({name, formals}) = {name=name, formals=formals, locals=ref 0}
