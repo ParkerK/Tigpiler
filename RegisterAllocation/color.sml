@@ -1,14 +1,19 @@
 (* Page 253 *)
-signature REG_ALLOC = 
+signature COLOR = 
 sig
   structure Frame : FRAME
+  
   type allocation = Frame.register Temp.Table.table
-  val alloc : Assem.instr list * Frame.frame ->
-                    Assem.instr list * allocation
+  
+  val color : {intereference: Liveness.igraph,
+              initial: allocation,
+              spillCOst: Graph.node -> int,
+              registers: Frame.register list}
+              -> allocation * Temp.temp list
                   
 end
 
-structure RegAlloc :> REGALLOC = 
+structure Color :> COLOR =
 struct
 
 end
