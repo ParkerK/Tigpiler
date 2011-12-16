@@ -83,30 +83,29 @@ struct
     end
       
     fun colorMap (ltk, gtk) =
-        let 
-          fun isEmpty (s) = Set.isEmpty(s)
-  	    in
-  		    (
-          if (isEmpty ltk andalso isEmpty gtk)
-            then () (* done *)
-  		    else 
-            (if (isEmpty ltk ) then 
-  			       spill() (* we'll need to spill registers *)
-  		       else 
-  			   (let 
-             val head = hd(Set.listItems(ltk))
-             val node = tnode head
-  				   val _ = colorNode node 
-  				   val _ = popNode node
-  				   val remaining = Set.union(ltk, gtk)
-             val remaining = Set.delete(remaining, head)
-  				   val (newltk, newgtk) = sortNodes(remaining)
-  			    in
-  				    colorMap(newltk,newgtk)
-  			    end)
+      let 
+        fun isEmpty (s) = Set.isEmpty(s)
+      in (
+        if (isEmpty ltk andalso isEmpty gtk)
+          then () (* done *)
+        else (
+          if (isEmpty ltk ) then 
+            spill() (* we'll need to spill registers *)
+          else (
+            let 
+              val head = hd(Set.listItems(ltk))
+              val node = tnode head
+              val _ = colorNode node 
+              val _ = popNode node
+              val remaining = Set.union(ltk, gtk)
+              val remaining = Set.delete(remaining, head)
+              val (newltk, newgtk) = sortNodes(remaining)
+            in
+              colorMap(newltk,newgtk)
+            end )
+            )
           )
-          )
-  	    end
+        end
         
   val (under_k, above_k) = sortNodes (nodeSet) 
    
