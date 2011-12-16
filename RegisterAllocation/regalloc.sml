@@ -29,11 +29,9 @@ struct
     
       (* null l
         returns true if the list l is empty. *)
-	     val didSpill = List.null (spilllistx)
+	     val didSpill = List.null (spilllist)
      in
-		   if didSpill then
-         ()
-      else
-        (instrs, newalloc)
+       (* No spills *)
+       (instrs, newalloc)
     end
 end

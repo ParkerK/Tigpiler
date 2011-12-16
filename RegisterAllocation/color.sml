@@ -20,19 +20,20 @@ struct
   structure Frame : FRAME = MipsFrame
   
   type allocation = Frame.register Temp.Table.table
-  
+  val didSpill = ref false
   structure Set = ListSetFn(struct
                             type ord_key = Temp.temp
                             val compare  = Int.compare
                             end)
                             
-  exception Spilled
-  fun spill() = raise Spilled
+ 							
+  fun spill() = (print "Spilling!"; didSpill := true)
   fun color {interference, initial : allocation, spillCost : Graph.node -> int, registers : Frame.register list} = 
   let
     val Liveness.IGRAPH {graph, tnode, gtemp, moves} = interference
     val nodes = G.nodes (graph)
     val nodeSet = Set.addList(Set.empty, (map gtemp (nodes)))
+	val spillSet = Set.addList(Set.empty, (map gtemp (nodes))) (* If we spill, we spill EVERYTHING *)
     val colorPalette = Set.addList(Set.empty, Frame.colorable)
     val colorTable = ref Temp.Table.empty
     val coloredNodes = ref Set.empty
@@ -131,9 +132,11 @@ struct
         
   val (under_k, above_k) = sortNodes (nodeSet) 
   val _ =  colorTable (under_k, above_k)
+  val returnSpills = [];
   
   in
-    (finalRegs(),[])    
+	 if !didSpill then returnSpills = [] else returnSpills = Set.listItems(spillSet);
+    (finalRegs(),returnSpills)    
   end 
   
 end
