@@ -80,7 +80,7 @@ structure Translate : TRANSLATE = struct
   fun allocLocal(Top) = raise Impossible ("can't allocate a local variable at the top most scope")
     | allocLocal(l as Level({frame, parent}, uref)) = (fn(b) => (l,Frame.allocLocal(frame)(b)))
   
-  fun seq([]) = T.LABEL(Temp.newlabel())
+  fun seq([]) = T.EXP (T.CONST 0)
     | seq([s]) = s
     | seq(h::t) = T.SEQ(h,seq(t))
     
