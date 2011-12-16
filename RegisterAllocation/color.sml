@@ -36,7 +36,7 @@ struct
                 
     fun numColorables () = Set.numItems(colorables)
                 
-    fun neighbors(node) = List.length(G.adj(nodes))
+    fun neighbors(node) = List.length(G.adj(node))
     
     fun popNode(node) =
     let
