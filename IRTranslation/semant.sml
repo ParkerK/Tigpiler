@@ -259,7 +259,15 @@ structure Semant :> SEMANT = struct
 
       | trexp (A.LetExp {decs, body, pos}) =
           let
-            val ({tenv=tenv', venv=venv'}, decList) = transDecs(venv,tenv,decs, break, [], level)
+            val ({tenv=tenv', venv=venv'}, decList, _) =
+              foldr (fn (dec, ({venv=v, tenv=t}, e, l)) => 
+                let 
+                  val ({venv=venv', tenv=tenv'}, explist', level') = transDec(v, t, dec, break, e, l)
+                in 
+                  ({venv=venv', tenv=tenv'}, explist', level')
+                end
+              )
+              ({venv=venv, tenv=tenv}, [], level) decs
             val _ = print ("--let exp, before "^Int.toString(List.length(decs))^" decs \n")
             val _ = print ("--let exp, after "^Int.toString(List.length(decList))^" decs \n")
             val {exp=bodyExp, ty=bodyTy} = transExp (venv',tenv', break, level) body
@@ -384,22 +392,6 @@ structure Semant :> SEMANT = struct
         in
           ({venv=venv',tenv=tenv}, explist', level)
         end
-        
-    and transDecs (venv, tenv, decs, break, explist, level) =
-      (*foldr (fn (dec, ({venv=v, tenv=t}, e, l)) => 
-        let val ({venv=venv', tenv=tenv'}, explist', level') =transDec(v, t, dec, break, e, l)
-        in 
-          ({venv=venv', tenv=tenv'}, explist')
-        end
-      )
-      ({venv=venv, tenv=tenv}, explist, level) decs*)
-    (case decs of
-          [] => ({venv=venv, tenv=tenv}, explist)
-        | (d::ds) => let 
-                      val ({venv=venv', tenv=tenv'}, explist', level') = transDec(venv, tenv, d, break, explist, level) (*NONE = break?*)
-                    in
-                      transDecs(venv', tenv', ds, break, explist', level)
-                    end)
     
     fun transProg(exp) =
       let
