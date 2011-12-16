@@ -130,7 +130,8 @@ struct
         end
         
   val (under_k, above_k) = sortNodes (nodeSet) 
-  val _ =  colorTable (under_k, above_k) 
+  val _ =  colorTable (under_k, above_k)
+  
   in
     (finalRegs(),[])    
   end 
