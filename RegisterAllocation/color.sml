@@ -25,7 +25,9 @@ struct
                             type ord_key = Temp.temp
                             val compare  = Int.compare
                             end)
-  
+                            
+  exception Spilled
+  fun spill() = raise Spilled
   fun color {interference, initial : allocation, spillCost : Graph.node -> int, registers : Frame.register list} = 
   let
   	val Liveness.IGRAPH {graph, tnode, gtemp, moves} = interference
@@ -72,11 +74,40 @@ struct
       )
     end
     
-    (*fun colorMap (ltk, gtk) =
+    fun colorNode (node) =
+    
+    let
+      val neighbors = G.adj (node)
+    in
+      ()
+    end
+      
+    fun colorMap (ltk, gtk) =
         let 
-          val numLess     = 
-          val numGreater  =
-        *)
+          fun isEmpty (s) = Set.isEmpty(s)
+  	    in
+  		    (
+          if (isEmpty ltk andalso isEmpty gtk)
+            then () (* done *)
+  		    else 
+            (if (isEmpty ltk ) then 
+  			       spill() (* we'll need to spill registers *)
+  		       else 
+  			   (let 
+             val head = hd(Set.listItems(ltk))
+             val node = tnode head
+  				   val _ = colorNode node 
+  				   val _ = popNode node
+  				   val remaining = Set.union(ltk, gtk)
+             val remaining = Set.delete(remaining, head)
+  				   val (newltk, newgtk) = sortNodes(remaining)
+  			    in
+  				    colorMap(newltk,newgtk)
+  			    end)
+          )
+          )
+  	    end
+        
   val (under_k, above_k) = sortNodes (nodeSet) 
    
   in
