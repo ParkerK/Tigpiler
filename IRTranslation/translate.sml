@@ -80,13 +80,13 @@ structure Translate : TRANSLATE = struct
   fun allocLocal(Top) = raise Impossible ("can't allocate a local variable at the top most scope")
     | allocLocal(l as Level({frame, parent}, uref)) = (fn(b) => (l,Frame.allocLocal(frame)(b)))
   
-  fun seq([]) = T.LABEL(Temp.newlabel())
+  fun seq([]) = T.EXP (T.CONST 0)
     | seq([s]) = s
     | seq(h::t) = T.SEQ(h,seq(t))
     
   fun unEx(Ex e) = e
     | unEx(Cx genstm) =
-        let 
+        let
           val r = Temp.newtemp()
           val t = Temp.newlabel() and f = Temp.newlabel()
         in
@@ -269,13 +269,10 @@ structure Translate : TRANSLATE = struct
     fun letExp ([], body) = body
       | letExp (decs, body) = Ex (T.ESEQ (seq (map unNx decs), unEx body))
     
-    fun seqExp(exps) =   
-      let
-        val firsts = List.rev(List.tl(List.rev exps))
-        val last = List.last exps
-      in
-        Ex(T.ESEQ(seq(map unNx firsts),unEx last))
-      end
+    fun seqExp [] = Ex (T.CONST 0)
+      | seqExp [exp] = exp
+      | seqExp (exp :: exps) =
+          Ex (T.ESEQ (unNx exp, unEx (seqExp exps)))
     
     fun leveleq (Level(_,uref1),Level(_,uref2)) = uref1=uref2
       | leveleq (_,_) = false
