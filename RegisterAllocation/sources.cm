@@ -3,6 +3,7 @@ Group is
 absyn.sml
 assem.sml
 canon.sml
+color.sml
 env.sml
 errormsg.sml
 findescape.sml
