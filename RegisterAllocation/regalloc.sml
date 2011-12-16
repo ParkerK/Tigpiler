@@ -8,7 +8,7 @@ sig
                   
 end
 
-structure RegAlloc :> REG_ALLOC = 
+structure RegAlloc : REG_ALLOC = 
 struct
   structure Frame : FRAME = MipsFrame
   type allocation = Frame.register Temp.Table.table
