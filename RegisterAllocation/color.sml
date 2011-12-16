@@ -31,7 +31,11 @@ struct
   let
     val nodes = G.nodes (graph)
     val nodeSet = Set.addList(Set.empty, (map gtemp (nodes)))
-    
+    val colorables = Set.addList(Set.empty, 
+                (map gtemp (nodes)))
+                
+    fun numColorables () => Set.numItems(colorables)
+                
     fun neighbors(node) = List.length(G.adj(nodes))
     
     fun popNode(node) =
@@ -52,6 +56,24 @@ struct
           (G.rm_edge{from=node, to=n}; popSucc(nt, node))
         | popSucc([], _) = ()
     
+    fun sortNodes (nodes) =
+    (* filter f se
+    creates a new set containing only those elements of se that satisfy the predicate f. This is equivalent to:
+    
+    List.foldl add' empty (List.filter f (listItems se))   *)
+    
+    let
+      val lt = (fn (n) => (neighbors(tnode n) < numColorables ()  ))
+      val gte = (fn (n) => (neighbors (tnode n) >= numColorables () ))
+    in
+      ( 
+        (Set.filter lt nodes),
+        Set.filter gte nodes)
+      )
+    end
+    
+ 
+
     
   in
     body
