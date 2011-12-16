@@ -17,7 +17,6 @@ structure Color :> COLOR =
 struct
   
   structure G = Liveness.Graph
-  structure IGraph = Liveness.IGRAPH
   structure Frame : FRAME = MipsFrame
   
   type allocation = Frame.register Temp.Table.table
