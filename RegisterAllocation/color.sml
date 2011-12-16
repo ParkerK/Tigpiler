@@ -30,7 +30,7 @@ struct
   fun spill() = raise Spilled
   fun color {interference, initial : allocation, spillCost : Graph.node -> int, registers : Frame.register list} = 
   let
-  	val Liveness.IGRAPH {graph, tnode, gtemp, moves} = interference
+    val Liveness.IGRAPH {graph, tnode, gtemp, moves} = interference
     val nodes = G.nodes (graph)
     val nodeSet = Set.addList(Set.empty, (map gtemp (nodes)))
     val colorables = Set.addList(Set.empty, 
