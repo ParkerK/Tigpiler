@@ -44,7 +44,6 @@ struct
                 
     fun neighbors(node) = List.length(G.adj(node))
   	fun temp2reg(temp) = valOf(Temp.Table.look(Frame.tempMap,temp))
-    fun finalRegs () = !regColorMap
     fun popNode(node) =
     let
       val preds = G.pred(node)
@@ -136,7 +135,7 @@ struct
   
   in
 	 if !didSpill then returnSpills = [] else returnSpills = Set.listItems(spillSet);
-    (finalRegs(),returnSpills)    
+    (!regColorMap,returnSpills)    
   end 
   
 end
