@@ -260,8 +260,6 @@ structure Semant :> SEMANT = struct
             val (venv', tenv', decList, _) =
               foldr (fn (dec, (v, t, e, l)) => transDec(v, t, dec, break, e, l))
                 (venv, tenv, [], level) decs
-            val _ = print ("--let exp, before "^Int.toString(List.length(decs))^" decs \n")
-            val _ = print ("--let exp, after "^Int.toString(List.length(decList))^" decs \n")
             val {exp=bodyExp, ty=bodyTy} = transExp (venv',tenv', break, level) body
           in
             {exp=Tr.letExp(decList,bodyExp), ty=bodyTy}
