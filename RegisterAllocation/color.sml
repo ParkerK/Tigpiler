@@ -7,7 +7,7 @@ sig
   
   val color : {intereference: Liveness.igraph,
               initial: allocation,
-              spillCOst: Graph.node -> int,
+              spillCost: Graph.node -> int,
               registers: Frame.register list}
               -> allocation * Temp.temp list
                   
