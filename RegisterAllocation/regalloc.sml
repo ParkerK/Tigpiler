@@ -10,13 +10,20 @@ end
 
 structure RegAlloc :> REGALLOC = 
 struct
-
-  fun alloc(list, frame) = 
+  structure Frame : FRAME = MipsFrame
+  fun alloc(instrs, frame) = 
     let
       val (fgraph, nodelist) = Makegraph.instrs2graph(instrs)
       val (igraph, liveoutmapping) = Liveness.interferenceGraph(fgraph, nodelist)
       (*val _ = Liveness.show(out, igraph)*)
-      
+      val allocation = Frame.tempMap
+      val reglist = Frame.registers
+      val (newalloc, templist) = 
+        Color.color {intereference = igraph,
+                    initial = allocation,
+                    spillCost = (fn node => 0),
+                    registers = reglist}
     in
+      (instrs, newalloc)
     end
 end

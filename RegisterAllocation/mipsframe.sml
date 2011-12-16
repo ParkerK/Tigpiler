@@ -1,29 +1,75 @@
 structure MipsFrame : FRAME =
 struct
   type frame = {name: Temp.label, formals: bool list, locals: int ref}
-  type register = Temp.temp
-  datatype access = InFrame of int (*a memory location at offset x from FP*)
-                  | InReg of Temp.temp (*value held in register*)
+  type register = string
+  datatype access = InFrame of int (* a memory location at offset x from FP *)
+                  | InReg of Temp.temp (* value held in register *)
   datatype frag = PROC of {body: Tree.stm, frame: frame}
                 | STRING of Temp.label * string
-  
-  (*val tempMap = Temp.Table.table*)
-  
-  val ZERO = Temp.newtemp() (* r0, zero *)
-  val FP = Temp.newtemp()   (* Framepointer *)
-  val SP = Temp.newtemp()   (* Stackpointer *)
-  val RA = Temp.newtemp()   (* Return address *)
-  val RV = Temp.newtemp()   (* Return value *)
-  
   val wordsize = 4 (*bytes*)
-  
+
+  (* MIPS Registers : http://en.wikipedia.org/wiki/MIPS_architecture *)
+  val ZERO = Temp.newtemp() (* Zero *)
+  val AT = Temp.newtemp()   (* Assembler Temporary *)
+                            
+  val v0 = Temp.newtemp()   (* Return Values *)
+  val v1 = Temp.newtemp()   
+  val RV = v0
+                            
+  val a0 = Temp.newtemp()   (* Function Arguments *)
+  val a1 = Temp.newtemp()   
+  val a2 = Temp.newtemp()   
+  val a3 = Temp.newtemp()   
+                            
+  val t0 = Temp.newtemp()   (* Temporaries *)
+  val t1 = Temp.newtemp()   
+  val t2 = Temp.newtemp()   
+  val t3 = Temp.newtemp()   
+  val t4 = Temp.newtemp()   
+  val t5 = Temp.newtemp()   
+  val t6 = Temp.newtemp()   
+  val t7 = Temp.newtemp()   
+  val t8 = Temp.newtemp()   
+  val t9 = Temp.newtemp()   
+                            
+  val s0 = Temp.newtemp()   (* Saved Temporaries *)
+  val s1 = Temp.newtemp()   
+  val s2 = Temp.newtemp()   
+  val s3 = Temp.newtemp()   
+  val s4 = Temp.newtemp()   
+  val s5 = Temp.newtemp()   
+  val s6 = Temp.newtemp()   
+  val s7 = Temp.newtemp()   
+                            
+  val GP = Temp.newtemp()
+  val SP = Temp.newtemp()   (* Stack Pointer *)
+  val FP = Temp.newtemp()   (* Frame Pointer *)
+  val RA = Temp.newtemp()   (* Return Address *)
+
+  val registers = ["ZERO", "AT", "v0", "v1", "a0", "a1", "a2", "a3", "t0", "t1",
+                   "t2", "t3", "t4", "t5", "t6", "t7", "t8", "t9", "s0", "s1",
+                   "s2", "s3", "s4", "s5", "s6", "s7", "GP", "SP", "FP", "RA"]
+  val registerTemps = [ZERO, AT, v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5,
+                       t6, t7, t8, t9, s0, s1, s2, s3, s4, s5, s6, s7, GP, SP,
+                       FP, RA]
+
   (* Register Lists - Page 208 *)
-  val specialregs = [ZERO, FP, SP, RA, RV]
-  (* Create Regs *)
-  val argregs = List.tabulate (4, (fn _ => Temp.newtemp ()))      (* [a0,a1,a2,a3] *)
-  val calleesaves = List.tabulate (8, (fn _ => Temp.newtemp ()))  (* [s0,...,s7] *)
-  val callersaves = List.tabulate (10, (fn _ => Temp.newtemp()))  (* [t0,...,t9] *)
-  
+  val argregs = [a0, a1, a2, a3]
+  val calleesaves = [s0, s1, s2, s3, s4, s5, s6, s7]
+  val callersaves = [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9]
+  val specialregs = [ZERO, AT, v0, v1, GP, SP, FP, RA]
+
+  val colorable = calleesaves @ callersaves
+
+  val tempMap = 
+    List.foldl 
+      (fn ((key, value), table) => Temp.Table.enter(table, key, value))
+        Temp.Table.empty
+          (ListPair.zip(registerTemps, registers))
+
+  fun string(l,s) = 
+      (Symbol.name(l) ^ ": .asciiz \"" ^ s ^ "\"\n")
+      
   val calldefs = callersaves @ [RA, RV]
   fun newFrame({name, formals}) = {name=name, formals=formals, locals=ref 0}
   
@@ -58,7 +104,7 @@ struct
   fun seq [] = Tree.EXP (Tree.CONST 0)
     | seq [exp] = exp
     | seq (exp :: exps) = (Tree.SEQ (exp, (seq exps)))
-	
+  
   fun externalCall (str, left, right) = Tree.TEMP (Temp.newtemp()) (*todo*)
   
   fun procEntryExit1 (frame, stm) =
@@ -71,12 +117,12 @@ struct
 
     fun moveargs (arg, access) =
       let
-	      val access' = exp access
-	    in
+        val access' = exp access
+      in
         Tree.MOVE (access' (Tree.TEMP FP), Tree.TEMP arg)
-  	  end
+      end
     
-	  val funFormals = formals frame
+    val funFormals = formals frame
     val viewShift = seq (ListPair.map moveargs (argregs, funFormals))
     
   in
