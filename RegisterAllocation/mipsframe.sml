@@ -123,9 +123,10 @@ struct
     val viewShift = seq (ListPair.map moveargs (argregs, funFormals))
     
   in
-    (case funFormals of
+    (*(case funFormals of
       [] => stm'
-      | _  => Tree.SEQ (viewShift, stm'))
+      | _  => Tree.SEQ (viewShift, stm'))*)
+    stm
   end
   
   structure A = Assem
