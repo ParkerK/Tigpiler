@@ -21,7 +21,7 @@ structure Main = struct
       app (fn i => TextIO.output(out,format0 i)) instrs
     end
   | emitproc out (Frame.STRING(lab,s)) = 
-      TextIO.output(out, s) (*s originally Frame.STRING(lab,s)*)
+      TextIO.output(out, Frame.string(Temp.namedlabel(Symbol.name lab), s))
 
   fun withOpenFile fname f = 
     let 
