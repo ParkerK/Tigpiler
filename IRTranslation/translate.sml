@@ -66,7 +66,6 @@ structure Translate : TRANSLATE = struct
   val newbreakpoint = Temp.newlabel
   
   exception Impossible of string
-  
   fun newLevel({parent=l, name=n, formals=f}) = (Level ({frame=Frame.newFrame {name=n, formals=true::f}, parent=l}, ref())) (*change level?*)
   fun formals(Top) = []
     | formals(l as Level({frame, parent}, uref)) =
@@ -114,6 +113,8 @@ structure Translate : TRANSLATE = struct
     | unCx(Ex e) = (fn (t, f) => T.CJUMP(T.NE, e, T.CONST 0, t, f))
     | unCx(Cx genstm) = genstm
     | unCx(Nx _) = raise Impossible("Cannot unCx an Nx")
+  
+  fun initExp (acc, lev, init) = Nx (T.MOVE (unEx (acc lev), unEx init))
     
   fun whileExp (test, body, done) = 
     let
