@@ -56,7 +56,7 @@ struct
           (G.rm_edge{from=node, to=n}; popSucc(nt, node))
         | popSucc([], _) = ()
     
-    fun sortNodes (nodes) =
+    fun sortNodes (nodes) = (* Make sure we're passing this a SET! *)
     (* filter f se
     creates a new set containing only those elements of se that satisfy the predicate f. This is equivalent to:
     
@@ -72,11 +72,12 @@ struct
       )
     end
     
- 
+    fun colorMap (ltk, gtk)
 
-    
+  val (under_k, above_k) = sortNodes (nodeSet) 
+   
   in
-    body
+    colorMap (under_k, above_k)
   end 
   
 end
