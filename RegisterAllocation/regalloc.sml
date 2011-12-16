@@ -11,4 +11,12 @@ end
 structure RegAlloc :> REGALLOC = 
 struct
 
+  fun alloc(list, frame) = 
+    let
+      val (fgraph, nodelist) = Makegraph.instrs2graph(instrs)
+      val (igraph, liveoutmapping) = Liveness.interferenceGraph(fgraph, nodelist)
+      (*val _ = Liveness.show(out, igraph)*)
+      
+    in
+    end
 end
