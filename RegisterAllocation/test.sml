@@ -35,5 +35,5 @@ let
       testList(listDir(dir)))
     end
 in
-  test ("../TestPrograms","../InsnSelection-Out")
+  test ("../TestPrograms","../RegisterAllocation-Out")
 end
