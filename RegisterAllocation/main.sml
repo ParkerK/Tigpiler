@@ -15,10 +15,13 @@ structure Main = struct
       (*val _ = app (fn s => Printtree.printtree(out,s)) stms; *)
       val stms' = Canon.traceSchedule(Canon.basicBlocks stms)
       val instrs = List.concat(map (MipsGen.codegen frame) stms') 
-      val (instrs', allocation) = RegAlloc.alloc(instrs, frame)
+      val {prolog,epilog,body=instrs'} = Frame.procEntryExit3(frame,instrs)
+      val (instrs'', allocation) = RegAlloc.alloc(instrs, frame)
       val format0 = Assem.format(Temp.makestring)
+      val format1 = Assem.format(fn (t) => ("$" ^ valOf(Temp.Table.look(allocation, t))))
+
     in  
-      app (fn i => TextIO.output(out,format0 i)) instrs'
+      app (fn i => TextIO.output(out,format1 i)) instrs''
     end
   | emitproc out (Frame.STRING(lab,s)) = 
       TextIO.output(out, Frame.string(Temp.namedlabel(Symbol.name lab), s))
