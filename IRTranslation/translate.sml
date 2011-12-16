@@ -13,7 +13,8 @@ sig
   val newLevel : {parent: level, name: Temp.label, formals: bool list} -> level
   val formals : level -> access list
   val allocLocal : level -> bool -> access
-
+  val assign : exp * exp -> exp
+  
   val unEx : exp -> Tree.exp
   val unNx : exp -> Tree.stm
   val unCx : exp -> (Temp.label * Temp.label -> Tree.stm)
@@ -114,8 +115,8 @@ structure Translate : TRANSLATE = struct
     | unCx(Cx genstm) = genstm
     | unCx(Nx _) = raise Impossible("Cannot unCx an Nx")
   
-  fun initExp (acc, lev, init) = Nx (T.MOVE (unEx (acc lev), unEx init))
-    
+  fun assign (l, r) = Nx (T.MOVE (unEx l, unEx r))
+      
   fun whileExp (test, body, done) = 
     let
       val test = unCx test
