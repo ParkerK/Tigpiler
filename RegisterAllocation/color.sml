@@ -5,7 +5,7 @@ sig
   
   type allocation = Frame.register Temp.Table.table
   
-  val color : {intereference: Liveness.igraph,
+  val color : {interference: Liveness.igraph,
               initial: allocation,
               spillCost: Graph.node -> int,
               registers: Frame.register list}
@@ -26,9 +26,9 @@ struct
                             val compare  = Int.compare
                             end)
   
-  fun color {interference=interference, initial=initial, spillCost=spillCost, registers=registers} =
+  fun color {interference, initial : allocation, spillCost : Graph.node -> int, registers : Frame.register list} = 
   let
-    val {graph, tnode, gtemp, moves} = interference
+  	val Liveness.IGRAPH {graph, tnode, gtemp, moves} = interference
     val nodes = G.nodes (graph)
     val nodeSet = Set.addList(Set.empty, (map gtemp (nodes)))
     val colorables = Set.addList(Set.empty, 
@@ -81,7 +81,7 @@ struct
    
   in
     (*colorMap (under_k, above_k)*)
-    (initial, colorables)
+    (initial, Set.listItems(colorables))
     
   end 
   
