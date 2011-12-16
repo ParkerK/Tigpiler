@@ -20,12 +20,18 @@ struct
       (*val _ = Liveness.show(out, igraph)*)
       val allocation = Frame.tempMap
       val reglist = Frame.registers
-      val (newalloc, templist) = 
+      (* Color returns allocation and list of spills *)
+      val (newalloc, spilllist) = 
         Color.color {interference = igraph,
                     initial = allocation,
                     spillCost = (fn node => 0),
                     registers = reglist}
-    in
-      (instrs, newalloc)
+    
+      (* null l
+        returns true if the list l is empty. *)
+	     val didSpill = List.null (spilllist)
+     in
+       (* No spills *)
+       (instrs, newalloc)
     end
 end
