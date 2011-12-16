@@ -17,7 +17,7 @@ structure Color :> COLOR =
 struct
   
   structure G = Liveness.Graph
-  structure IGraph = Liveess.IGRAPH
+  structure IGraph = Liveness.IGRAPH
   structure Frame : FRAME = MipsFrame
   
   type allocation = Frame.register Temp.Table.table
@@ -27,14 +27,15 @@ struct
                             val compare  = Int.compare
                             end)
   
-  fun color {Liveness.IGRAPH{graph, tnode, gtemp, moves}, initial, spillost, registers} =
+  fun color {interference=interference, initial=initial, spillCost=spillCost, registers=registers} =
   let
+    val {graph, tnode, gtemp, moves} = interference
     val nodes = G.nodes (graph)
     val nodeSet = Set.addList(Set.empty, (map gtemp (nodes)))
     val colorables = Set.addList(Set.empty, 
                 (map gtemp (nodes)))
                 
-    fun numColorables () => Set.numItems(colorables)
+    fun numColorables () = Set.numItems(colorables)
                 
     fun neighbors(node) = List.length(G.adj(nodes))
     
@@ -68,16 +69,21 @@ struct
     in
       ( 
         (Set.filter lt nodes),
-        Set.filter gte nodes)
+        (Set.filter gte nodes)
       )
     end
     
-    fun colorMap (ltk, gtk)
-
+    (*fun colorMap (ltk, gtk) =
+        let 
+          val numLess     = 
+          val numGreater  =
+        *)
   val (under_k, above_k) = sortNodes (nodeSet) 
    
   in
-    colorMap (under_k, above_k)
+    (*colorMap (under_k, above_k)*)
+    (initial, colorables)
+    
   end 
   
 end
