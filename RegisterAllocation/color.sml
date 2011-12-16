@@ -18,7 +18,7 @@ struct
   
   structure G = Liveness.Graph
   structure IGraph = Liveess.IGRAPH
-  structure F = MipsFrame
+  structure Frame : FRAME = MipsFrame
   
   type allocation = Frame.register Temp.Table.table
   
