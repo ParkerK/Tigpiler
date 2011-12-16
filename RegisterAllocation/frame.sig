@@ -16,7 +16,7 @@ sig
   val argregs: Temp.temp list
   val calldefs : Temp.temp list
   val callersaves : Temp.temp list
-
+  val colorable : Temp.temp list
   val newFrame : {name: Temp.label, formals: bool list} -> frame
   val name : frame -> Temp.label
   val formals : frame -> access list
