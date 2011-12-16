@@ -51,7 +51,7 @@ struct
     end
     
     and popPred (n::nt, node) =
-          (G.rm_egde{from=n, to=node}; popEdge(nt, node)) 
+          (G.rm_edge{from=n, to=node}; popNode(nt, node)) 
         | popPred([], _) = ()
     and popSucc (n::nt, node) = 
           (G.rm_edge{from=node, to=n}; popSucc(nt, node))
