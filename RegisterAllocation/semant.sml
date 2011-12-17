@@ -50,7 +50,7 @@ structure Semant :> SEMANT = struct
       Types.RECORD(_,_) => (ty1 = ty2) orelse ty2 = Types.NIL
     | Types.NIL => (ty1 = ty2) orelse (case ty2 of Types.RECORD(_,_) => true
                                         |  _ => (ty2 = Types.NIL))
-    | _ => (err pos "type mismatch"; false)
+    | _ => (ty1 = ty2)
 
   fun compare_tys ([], trexps, pos) = {exp=Tr.empty, ty=Types.UNIT}
       | compare_tys(tys, [], pos) = {exp=Tr.empty, ty=Types.UNIT}
@@ -87,7 +87,8 @@ structure Semant :> SEMANT = struct
       fun trexp (A.NilExp) = {exp=Tr.nilExp(), ty=Types.NIL}
       | trexp (A.VarExp var) = trvar var
       | trexp (A.IntExp i) = {exp=(Tr.intExp(i)), ty=Types.INT}
-      | trexp (A.StringExp (str, pos)) = {exp=Tr.stringExp(str), ty=Types.STRING}
+      | trexp (A.StringExp (str, pos)) = 
+        (print (str^"------------\n");{exp=Tr.stringExp(str), ty=Types.STRING})
       | trexp (A.OpExp {left, oper, right, pos}) = 
         if oper = A.PlusOp orelse oper = A.MinusOp orelse 
            oper = A.TimesOp orelse oper = A.DivideOp then
@@ -383,6 +384,7 @@ structure Semant :> SEMANT = struct
     
     fun transProg(exp) =
       let
+        val _ = Tr.init()
         val firstlevel = Translate.newLevel {
           name=Temp.namedlabel "firstlevel",
           parent=Tr.outermost,

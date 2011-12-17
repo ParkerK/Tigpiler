@@ -45,6 +45,7 @@ sig
   val getResult : unit -> frag list
   (*val breakExp : exp -> Temp.label*)
   
+  val init : unit -> unit
 end
 
 structure Translate : TRANSLATE = struct 
@@ -355,6 +356,7 @@ structure Translate : TRANSLATE = struct
       in
         ()
       end
+    fun init() = (frags := [])
     fun getResult() = !frags
     
 end
