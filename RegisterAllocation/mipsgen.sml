@@ -216,10 +216,10 @@ struct
         result (fn r =>
                    emit (A.OPER {assem="li `d0, " ^ (int n) ^ "\n",
                                  dst=[r], src=[], jump=NONE}))
-      | munchExp(_) = result(fn _ => emit(A.OPER{assem="bad munch exp! line ##", src=[], dst=[], jump=NONE}))
+      | munchExp(_) = result(fn _ => emit(A.OPER{assem="bad munch exp! line 00", src=[], dst=[], jump=NONE}))
       
       (*print IR tree*)
-      val _ = (Printtree.printtree(TextIO.stdOut, stm); TextIO.flushOut TextIO.stdOut;())
+      (*val _ = (Printtree.printtree(TextIO.stdOut, stm); TextIO.flushOut TextIO.stdOut;())*)
     in
       munchStm stm;
       rev(!ilist)
