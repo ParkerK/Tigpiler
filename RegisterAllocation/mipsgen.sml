@@ -71,19 +71,19 @@ struct
       
     (* JUMP *)
      | munchStm(T.CJUMP(oper, T.CONST i, e1, lab1, lab2)) =
-      emit(A.OPER{assem=((operToJump (oper)) ^ " `s0," ^ int i ^ "," ^ Symbol.name(lab1) ^ "\n" ^ "j1 " ^ (Symbol.name lab2) ^ "\n"),
+      emit(A.OPER{assem=((operToJump (oper)) ^ " `s0," ^ int i ^ "," ^ Symbol.name(lab1) ^ "\n" ^ "j " ^ (Symbol.name lab2) ^ "\n"),
         src=[munchExp e1], dst=[], jump=SOME([lab1,lab2])})
 
     | munchStm(T.CJUMP(oper, e1, T.CONST i, lab1, lab2)) =
-            emit(A.OPER{assem=((operToJump oper) ^ " `s0," ^ int i ^ "," ^ Symbol.name(lab1) ^ "\n" ^ "j2 " ^ (Symbol.name lab2) ^ "\n"),
+            emit(A.OPER{assem=((operToJump oper) ^ " `s0," ^ int i ^ "," ^ Symbol.name(lab1) ^ "\n" ^ "j " ^ (Symbol.name lab2) ^ "\n"),
                         src=[munchExp e1], dst=[], jump=SOME([lab1,lab2])})
 
     | munchStm(T.CJUMP(oper, e1, e2, lab1, lab2)) =
-      emit(A.OPER{assem=((operToJump oper) ^ " `s0,`s1," ^ Symbol.name(lab1) ^ "\n" ^ "j3 " ^ (Symbol.name lab2) ^ "\n"),
+      emit(A.OPER{assem=((operToJump oper) ^ " `s0,`s1," ^ Symbol.name(lab1) ^ "\n" ^ "j " ^ (Symbol.name lab2) ^ "\n"),
         src=[munchExp e1, munchExp e2], dst=[], jump=SOME([lab1,lab2])})
 
     | munchStm(T.JUMP(T.NAME(lab), llst)) =
-      emit(A.OPER{assem = "j4 " ^ (Symbol.name lab) ^ "\n",
+      emit(A.OPER{assem = "j " ^ (Symbol.name lab) ^ "\n",
         src=[], dst=[], jump=SOME[Temp.namedlabel(Symbol.name lab)]})
         
     | munchStm(T.EXP(T.CALL(T.NAME(lab),args))) = 
