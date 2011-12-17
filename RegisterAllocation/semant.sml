@@ -158,7 +158,7 @@ structure Semant :> SEMANT = struct
           in
             (case else' of
               NONE =>
-                (checkInt (test', pos);
+                (checkInt (test', pos); checkUnit(then'', pos);
                 {exp=(Tr.ifThenExp(#exp test', #exp then'')), ty=(#ty then'')})
             | SOME else' =>
                 let val else'' = trexp (else')
