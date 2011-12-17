@@ -87,8 +87,7 @@ structure Semant :> SEMANT = struct
       fun trexp (A.NilExp) = {exp=Tr.nilExp(), ty=Types.NIL}
       | trexp (A.VarExp var) = trvar var
       | trexp (A.IntExp i) = {exp=(Tr.intExp(i)), ty=Types.INT}
-      | trexp (A.StringExp (str, pos)) = 
-        (print (str^"------------\n");{exp=Tr.stringExp(str), ty=Types.STRING})
+      | trexp (A.StringExp (str, pos)) = {exp=Tr.stringExp(str), ty=Types.STRING}
       | trexp (A.OpExp {left, oper, right, pos}) = 
         if oper = A.PlusOp orelse oper = A.MinusOp orelse 
            oper = A.TimesOp orelse oper = A.DivideOp then
