@@ -16,7 +16,7 @@ structure Main = struct
       val stms' = Canon.traceSchedule(Canon.basicBlocks stms)
       val instrs = List.concat(map (MipsGen.codegen frame) stms') 
       val {prolog,epilog,body=instrs'} = Frame.procEntryExit3(frame,instrs)
-      val (instrs'', allocation) = RegAlloc.alloc(instrs, frame)
+      val (instrs'', allocation) = RegAlloc.alloc(instrs', frame)
       val format0 = Assem.format(Temp.makestring)
       val format1 = Assem.format(fn (t) => ("$" ^ valOf(Temp.Table.look(allocation, t))))
 
