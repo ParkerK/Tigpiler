@@ -241,12 +241,13 @@ structure Semant :> SEMANT = struct
         let
           val access = Tr.allocLocal level (!escape)
           val breakpoint = Tr.newbreakpoint()
-          val {exp=lo', ty=loty} = transExp (venv, tenv, break, level) lo
-          val {exp=hi', ty=hity} = transExp (venv, tenv, break, level) hi
+          val lo' = trexp lo
+          val hi' = trexp hi
           val venv' = S.enter (venv, var, Env.VarEntry {access=access, ty=T.INT})
           val {exp=bodyExp, ty=body_ty} = transExp (venv', tenv, breakpoint, level) body
         in
-          {exp=Tr.forExp(Tr.simpleVar (access, level), breakpoint, lo', hi', bodyExp), ty=T.UNIT}
+          (checkInt(lo', pos); checkInt(hi', pos);
+          {exp=Tr.forExp(Tr.simpleVar (access, level), breakpoint, #exp lo', #exp hi', bodyExp), ty=T.UNIT})
         end
 
       | trexp (A.BreakExp pos) =
