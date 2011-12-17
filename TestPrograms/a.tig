@@ -1,6 +1,7 @@
-let
-	var a := 1
-	var b := a
-in
-	b
-end
+let 
+     var N := 8 
+     type intArray = array of int 
+     var row := intArray [ N ] of 0 
+     var col := intArray [ N ] of 0 
+  in print("Success\n") 
+end 
