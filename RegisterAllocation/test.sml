@@ -26,7 +26,7 @@ let
         in
           (
             print (infile ^ "\n");
-            Main.compile(infile, outfile) handle e => (print "****************wtf\n");
+            Main.compile(infile, outfile) handle e => ();
             testList(rest)
           )
         end
