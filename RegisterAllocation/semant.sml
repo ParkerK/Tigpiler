@@ -19,24 +19,26 @@ structure Semant :> SEMANT = struct
         SOME ty2 => ty2
       | NONE => (err pos ("type is not defined: " ^ Symbol.name n) ;
                 Types.UNIT))
-
+  
+  fun checkDups([],p) = ()
+    | checkDups(h,[]) = ()
+    | checkDups(h::l,p::ps) = 
+        if (List.exists (fn (x) => (h = x)) l) then
+          (err p (" duplicate entry: " ^ (Symbol.name h)))
+        else checkDups(l,ps)
+        
   fun transTy (tenv, t)=
     let 
-      fun recordtys(fields)= map (fn{name, escape, typ, pos}=>
-            (case SOME(typelookup tenv typ pos) of 
-               SOME t => (name, t)
-             | NONE => (name, Types.UNIT))) fields
-      fun checkdups(h::l) = 
-            (List.exists (fn {name, escape, typ, pos}=> 
-              if (#name h)=name then
-                (err pos ("duplicate field: " ^ Symbol.name name);true)
-              else false) l;
-            checkdups(l))
-        | checkdups(_) = ()
+      fun recordtys(fields)= 
+        map (fn{name, escape, typ, pos}=>
+          (case SOME(typelookup tenv typ pos) of 
+             SOME t => (name, t)
+           | NONE => (name, Types.UNIT))) fields
     in
       case t of
         A.NameTy (n, pos) => typelookup tenv n pos
-      | A.RecordTy fields => (checkdups(fields);Types.RECORD (recordtys fields, ref()))
+      | A.RecordTy fields => (checkDups((map #name fields), (map #pos fields)); 
+                              Types.RECORD (recordtys fields, ref()))
       | A.ArrayTy (n,pos) => Types.ARRAY(typelookup tenv n pos, ref())
     end
   
