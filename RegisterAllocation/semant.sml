@@ -46,12 +46,12 @@ structure Semant :> SEMANT = struct
     end
   
   fun compare_ty (ty1, ty2, pos)=
-    case ty1 of 
-      T.RECORD(_,_) => (ty1 = ty2) orelse ty2 = T.NIL
-    | T.NIL => (ty1 = ty2) orelse 
-                      (case ty2 of T.RECORD(_,_) => true
-                                |  _ => (ty2 = T.NIL))
-    | _ => (ty1 = ty2)
+    case (ty1, ty2) of 
+      (T.RECORD(l1,u1), T.RECORD(l2,u2)) => (u1=u2) andalso
+        (List.all (fn ((s1,t1),(s2,t2)) => (s1=s2) andalso (t1=t2)) (ListPair.zip(l1,l2)))
+    | (T.RECORD(_,_), T.NIL) => true
+    | (T.NIL, T.RECORD(_,_)) => true
+    | (_,_) => (ty1 = ty2)
 
   fun compare_tys ([], trexps, pos) = {exp=Tr.empty, ty=T.UNIT}
     | compare_tys(tys, [], pos) = {exp=Tr.empty, ty=T.UNIT}
@@ -73,7 +73,7 @@ structure Semant :> SEMANT = struct
     ((if ty = T.STRING then () else err pos "string required"); exp)
       
   fun checkRecord (rty, {exp, ty}, pos) =
-    ((if compare_ty(rty, ty, pos) then () else err pos "string required"); exp)
+    ((if compare_ty(rty, ty, pos) then () else err pos "record required"); exp)
     
   fun checkArray (rty, {exp, ty}, pos) =
     ((if compare_ty(rty, ty, pos) then () else err pos "array required"); exp)
