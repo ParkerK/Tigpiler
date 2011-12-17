@@ -85,10 +85,10 @@ To Fix:
 ----------------------------
 To Fix:  
 
-+ <del> Color nodes, everything is showing as $t0 </del>
++ <del> Color nodes, everything is showing as $t0 </del>  
 
 7.Working compiler, produces assembly (12/9)  
 --------------------------------------------
 To Fix:  
 
-+ <del> Fix previous issues from past modules </del>
++ <del> Fix previous issues from past modules </del>  
