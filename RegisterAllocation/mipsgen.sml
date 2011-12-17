@@ -57,7 +57,7 @@ struct
                     dst=[], jump=NONE})
       
     | munchStm(T.MOVE(T.MEM(e1),e2)) =
-        emit(A.OPER{assem="sw `s1, (`s0)\n",
+        emit(A.OPER{assem="sw `s1, `s0\n",
                     src=[munchExp e1, munchExp e2],
                     dst=[], jump=NONE})
 
@@ -100,10 +100,10 @@ struct
         if(i > 0 andalso i < 5)
         then
             let
-                val reg = "`a" ^ int (i-1)
+                val reg = "$a" ^ int (i-1)
                 val r = List.nth(F.argregs,(i-1))
             in            
-                (emit(A.MOVE{assem="move " ^ reg ^ ", `s0\n",
+                (emit(A.MOVE{assem="addi " ^ reg ^ ",`s0,0\n",
                  src=munchExp eh, dst=r});
                  r::munchArgs(i+1,et))
             end       
