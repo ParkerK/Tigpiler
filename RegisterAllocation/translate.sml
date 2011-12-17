@@ -157,86 +157,78 @@ structure Translate : TRANSLATE = struct
           T.LABEL escape])
         end
     fun ifThenExp (cond, thenExp) =
-        let
-          val cond = unCx(cond)
-          val thenLabel = Temp.newlabel()
-          val endLabel = Temp.newlabel()
-          val r = Temp.newtemp()
-        in
-          case (cond, thenExp) of
-                  (_, Cx _) =>
-                    Cx (fn (t, f) =>
-                           seq [(cond) (thenLabel, endLabel),
-                                T.LABEL thenLabel,
-                                (unCx thenExp) (t, f),
-                                T.LABEL endLabel])
-                  | (_, Nx _) =>
-                    Nx (seq [(cond) (thenLabel, endLabel),
+      let
+        val cond = unCx(cond)
+        val thenLabel = Temp.newlabel()
+        val endLabel = Temp.newlabel()
+        val r = Temp.newtemp()
+      in
+        case (cond, thenExp) of
+          (_, Cx _) =>
+            Cx (fn (t, f) =>
+               seq [(cond) (thenLabel, endLabel),
+                    T.LABEL thenLabel,
+                    (unCx thenExp) (t, f),
+                    T.LABEL endLabel])
+        | (_, Nx _) =>
+            Nx (seq [(cond) (thenLabel, endLabel),
+                     T.LABEL thenLabel,
+                     unNx thenExp,
+                     T.LABEL endLabel])
+        | (_, Ex ex) => 
+            Ex (T.ESEQ (seq [(cond) (thenLabel, endLabel),
                              T.LABEL thenLabel,
-                             unNx thenExp,
-                             T.LABEL endLabel])
-                  | (_, Ex ex) => 
-                    Ex (T.ESEQ (seq [(cond) (thenLabel, endLabel),
-                                     T.LABEL thenLabel,
-                                     T.MOVE (T.TEMP r, ex),
-                                     T.LABEL endLabel],
-                                T.TEMP r))
+                             T.MOVE (T.TEMP r, ex),
+                             T.LABEL endLabel],
+                        T.TEMP r))
         end
     fun ifThenElseExp (cond, thenExp, elseExp) =
-        let
-          val cond = unCx(cond)
-          val thenLabel = Temp.newlabel()
-          val elseLabel = Temp.newlabel()
-          val joinLabel = Temp.newlabel()
-          val r = Temp.newtemp() (* Only for when thenExp/elseExp = Ex, suggested on page 162 *)
-        in
-          case (cond, thenExp, elseExp) of
-                  (_, Cx _, Cx _) =>
-                    Cx (fn (t, f) =>
-                           seq [(cond) (thenLabel, elseLabel),
-                                T.LABEL thenLabel,
-                                (unCx thenExp) (t, f),
-                                T.LABEL elseLabel,
-                                (unCx elseExp) (t, f)])
-                  | (_, Ex _, Ex _) =>
-                    Ex (T.ESEQ (seq [(cond) (thenLabel, elseLabel),
-                                     T.LABEL thenLabel,
-                                     T.MOVE (T.TEMP r, unEx thenExp),
-                                     T.JUMP (T.NAME joinLabel, [joinLabel]),
-                                     T.LABEL elseLabel,
-                                     T.MOVE (T.TEMP r, unEx elseExp),
-                                     T.LABEL joinLabel],
-                                T.TEMP r))
-                  | (_, Nx _, Nx _) =>
-                    Nx (seq [(cond) (thenLabel, elseLabel),
-                             T.LABEL thenLabel,
-                             unNx thenExp,
-                             T.JUMP (T.NAME joinLabel, [joinLabel]),
-                             T.LABEL elseLabel,
-                             unNx elseExp,
-                             T.LABEL joinLabel])
-                  | (_,_,_) => raise Impossible("ifBody and elseBody must be same type") (* We shouldn't get here ever *)          
-      
+      let
+        val cond = unCx(cond)
+        val thenLabel = Temp.newlabel()
+        val elseLabel = Temp.newlabel()
+        val joinLabel = Temp.newlabel()
+        val r = Temp.newtemp() (* Only for when thenExp/elseExp = Ex, suggested on page 162 *)
+      in
+        case (cond, thenExp, elseExp) of
+          (_, Cx _, Cx _) =>
+            Cx (fn (t, f) =>
+                   seq [(cond) (thenLabel, elseLabel),
+                        T.LABEL thenLabel,
+                        (unCx thenExp) (t, f),
+                        T.LABEL elseLabel,
+                        (unCx elseExp) (t, f)])
+        | (_, Ex _, Ex _) =>
+          Ex (T.ESEQ (seq [(cond) (thenLabel, elseLabel),
+                           T.LABEL thenLabel,
+                           T.MOVE (T.TEMP r, unEx thenExp),
+                           T.JUMP (T.NAME joinLabel, [joinLabel]),
+                           T.LABEL elseLabel,
+                           T.MOVE (T.TEMP r, unEx elseExp),
+                           T.LABEL joinLabel],
+                      T.TEMP r))
+        | (_, Nx _, Nx _) =>
+          Nx (seq [(cond) (thenLabel, elseLabel),
+                   T.LABEL thenLabel,
+                   unNx thenExp,
+                   T.JUMP (T.NAME joinLabel, [joinLabel]),
+                   T.LABEL elseLabel,
+                   unNx elseExp,
+                   T.LABEL joinLabel])
+        | (_,_,_) => raise Impossible("ifBody and elseBody must be same type") (* We shouldn't get here ever *)          
+
     end
       
-    fun intExp (i) = Ex (T.CONST (i)) (* Return a constant of that value *)
+    fun intExp (i) = Ex (T.CONST (i))
     fun nilExp () = Ex (T.CONST (0))
-    
     fun stringExp str =
-        let
-          val label = Temp.newlabel()
-        in
-          frags := Frame.STRING (label, str) :: !frags;
-          Ex (T.NAME label)
-        end
-      
-    fun assignExp (var, exp) =
-      let
-        val var = unEx var
-        val exp = unEx exp
+      let val label = Temp.newlabel()
       in
-        Nx (T.MOVE (var, exp))
+        frags := Frame.STRING (label, str) :: !frags;
+        Ex (T.NAME label)
       end
+      
+    fun assignExp (var, exp) = Nx (T.MOVE (unEx var, unEx exp))
     
     fun breakExp break = Nx (T.JUMP(T.NAME break, [break]))
     
@@ -259,13 +251,13 @@ structure Translate : TRANSLATE = struct
       | intOpExp (A.GtOp, left, right)     = relopExp (T.GT, left, right)
       | intOpExp (A.GeOp, left, right)     = relopExp (T.GE, left, right)
                                             
-    fun stringOpExp (A.EqOp, left, right)     = relopStrExp (T.EQ, left, right, "stringEqual")
-      | stringOpExp (A.NeqOp, left, right)    = relopStrExp (T.NE, left, right, "stringNotEqual")
-      | stringOpExp (A.LtOp, left, right)     = relopStrExp (T.LT, left, right, "stringLessThan")
-      | stringOpExp (A.LeOp, left, right)     = relopStrExp (T.LE, left, right, "stringLessThanOrEqual")
-      | stringOpExp (A.GtOp, left, right)     = relopStrExp (T.GT, left, right, "stringGreaterThan")
-      | stringOpExp (A.GeOp, left, right)     = relopStrExp (T.GE, left, right, "stringGreaterThanEqual")      
-      | stringOpExp (_, _, _)                 = raise Impossible ("illegal operation on strings")
+    fun stringOpExp (A.EqOp, left, right)  = relopStrExp (T.EQ, left, right, "stringEqual")
+      | stringOpExp (A.NeqOp, left, right) = relopStrExp (T.NE, left, right, "stringNotEqual")
+      | stringOpExp (A.LtOp, left, right)  = relopStrExp (T.LT, left, right, "stringLessThan")
+      | stringOpExp (A.LeOp, left, right)  = relopStrExp (T.LE, left, right, "stringLessThanOrEqual")
+      | stringOpExp (A.GtOp, left, right)  = relopStrExp (T.GT, left, right, "stringGreaterThan")
+      | stringOpExp (A.GeOp, left, right)  = relopStrExp (T.GE, left, right, "stringGreaterThanEqual")      
+      | stringOpExp (_, _, _)              = raise Impossible ("illegal operation on strings")
       
     fun recordCompExp (A.EqOp, left, right)   = relopExp (T.EQ, left, right)
       | recordCompExp (A.NeqOp, left, right)  = relopExp (T.NE, left, right)
@@ -278,21 +270,14 @@ structure Translate : TRANSLATE = struct
     
     fun seqExp [] = Ex (T.CONST 0)
       | seqExp [exp] = exp
-      | seqExp (exp :: exps) =
-          Ex (T.ESEQ (unNx exp, unEx (seqExp exps)))
+      | seqExp (exp :: exps) = Ex (T.ESEQ (unNx exp, unEx (seqExp exps)))
     
     fun leveleq (Level(_,uref1),Level(_,uref2)) = uref1=uref2
       | leveleq (_,_) = false
 
     fun traceSL (deflevel,curlevel as Level({frame:Frame.frame, parent:level}, _)) = 
-      if leveleq(deflevel,curlevel) then
-        T.TEMP(Frame.FP)
-      else
-        let 
-          val locals = !(#locals frame)
-        in
-          T.MEM(T.BINOP(T.PLUS, T.CONST(locals), traceSL(deflevel, parent)))
-        end
+        if leveleq(deflevel,curlevel) then T.TEMP(Frame.FP)
+        else T.MEM(T.BINOP(T.PLUS, T.CONST(!(#locals frame)), traceSL(deflevel, parent)))
     | traceSL (_,TopLevel) = T.TEMP(Frame.FP)
     
     fun simpleVar(acc,l) = 
@@ -308,41 +293,39 @@ structure Translate : TRANSLATE = struct
       end
     
     fun fieldVar (var, offset) =
-      let
-        val var = unEx var
-        val addr = Temp.newtemp ()
-      in
-          Ex(T.ESEQ(T.MOVE(T.TEMP(addr),
-            T.BINOP(T.PLUS,var,
+      let val addr = Temp.newtemp()
+      in 
+        Ex(T.ESEQ(T.MOVE(T.TEMP(addr),
+            T.BINOP(T.PLUS, unEx var,
             T.BINOP(T.MUL,unEx offset,
             T.CONST(Frame.wordsize)))),
             T.MEM(T.TEMP(addr))))
-        end
+      end
     
     fun subscriptExp(arr, offset) =
-        let
-          val address = Temp.newtemp()
-          val arr = unEx arr
-          val offset = unEx offset
-        in
-            Ex(T.ESEQ(
-              T.MOVE(T.TEMP(address),
-              T.BINOP(T.PLUS,
-              arr,
-              T.BINOP(T.MUL,
-              offset,
-              T.CONST(Frame.wordsize)))),
-              T.MEM(T.TEMP(address))))
-          end
+      let
+        val address = Temp.newtemp()
+        val arr = unEx arr
+        val offset = unEx offset
+      in
+        Ex(T.ESEQ(
+          T.MOVE(T.TEMP(address),
+          T.BINOP(T.PLUS,
+          arr,
+          T.BINOP(T.MUL,
+          offset,
+          T.CONST(Frame.wordsize)))),
+          T.MEM(T.TEMP(address))))
+      end
           
     fun recordExp (explist) = 
       let
         val size = T.CONST(length(explist))
         val r = Temp.newtemp()
         val setup = T.MOVE(T.TEMP(r),
-               T.CALL(T.NAME(Temp.namedlabel("initRecord")),[size]))
+                           T.CALL(T.NAME(Temp.namedlabel("initRecord")),[size]))
         fun step(exp,n) = 
-            T.MOVE(T.MEM(T.BINOP(T.PLUS, T.TEMP(r), T.CONST(n * Frame.wordsize))),
+          T.MOVE(T.MEM(T.BINOP(T.PLUS, T.TEMP(r), T.CONST(n * Frame.wordsize))),
              (unEx exp))
         fun steps([],n) = [setup]
           | steps(e::es,n) = (step(e,n))::(steps(es,n-1))
