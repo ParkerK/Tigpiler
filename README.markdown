@@ -53,7 +53,7 @@ To Fix:
 + Need to handle illegal integers, e.g. var a:=5a
 + <del> There is a bug in your lexer, such that strings ending with f are not being processed </del>
 
-2. Parser (10/17)
+2.Parser (10/17)
 ----------------
 To Fix:  
 
