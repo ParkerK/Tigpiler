@@ -84,9 +84,11 @@ To Fix:
 6.Register Allocation (12/5)  
 ----------------------------
 To Fix:  
+
 + <del> Color nodes, everything is showing as $t0 </del>
 
 7.Working compiler, produces assembly (12/9)  
 --------------------------------------------
 To Fix:  
+
 + <del> Fix previous issues from past modules </del>
