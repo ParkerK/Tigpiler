@@ -35,7 +35,7 @@ struct
     val nodeSet = Set.addList(Set.empty, (map gtemp (nodes)))
 	val spillSet = Set.addList(Set.empty, (map gtemp (nodes))) (* If we spill, we spill EVERYTHING *)
     val colorPalette = Set.addList(Set.empty, Frame.colorable)
-    val colorTable = ref Temp.Table.empty
+    val cTable = ref Temp.Table.empty
     val coloredNodes = ref Set.empty
   	val regColorMap = ref initial : allocation ref
     
@@ -85,7 +85,7 @@ struct
         fun rmC([]) = ()
         | rmC(n::ns) = (
           (if Set.member((!coloredNodes),n) then
-            (validcolors := Set.delete((!validcolors),valOf(Temp.Table.look((!colorTable),n))))
+            (validcolors := Set.delete((!validcolors),valOf(Temp.Table.look((!cTable),n))))
           else ());
           rmC(ns))
       
@@ -99,7 +99,7 @@ struct
           in (
             coloredNodes := Set.add((!coloredNodes),  node');
             regColorMap := Temp.Table.enter((!regColorMap),  node', temp2reg(color));
-            colorTable := Temp.Table.enter((!colorTable),  node', color))
+            cTable := Temp.Table.enter((!cTable),  node', color))
           end
           )
       end
