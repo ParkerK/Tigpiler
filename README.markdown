@@ -81,8 +81,8 @@ To Fix:
 
 + <del> Incorrect instructions used, ie 'LOAD' instead of 'lw' </del>
 
-6. Register Allocation (12/5)  
------------------------------
+6.Register Allocation (12/5)  
+----------------------------
 
-7. Working compiler, produces assembly (12/9)  
----------------------------------------------
+7.Working compiler, produces assembly (12/9)  
+--------------------------------------------
