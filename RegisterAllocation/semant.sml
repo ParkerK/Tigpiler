@@ -44,11 +44,19 @@ structure Semant :> SEMANT = struct
                               T.RECORD (recordtys fields, ref()))
       | A.ArrayTy (n,pos) => T.ARRAY(typelookup tenv n pos, ref())
     end
-  
-  fun compare_ty (ty1, ty2, pos)=
+    
+  fun actual_ty (T.NAME (s,ty)) = 
+      (case !ty of
+        NONE => raise ErrMsg
+      | SOME t => actual_ty t)
+    | actual_ty t = t
+      
+  fun compare_ty (ty1, ty2, pos) =
     case (ty1, ty2) of 
-      (T.RECORD(l1,u1), T.RECORD(l2,u2)) => (u1=u2) andalso
-        (List.all (fn ((s1,t1),(s2,t2)) => (s1=s2) andalso (t1=t2)) (ListPair.zip(l1,l2)))
+      (T.NAME(_,_), T.NAME(_,_)) => compare_ty(actual_ty ty1, actual_ty ty2, pos)
+    | (T.NAME(_,_), _) => compare_ty(actual_ty ty1, ty2, pos)
+    | (_, T.NAME(_,_)) => compare_ty(ty1, actual_ty ty2, pos)
+    | (T.RECORD(l1,u1), T.RECORD(l2,u2)) => ty1 = ty2
     | (T.RECORD(_,_), T.NIL) => true
     | (T.NIL, T.RECORD(_,_)) => true
     | (_,_) => (ty1 = ty2)
@@ -56,12 +64,6 @@ structure Semant :> SEMANT = struct
   fun compare_tys ([], trexps, pos) = {exp=Tr.empty, ty=T.UNIT}
     | compare_tys(tys, [], pos) = {exp=Tr.empty, ty=T.UNIT}
     | compare_tys(t1::l1,t2::l2,pos) = (compare_ty(t1,t2,pos); compare_tys(l1,l2,pos))
-  
-  fun actual_ty (T.NAME (s,ty)) = 
-      (case !ty of
-        NONE => raise ErrMsg
-      | SOME t => actual_ty t)
-    | actual_ty t = t 
 
   fun checkInt ({exp, ty}, pos) =
     ((if ty = T.INT then () else err pos "integer required"); exp)
@@ -260,7 +262,7 @@ structure Semant :> SEMANT = struct
       | trexp (A.LetExp {decs, body, pos}) =
           let
             val (venv', tenv', decList, _) =
-              foldr (fn (dec, (v, t, e, l)) => transDec(v, t, dec, break, e, l))
+              foldl (fn (dec, (v, t, e, l)) => transDec(v, t, dec, break, e, l))
                 (venv, tenv, [], level) decs
             val {exp=bodyExp, ty=bodyTy} = transExp (venv',tenv', break, level) body
           in
@@ -304,7 +306,9 @@ structure Semant :> SEMANT = struct
                     SOME(s, pos) =>
                       (case S.look (tenv,s) of
                           NONE => (err pos ("type not defined: " ^ S.name s))
-                        | SOME ty2 => (compare_ty(ty, ty2, pos1);()))
+                        | SOME ty2 => (
+                          if compare_ty(ty, ty2, pos1) then ()
+                          else (err pos "var dec type mismatch")))
                   | NONE => ()
         in
           (S.enter(venv, name, E.VarEntry{access=access, ty=ty}), tenv, explist', level)
@@ -316,16 +320,21 @@ structure Semant :> SEMANT = struct
           val poss = map #pos tydecs
           val _ = checkDups(names, poss)
           val typs = map #ty tydecs
-          fun addt (n,env) = S.enter(env,n,T.NAME(n,ref(S.look(tenv, n))))
+          fun addt (n,env) = S.enter(env,n,T.NAME(n,ref NONE))
           val tenv' = foldr addt tenv names
+          
           val nts = map (fn t => transTy (tenv', t)) typs
-          fun updt (n,nt) = 
-            let val (SOME (T.NAME(_,r))) = S.look(tenv',n)
-            in r := SOME nt
-            end
-          val _ = app updt (ListPair.zip(names,nts))
+          fun updt ((n,nt), pos) = 
+            case S.look(tenv',n) of
+              SOME (T.NAME(_,r)) =>
+                (case !r of
+                  NONE => r := SOME nt
+                | SOME t => if (t = nt) then () 
+                            else (err pos "var dec type mismatch"))
+            | _ => (err pos "var dec type mismatch")
         in 
-          (venv, tenv', explist, level)
+          (app updt (ListPair.zip(ListPair.zip(names,nts), poss));
+          (venv, tenv', explist, level))
         end
 
     | transDec(venv, tenv, A.FunctionDec(fundecs), break, explist, level) =

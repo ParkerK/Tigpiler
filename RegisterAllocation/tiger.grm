@@ -159,7 +159,7 @@ boolexp:    exp AND exp             (makeIf(exp1, exp2, SOME(A.IntExp(0)), exp1l
 
 (* Declarations *)
 decs:   (* empty *)     (nil)
-    |   dec decs        (decs @ [dec])
+    |   dec decs        ([dec] @ decs)
 
 dec:    vardec                (vardec)
     |   tydecs  %prec LOWPREC (A.TypeDec tydecs)
