@@ -45,7 +45,7 @@ that we have collected. You can run `sml test.sml` in any directory to see the o
 Parts
 =====
 
-1. Lexer (9/19)  
+1. Lexer (9/19)
 ---------------
 
 To Fix:  
