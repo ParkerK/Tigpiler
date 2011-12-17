@@ -40,7 +40,7 @@ sig
   
   val simpleVar : access * level -> exp
   val subscriptExp : exp * exp -> exp
-  val fieldVar : exp * exp -> exp
+  val fieldVar : exp * int -> exp
   val empty : exp
 
   val procEntryExit: {level: level, body: exp} -> unit
@@ -297,14 +297,8 @@ structure Translate : TRANSLATE = struct
       end
     
     fun fieldVar (var, offset) =
-      let val addr = Temp.newtemp()
-      in 
-        Ex(T.ESEQ(T.MOVE(T.TEMP(addr),
-            T.BINOP(T.PLUS, unEx var,
-            T.BINOP(T.MUL,unEx offset,
-            T.CONST(Frame.wordsize)))),
-            T.MEM(T.TEMP(addr))))
-      end
+      Ex(T.MEM(T.BINOP(T.PLUS, unEx(var), 
+         T.BINOP(T.MUL, T.CONST(offset), T.CONST(Frame.wordsize)))))
     
     fun subscriptExp(arr, offset) =
       let

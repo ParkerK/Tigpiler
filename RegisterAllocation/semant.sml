@@ -120,8 +120,7 @@ structure Semant :> SEMANT = struct
               | T.NIL => 
                   (checkRecord(T.NIL, right', pos);
                   {exp=Tr.recordCompExp(oper, #exp left', #exp right'), ty=T.INT})
-              | ty => (print ("-------"^T.toString(ty));
-                      err pos "2can't perform comparisons on this type";
+              | ty => (err pos "2can't perform comparisons on this type";
                       {exp=Tr.nilExp(), ty=T.INT}))
             else
               (err pos "error"; {exp=Tr.nilExp(), ty=T.INT})
@@ -277,9 +276,26 @@ structure Semant :> SEMANT = struct
               {exp=Tr.nilExp(), ty=T.INT}))
 
       | trvar (A.FieldVar(var,id,pos)) =
-          (case trvar var of
-            {exp, ty=record as T.RECORD (fields, _)} => {exp=Tr.nilExp(), ty=record}
-          | _ => (err pos "no var found"; {exp=Tr.nilExp(), ty=T.UNIT}))
+        let
+          val {exp, ty} = trvar var
+          fun getTypes([],asym,rty,pos) =
+                (err pos ("var field of not valid"); T.UNIT)
+            | getTypes((s,t)::sts,asym,rty,pos) =
+                if (s = asym) then actual_ty t
+                else getTypes(sts,asym,rty,pos)
+                
+          fun findOffset([], target, count) = count
+            | findOffset(x::xs, target, count) = 
+                if x = target then count else findOffset(xs, target, (count + 1))
+
+        in
+          (case ty of
+            T.RECORD(symtys, uq) =>
+                {exp=Tr.fieldVar(exp, findOffset(map #1 symtys, id, 0)), 
+                 ty=getTypes(symtys,id,ty,pos)}
+              | _ => (err pos ("field var is not a Record type");
+                {exp=Tr.nilExp(), ty=T.UNIT}))
+        end
 
       | trvar (A.SubscriptVar(var, exp, pos)) =
           let
