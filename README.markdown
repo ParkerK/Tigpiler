@@ -58,7 +58,7 @@ To Fix:
 ----------------
 To Fix:  
 
-+ Missing documentation
++ <del> Missing documentation </del>
 
 3. Semantic Analysis (10/31)
 ----------------------------
