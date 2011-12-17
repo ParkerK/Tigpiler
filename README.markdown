@@ -59,8 +59,8 @@ To Fix:
 
 + <del> Missing documentation </del>
 
-3. Semantic Analysis (10/31)
-----------------------------
+3.Semantic Analysis (10/31)
+---------------------------
 To Fix:  
 
 + If, while, ... expressions are returning errors when not supposed to, e.g. "if(5>3)..." returns integer required error.
@@ -69,13 +69,13 @@ To Fix:
 + Need to handle recursive declarations: At the moment not throwing errors. (See page 120)
 + How are you handling cases where types have the same name as variables? Should it return an error?
 
-4. Frame Analysis and Intermediate Representation (11/14)  
----------------------------------------------------------
+4.Frame Analysis and Intermediate Representation (11/14)  
+--------------------------------------------------------
 To Fix:  
 
 + None
 
-5. Instruction Selection (11/21)  
+5.Instruction Selection (11/21)  
 --------------------------------
 To Fix:  
 
