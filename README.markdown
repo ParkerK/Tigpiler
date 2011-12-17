@@ -47,7 +47,6 @@ Parts
 
 1. Lexer (9/19)
 ---------------
-
 To Fix:  
 
 + <del> A little too aggressive illegal escape char checker. e.g. \\ is a regular backslash. Currently your lexer reporting error </del>  
