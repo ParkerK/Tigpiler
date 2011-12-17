@@ -216,8 +216,10 @@ struct
         result (fn r =>
                    emit (A.OPER {assem="li `d0, " ^ (int n) ^ "\n",
                                  dst=[r], src=[], jump=NONE}))
-      | munchExp(_) = result(fn _ => emit(A.OPER{assem="bad munch exp! line 00\n", src=[], dst=[], jump=NONE}))
-      
+      | munchExp(T.CALL (_,_)) = 
+        ((Printtree.printtree(TextIO.stdOut, stm); TextIO.flushOut TextIO.stdOut;());
+        result(fn _ => emit(A.OPER{assem="--bad call\n", src=[], dst=[], jump=NONE})))
+      | munchExp(T.BINOP(_, _, _)) = result(fn _ => emit(A.OPER{assem="--bad binop\n", src=[], dst=[], jump=NONE}))
       (*print IR tree*)
       (*val _ = (Printtree.printtree(TextIO.stdOut, stm); TextIO.flushOut TextIO.stdOut;())*)
     in
