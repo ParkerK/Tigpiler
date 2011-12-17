@@ -328,7 +328,20 @@ structure Translate : TRANSLATE = struct
               T.MEM(T.TEMP(address))))
           end
           
-    fun recordExp (explist) = hd(explist) (*todo*)
+    fun recordExp (explist) = 
+      let
+        val size = T.CONST(length(explist))
+        val r = Temp.newtemp()
+        val setup = T.MOVE(T.TEMP(r),
+               T.CALL(T.NAME(Temp.namedlabel("initRecord")),[size]))
+        fun step(exp,n) = 
+            T.MOVE(T.MEM(T.BINOP(T.PLUS, T.TEMP(r), T.CONST(n * Frame.wordsize))),
+             (unEx exp))
+        fun steps([],n) = [setup]
+          | steps(e::es,n) = (step(e,n))::(steps(es,n-1))
+      in
+        Ex(T.ESEQ(seq(rev(steps(explist,(length(explist) - 1)))), T.TEMP(r)))
+      end
     
     fun procEntryExit({level=level, body=exp})= 
       let
