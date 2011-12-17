@@ -40,6 +40,12 @@ struct
     | _ => "bad branch operator!"
     
   fun munchStm(T.SEQ(a,b)) = (munchStm a; munchStm b)
+    | munchStm(T.MOVE(T.TEMP t, T.CALL(T.NAME(l),args))) =
+        (emit(A.OPER{assem="jal " ^ Symbol.name(l) ^ "\n",
+                    src=munchArgs(0,args), 
+                    dst=F.RA::F.v0::F.callersaves,jump=NONE});
+        emit(A.OPER{assem="add `d0,`s0, $r0\n", 
+                    src=[F.v0], dst=[t], jump=NONE}))
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i)),e2)) =
         emit(A.OPER{assem="sw `s1, " ^ int i ^ "(`s0)\n",
                     src=[munchExp e1, munchExp e2],
@@ -52,7 +58,7 @@ struct
 
       
     | munchStm(T.MOVE(T.MEM(T.CONST i),e2)) =
-        emit(A.OPER{assem="sw `s0, " ^ int i ^ "(r0)\n",
+        emit(A.OPER{assem="sw `s0, " ^ int i ^ "($r0)\n",
                     src=[munchExp e2],
                     dst=[], jump=NONE})
       
@@ -67,7 +73,7 @@ struct
           dst=i})
 
     | munchStm(T.LABEL lab) =
-      emit(A.LABEL{assem=Symbol.name(lab) ^ ":\n", lab=lab})
+        emit(A.LABEL{assem=Symbol.name(lab) ^ ":\n", lab=lab})
       
     (* JUMP *)
      | munchStm(T.CJUMP(oper, T.CONST i, e1, lab1, lab2)) =
@@ -75,8 +81,8 @@ struct
         src=[munchExp e1], dst=[], jump=SOME([lab1,lab2])})
 
     | munchStm(T.CJUMP(oper, e1, T.CONST i, lab1, lab2)) =
-            emit(A.OPER{assem=((operToJump oper) ^ " `s0," ^ int i ^ "," ^ Symbol.name(lab1) ^ "\n" ^ "j " ^ (Symbol.name lab2) ^ "\n"),
-                        src=[munchExp e1], dst=[], jump=SOME([lab1,lab2])})
+        emit(A.OPER{assem=((operToJump oper) ^ " `s0," ^ int i ^ "," ^ Symbol.name(lab1) ^ "\n" ^ "j " ^ (Symbol.name lab2) ^ "\n"),
+          src=[munchExp e1], dst=[], jump=SOME([lab1,lab2])})
 
     | munchStm(T.CJUMP(oper, e1, e2, lab1, lab2)) =
       emit(A.OPER{assem=((operToJump oper) ^ " `s0,`s1," ^ Symbol.name(lab1) ^ "\n" ^ "j " ^ (Symbol.name lab2) ^ "\n"),
@@ -88,11 +94,11 @@ struct
         
     | munchStm(T.EXP(T.CALL(T.NAME(lab),args))) = 
          emit(A.OPER{assem="jal " ^ Symbol.name(lab) ^ "\n",
-         src=munchArgs(0,args), dst=F.RA::F.ZERO::F.callersaves, jump=NONE})
-     
+          src=munchArgs(0,args), dst=F.RA::F.callersaves, jump=NONE})
+
     | munchStm (T.EXP exp) = (munchExp exp; ())
     | munchStm (T.JUMP a) =   emit(A.OPER{assem="JUMP : bad munch stm! line 107", src=[], dst=[], jump=NONE})
-    | munchStm (T.MOVE a) =	emit(A.MOVE{assem="MOVE : bad munch stm! line 107", src=Temp.newtemp (), dst=Temp.newtemp ()})
+    | munchStm (T.MOVE a) = emit(A.MOVE{assem="MOVE : bad munch stm! line 107", src=Temp.newtemp (), dst=Temp.newtemp ()})
     (*| munchStm(_) = emit(A.OPER{assem="bad munch stm! line 107", src=[], dst=[], jump=NONE})*)
 
     and munchArgs(i,[]) = []
@@ -124,7 +130,7 @@ struct
               dst=[r], src=[munchExp e], jump=NONE}))
       | munchExp (T.MEM e) =
           result (fn r => emit (A.OPER 
-            {assem="lw `d0, `s0\n",
+            {assem="lw `d0, 0(`s0)\n",
               dst=[r], src=[munchExp e], jump=NONE}))
 
       (* PLUS *)

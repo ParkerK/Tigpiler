@@ -14,7 +14,6 @@ struct
                             
   val v0 = Temp.newtemp()   (* Return Values *)
   val v1 = Temp.newtemp()   
-  val RV = v0
                             
   val a0 = Temp.newtemp()   (* Function Arguments *)
   val a1 = Temp.newtemp()   
@@ -67,7 +66,7 @@ struct
         Temp.Table.empty
           (ListPair.zip(registerTemps, registers))
       
-  val calldefs = callersaves @ [RA, RV]
+  val calldefs = callersaves @ [RA, v0, v1]
   fun newFrame({name, formals}) = {name=name, formals=formals, locals=ref 0}
   
   fun name(f:frame) = #name f

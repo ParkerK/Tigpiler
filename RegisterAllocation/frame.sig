@@ -8,7 +8,8 @@ sig
   val FP : Temp.temp
   val ZERO : Temp.temp
   val RA : Temp.temp  
-  val RV : Temp.temp (*as seen by callee*)
+  val v0 : Temp.temp (*as seen by callee*)
+  val v1 : Temp.temp (*as seen by callee*)
   val registers : register list
   val tempMap : register Temp.Table.table
 
