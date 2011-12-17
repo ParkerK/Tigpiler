@@ -144,7 +144,9 @@ structure Semant :> SEMANT = struct
             | SOME else' =>
                 let val else'' = trexp (else')
                 in
-                  checkInt(test', pos); checkUnit(then'', pos); checkUnit(else'', pos);
+                  checkInt(test', pos);
+                  if compare_ty(#ty then'', #ty else'', pos) then ()
+                  else (err pos "then and else clauses don't match in type"; ());
                   {exp=(Tr.ifThenElseExp(#exp test', #exp then'', #exp else'')), ty=Types.UNIT}
                 end
             )
@@ -282,14 +284,15 @@ structure Semant :> SEMANT = struct
           (Symbol.enter(venv, name, E.VarEntry{access=access, ty=ty}), tenv, explist', level)
         end
 
-    | transDec (venv, tenv, A.TypeDec vardecs, break, explist, level) = 
+    | transDec (venv, tenv, A.TypeDec tydecs, break, explist, level) = 
         let
-          val names = map #name vardecs
-          val poss = map #pos vardecs
-          val typs = map #ty vardecs
+          val names = map #name tydecs
+          val poss = map #pos tydecs
+          val _ = checkDups(names, poss)
+          val typs = map #ty tydecs
           fun addt (n,env) = Symbol.enter(env,n,Types.NAME(n,ref(Symbol.look(tenv, n))))
-            val tenv' = foldr addt tenv names
-            val nts = map (fn t => transTy (tenv', t)) typs
+          val tenv' = foldr addt tenv names
+          val nts = map (fn t => transTy (tenv', t)) typs
           fun updt (n,nt) = 
             let val (SOME (Types.NAME(_,r))) = Symbol.look(tenv',n)
             in r := SOME nt
