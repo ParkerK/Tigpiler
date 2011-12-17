@@ -41,18 +41,18 @@ struct
     
   fun munchStm(T.SEQ(a,b)) = (munchStm a; munchStm b)
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,e1,T.CONST i)),e2)) =
-        emit(A.OPER{assem="sw `s1, (`s0+" ^ int i ^ ")\n",
+        emit(A.OPER{assem="sw `s1, " ^ int i ^ "(`s0)\n",
                     src=[munchExp e1, munchExp e2],
                     dst=[],jump=NONE})
 
     | munchStm(T.MOVE(T.MEM(T.BINOP(T.PLUS,T.CONST i,e1)),e2)) =
-      emit(A.OPER{assem="sw `s1, (`s0+" ^ int i ^ ")\n",
+      emit(A.OPER{assem="sw `s1, " ^ int i ^ "(`s0)\n",
                   src=[munchExp e1, munchExp e2],
                          dst=[],jump=NONE})
 
       
     | munchStm(T.MOVE(T.MEM(T.CONST i),e2)) =
-        emit(A.OPER{assem="sw `s0, (r0+" ^ int i ^ ")\n",
+        emit(A.OPER{assem="sw `s0, " ^ int i ^ "(r0)\n",
                     src=[munchExp e2],
                     dst=[], jump=NONE})
       
@@ -103,7 +103,7 @@ struct
                 val reg = "`a" ^ int (i-1)
                 val r = List.nth(F.argregs,(i-1))
             in            
-                (emit(A.MOVE{assem="move " ^ reg ^ ", (`s0+0)\n",
+                (emit(A.MOVE{assem="move " ^ reg ^ ", `s0\n",
                  src=munchExp eh, dst=r});
                  r::munchArgs(i+1,et))
             end       
@@ -124,7 +124,7 @@ struct
               dst=[r], src=[munchExp e], jump=NONE}))
       | munchExp (T.MEM e) =
           result (fn r => emit (A.OPER 
-            {assem="lw `d0, (`s0)\n",
+            {assem="lw `d0, `s0\n",
               dst=[r], src=[munchExp e], jump=NONE}))
 
       (* PLUS *)
