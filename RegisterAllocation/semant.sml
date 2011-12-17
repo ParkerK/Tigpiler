@@ -118,7 +118,7 @@ structure Semant :> SEMANT = struct
                 (checkString(left', pos);
                 checkString(right', pos);
                 {exp=Tr.stringOpExp(oper, #exp left', #exp right'), ty=Types.INT})
-            | _ => (err pos "can't perform comparisons on this type";
+            | _ => (err pos "1can't perform comparisons on this type";
                   {exp=Tr.nilExp(), ty=Types.INT}))
            end
        else if oper = A.EqOp orelse oper = A.NeqOp then
@@ -138,8 +138,12 @@ structure Semant :> SEMANT = struct
             | Types.RECORD(symtys, uq) => 
                 (checkRecord(Types.RECORD(symtys, uq), right', pos);
                 {exp=Tr.recordCompExp(oper, #exp left', #exp right'), ty=Types.INT})
-            | _ => (err pos "can't perform comparisons on this type";
-                  {exp=Tr.nilExp(), ty=Types.INT}))
+            | Types.NIL => 
+                (checkRecord(Types.NIL, right', pos);
+                {exp=Tr.recordCompExp(oper, #exp left', #exp right'), ty=Types.INT})
+            | ty => (print ("-------"^Types.toString(ty));
+                    err pos "2can't perform comparisons on this type";
+                    {exp=Tr.nilExp(), ty=Types.INT}))
            end
        else
         (err pos "error";{exp=Tr.nilExp(), ty=Types.INT})
