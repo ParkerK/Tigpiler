@@ -20,6 +20,7 @@ sig
   val unCx : exp -> (Temp.label * Temp.label -> Tree.stm)
   val seq : Tree.stm list ->Tree.stm
   val newbreakpoint : unit -> breakpoint
+  val arrayExp : exp * exp -> exp
   val assignExp : exp * exp -> exp
   val breakExp : Tree.label -> exp
   val intExp : int -> exp
@@ -117,8 +118,11 @@ structure Translate : TRANSLATE = struct
     | unCx(Cx genstm) = genstm
     | unCx(Nx _) = raise Impossible("Cannot unCx an Nx")
   
+  fun arrayExp (size,init) =
+    Ex(T.CALL(T.NAME(Temp.namedlabel("initArray")), [unEx(size), unEx(init)]))
+
   fun assign (l, r) = Nx (T.MOVE (unEx l, unEx r))
-      
+  
   fun whileExp (test, body, done) = 
     let
       val test = unCx test

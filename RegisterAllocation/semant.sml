@@ -6,7 +6,10 @@ end
 structure Semant :> SEMANT = struct
   structure A = Absyn
   structure E = Env
+  structure S = Symbol
+  structure T = Types
   structure Tr = Translate
+  
   val err = ErrorMsg.error
   exception ErrMsg
 
@@ -72,6 +75,9 @@ structure Semant :> SEMANT = struct
   fun checkRecord (rty, {exp, ty}, pos) =
     ((if compare_ty(rty, ty, pos) then () else err pos "string required"); exp)
     
+  fun checkArray (rty, {exp, ty}, pos) =
+    ((if compare_ty(rty, ty, pos) then () else err pos "array required"); exp)
+    
    (* Takes venv, tenv, exp *)
   fun transExp(venv, tenv, break, level)  = 
     let 
@@ -118,7 +124,20 @@ structure Semant :> SEMANT = struct
             else
               (err pos "error"; {exp=Tr.nilExp(), ty=Types.INT})
         end
-      | trexp   (A.CallExp {func, args, pos}) = 
+      | trexp (A.ArrayExp {typ, size, init, pos}) =
+          let
+            val aty = typelookup tenv typ pos
+            val s = trexp size
+            val i = trexp init
+          in
+            (checkInt(s, pos);
+            (case aty of
+              Types.ARRAY(ty,_) => (checkArray(actual_ty ty, i, pos);())
+            | _ => (err pos (" not an array type")));
+            {exp=Tr.arrayExp(#exp s, #exp i), ty=aty})
+          end
+
+      | trexp (A.CallExp {func, args, pos}) = 
           (case Symbol.look (venv, func) of
             SOME (E.FunEntry {formals, result, level, label}) =>
               let val args' = map trexp args
@@ -247,9 +266,6 @@ structure Semant :> SEMANT = struct
             {exp=Tr.letExp(decList,bodyExp), ty=bodyTy}
           end
 
-      | trexp (A.ArrayExp {typ, size, init, pos}) =
-          {exp=Tr.nilExp(), ty=Types.UNIT}
-
      and trvar (A.SimpleVar(id,pos)) = 
           (case Symbol.look(venv, id) of
             SOME (E.VarEntry{access, ty}) => 
@@ -262,9 +278,18 @@ structure Semant :> SEMANT = struct
             {exp, ty=record as Types.RECORD (fields, _)} => {exp=Tr.nilExp(), ty=record}
           | _ => (err pos "no var found"; {exp=Tr.nilExp(), ty=Types.UNIT}))
 
-      | trvar (A.SubscriptVar(var, exp,pos)) =
-          (checkInt(trexp exp, pos);
-          {exp=Tr.nilExp(), ty=Types.UNIT})
+      | trvar (A.SubscriptVar(var, exp, pos)) =
+          let
+            val {exp=v,ty} = trvar var
+            val subs = trexp exp
+          in
+            (checkInt(subs, pos);
+            (case ty of 
+              Types.ARRAY(typ, _) => 
+                    {exp=Tr.subscriptExp(v, #exp subs), ty=actual_ty typ}
+            | _ => (err pos ("not an array type");
+                    {exp=Tr.nilExp(), ty=Types.UNIT})))
+          end
     in
       trexp
     end
