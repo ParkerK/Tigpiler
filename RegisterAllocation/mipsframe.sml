@@ -102,7 +102,7 @@ struct
     | seq [exp] = exp
     | seq (exp :: exps) = (Tree.SEQ (exp, (seq exps)))
   
-  fun externalCall (str, left, right) = Tree.TEMP (Temp.newtemp()) (*todo*)
+  fun externalCall (str, args) = Tree.CALL(Tree.NAME(Temp.namedlabel str), args)
   
   fun procEntryExit1 (frame, stm) =
   let

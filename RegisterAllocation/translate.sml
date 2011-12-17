@@ -244,7 +244,7 @@ structure Translate : TRANSLATE = struct
       Cx(fn(t, f) => T.CJUMP(oper, unEx left , unEx right , t, f))
       
     fun relopStrExp (oper, left, right, str) = 
-      Ex (Frame.externalCall (str, unEx left, unEx right))
+      Ex (Frame.externalCall (str, [unEx left, unEx right]))
                                             
     fun intOpExp (A.PlusOp, left, right)   = binopExp (T.PLUS, left, right)
       | intOpExp (A.MinusOp, left, right)  = binopExp (T.MINUS, left, right)

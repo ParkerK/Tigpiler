@@ -26,7 +26,7 @@ sig
   
   val exp : access -> Tree.exp -> Tree.exp
   
-  val externalCall : string * Tree.exp * Tree.exp -> Tree.exp
+  val externalCall : string * Tree.exp list -> Tree.exp
   
   val procEntryExit1 : frame * Tree.stm -> Tree.stm
   val procEntryExit2 : frame * Assem.instr list -> Assem.instr list
