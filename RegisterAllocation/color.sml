@@ -38,6 +38,7 @@ struct
     val cTable = ref Temp.Table.empty
     val coloredNodes = ref Set.empty
   	val regColorMap = ref initial : allocation ref
+    val validcolors = ref colorPalette
     
                 
     fun numColorables () = Set.numItems(colorPalette)
@@ -80,16 +81,16 @@ struct
     
     fun colorNode (node) =
       let
-        val validcolors = ref colorPalette
         val neighbors = G.adj (node)      
         fun rmC([]) = ()
         | rmC(n::ns) = (
           (if Set.member((!coloredNodes),n) then
-            (validcolors := Set.delete((!validcolors),valOf(Temp.Table.look((!cTable),n))))
+            (print "deleting \n";(validcolors := Set.delete((!validcolors),valOf(Temp.Table.look((!cTable),n)))))
           else ());
           rmC(ns))
       
       in (
+        print ("Validcolors : " ^(Int.toString (List.length (Set.listItems(!validcolors)))) ^ "\n");
         if Set.isEmpty((!validcolors)) then
           (spill())
         else
@@ -97,9 +98,12 @@ struct
             val color = hd((Set.listItems((!validcolors))))
             val node' = gtemp node
           in (
+            print ("Colored Nodes : " ^(Int.toString (List.length (Set.listItems(!coloredNodes)))) ^ "\n");
+            (*print ("Coloring: " ^ (Int.toString(node')) ^ temp2reg(color) ^"\n");*)
             coloredNodes := Set.add((!coloredNodes),  node');
             regColorMap := Temp.Table.enter((!regColorMap),  node', temp2reg(color));
-            cTable := Temp.Table.enter((!cTable),  node', color))
+            cTable := Temp.Table.enter((!cTable),  node', color));
+            rmC([node'])
           end
           )
       end
@@ -123,6 +127,7 @@ struct
               val remaining = Set.delete(remaining, head)
               val (newltk, newgtk) = sortNodes(remaining)
             in
+              (*print (Int.toString (List.length (Set.listItems (newltk))) ^ "\n");*)
               colorTable(newltk,newgtk)
             end )
             )
