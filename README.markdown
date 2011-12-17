@@ -63,11 +63,11 @@ To Fix:
 ---------------------------
 To Fix:  
 
-+ If, while, ... expressions are returning errors when not supposed to, e.g. "if(5>3)..." returns integer required error.
-+ Certain expressions should not return any value at all (see page 516). For example a:=(if (5>4) then 3) should return an error
-+ For "if then else" expressions the types of "then" and "else" values must be the same
-+ Need to handle recursive declarations: At the moment not throwing errors. (See page 120)
-+ How are you handling cases where types have the same name as variables? Should it return an error?
++ <del> If, while, ... expressions are returning errors when not supposed to, e.g. "if(5>3)..." returns integer required error. </del>
++ <del> Certain expressions should not return any value at all (see page 516). For example a:=(if (5>4) then 3) should return an error </del>
++ <del> For "if then else" expressions the types of "then" and "else" values must be the same </del>
++ <del> Need to handle recursive declarations: At the moment not throwing errors. (See page 120) </del>
++ <del> How are you handling cases where types have the same name as variables? Should it return an error? </del>
 
 4.Frame Analysis and Intermediate Representation (11/14)  
 --------------------------------------------------------
