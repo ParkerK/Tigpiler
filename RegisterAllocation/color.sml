@@ -85,12 +85,14 @@ struct
         fun rmC([]) = ()
         | rmC(n::ns) = (
           (if Set.member((!coloredNodes),n) then
-            (print "deleting \n";(validcolors := Set.delete((!validcolors),valOf(Temp.Table.look((!cTable),n)))))
+            (
+            (*print "deleting \n";*)
+            (validcolors := Set.delete((!validcolors),valOf(Temp.Table.look((!cTable),n)))))
           else ());
           rmC(ns))
       
       in (
-        print ("Validcolors : " ^(Int.toString (List.length (Set.listItems(!validcolors)))) ^ "\n");
+        (*print ("Validcolors : " ^(Int.toString (List.length (Set.listItems(!validcolors)))) ^ "\n");*)
         if Set.isEmpty((!validcolors)) then
           (spill())
         else
@@ -98,7 +100,7 @@ struct
             val color = hd((Set.listItems((!validcolors))))
             val node' = gtemp node
           in (
-            print ("Colored Nodes : " ^(Int.toString (List.length (Set.listItems(!coloredNodes)))) ^ "\n");
+            (*print ("Colored Nodes : " ^(Int.toString (List.length (Set.listItems(!coloredNodes)))) ^ "\n");*)
             (*print ("Coloring: " ^ (Int.toString(node')) ^ temp2reg(color) ^"\n");*)
             coloredNodes := Set.add((!coloredNodes),  node');
             regColorMap := Temp.Table.enter((!regColorMap),  node', temp2reg(color));
