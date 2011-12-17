@@ -79,7 +79,12 @@ structure Semant :> SEMANT = struct
         Types.STRING => ()
       | _ => err pos "string required");
       exp)
-
+      
+  fun checkRecord (rty, {exp, ty}, pos) =
+    ((if compare_ty(rty, ty, pos) then ()
+    else err pos "string required");
+    exp)
+    
    (* Takes venv, tenv, exp *)
   fun transExp(venv, tenv, break, level)  = (*removed break to make things compile*)
 
@@ -99,8 +104,7 @@ structure Semant :> SEMANT = struct
            checkInt(right', pos);
            {exp=Tr.intOpExp(oper, #exp left', #exp right'), ty=Types.INT})
          end
-        else if oper = A.EqOp orelse oper = A.NeqOp orelse oper = A.LtOp orelse
-                oper = A.LeOp orelse oper = A.GtOp orelse oper = A.GeOp then
+        else if oper = A.LtOp orelse oper = A.LeOp orelse oper = A.GtOp orelse oper = A.GeOp then
           let
             val left' = trexp left
             val right' = trexp right
@@ -114,6 +118,26 @@ structure Semant :> SEMANT = struct
                 (checkString(left', pos);
                 checkString(right', pos);
                 {exp=Tr.stringOpExp(oper, #exp left', #exp right'), ty=Types.INT})
+            | _ => (err pos "can't perform comparisons on this type";
+                  {exp=Tr.nilExp(), ty=Types.INT}))
+           end
+       else if oper = A.EqOp orelse oper = A.NeqOp then
+          let
+            val left' = trexp left
+            val right' = trexp right
+          in
+            (case #ty left' of
+              Types.INT =>
+                (checkInt(left', pos);
+                checkInt(right', pos);
+                {exp=Tr.intOpExp(oper, #exp left', #exp right'), ty=Types.INT})
+            | Types.STRING =>
+                (checkString(left', pos);
+                checkString(right', pos);
+                {exp=Tr.stringOpExp(oper, #exp left', #exp right'), ty=Types.INT})
+            | Types.RECORD(symtys, uq) => 
+                (checkRecord(Types.RECORD(symtys, uq), right', pos);
+                {exp=Tr.recordCompExp(oper, #exp left', #exp right'), ty=Types.INT})
             | _ => (err pos "can't perform comparisons on this type";
                   {exp=Tr.nilExp(), ty=Types.INT}))
            end
@@ -147,8 +171,7 @@ structure Semant :> SEMANT = struct
            val then'' = trexp (then')
          in
            (checkInt (test', pos);
-           checkUnit (then'', pos);
-           {exp=(Tr.ifThenExp(#exp test', #exp then'')), ty=Types.UNIT})
+           {exp=(Tr.ifThenExp(#exp test', #exp then'')), ty=(#ty then'')})
          end
          | SOME else' =>
          let

@@ -35,6 +35,7 @@ sig
   val forExp : exp * Tree.label * exp * exp * exp -> exp
   val callExp : level * Tree.label * exp list  -> exp
   val recordExp : exp list  -> exp
+  val recordCompExp : Absyn.oper * exp * exp -> exp
   
   val simpleVar : access * level -> exp
   val subscriptExp : exp * exp -> exp
@@ -265,6 +266,11 @@ structure Translate : TRANSLATE = struct
       | stringOpExp (A.GtOp, left, right)     = relopStrExp (T.GT, left, right, "stringGreaterThan")
       | stringOpExp (A.GeOp, left, right)     = relopStrExp (T.GE, left, right, "stringGreaterThanEqual")      
       | stringOpExp (_, _, _)                 = raise Impossible ("illegal operation on strings")
+      
+    fun recordCompExp (A.EqOp, left, right)   = relopExp (T.EQ, left, right)
+      | recordCompExp (A.NeqOp, left, right)  = relopExp (T.NE, left, right)
+      | recordCompExp (_, _, _)               = raise Impossible ("illegal operation on records")
+      
     fun callExp (_:level, label, exps:exp list) = Ex(T.CALL(T.NAME(label), map unEx exps))       
   
     fun letExp ([], body) = body
