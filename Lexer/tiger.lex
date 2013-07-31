@@ -5,6 +5,7 @@ val lineNum = ErrorMsg.lineNum
 val linePos = ErrorMsg.linePos
 val numComment = ref 0
 val stringToken = ref ""
+val stringStrPos = ref 0
 
 fun err(p1,p2) = ErrorMsg.error p1
 
@@ -59,22 +60,22 @@ formatchar={whitespace}|{newline};
 <INITIAL>"+"            => (Tokens.PLUS(yypos,yypos+1));
 <INITIAL>"-"            => (Tokens.MINUS(yypos,yypos+1));
 <INITIAL>"."            => (Tokens.DOT(yypos,yypos+1));
-            
+
 <INITIAL>"{"            => (Tokens.LBRACE(yypos,yypos+1));
 <INITIAL>"}"            => (Tokens.RBRACE(yypos,yypos+1));
 <INITIAL>"["            => (Tokens.LBRACK(yypos,yypos+1));
 <INITIAL>"]"            => (Tokens.RBRACK(yypos,yypos+1));
 <INITIAL>"("            => (Tokens.LPAREN(yypos,yypos+1));
 <INITIAL>")"            => (Tokens.RPAREN(yypos,yypos+1));
-                    
+
 <INITIAL>";"            => (Tokens.SEMICOLON(yypos,yypos+1));
 <INITIAL>":"            => (Tokens.COLON(yypos,yypos+1));
 <INITIAL>","            => (Tokens.COMMA(yypos,yypos+1));
-        
-<INITIAL>{quote}        => (stringToken:=""; YYBEGIN STRING; continue());
 
-<STRING>{quote}         => (YYBEGIN INITIAL;Tokens.STRING(!stringToken, yypos, yypos + size(!stringToken)));
-<STRING>"\\"            => (YYBEGIN ESCAPE; continue());  
+<INITIAL>{quote}        => (stringToken:=""; stringStrPos := yypos; YYBEGIN STRING; continue());
+
+<STRING>{quote}         => (YYBEGIN INITIAL;Tokens.STRING(!stringToken, !stringStrPos, yypos;
+<STRING>"\\"            => (YYBEGIN ESCAPE; continue());
 <STRING>{newline}       => (ErrorMsg.error yypos ("cannot have new line in string " ^ yytext); continue());
 <STRING>.               => (stringToken := !stringToken ^ yytext; continue());
 
@@ -83,13 +84,13 @@ formatchar={whitespace}|{newline};
 <ESCAPE>"r"             => (stringToken := !stringToken ^ "\r"; YYBEGIN STRING; continue());
 <ESCAPE>"t"             => (stringToken := !stringToken ^ "\t"; YYBEGIN STRING; continue());
 <ESCAPE>"f"             => (stringToken := !stringToken ^ "\f"; YYBEGIN STRING; continue());
-<ESCAPE>{ascii}         => (stringToken := !stringToken ^ String.str(Char.chr(valOf(Int.fromString yytext))); 
-                            YYBEGIN STRING; 
+<ESCAPE>{ascii}         => (stringToken := !stringToken ^ String.str(Char.chr(valOf(Int.fromString yytext)));
+                            YYBEGIN STRING;
                             continue());
 <ESCAPE>{formatchar}    => (YYBEGIN FORMAT; continue());
 <ESCAPE>.               => (ErrorMsg.error yypos ("illegal escape character " ^ yytext); continue());
 
-<FORMAT>{formatchar}    => (continue()); 
+<FORMAT>{formatchar}    => (continue());
 <FORMAT>"\\"            => (YYBEGIN STRING; continue());
 <FORMAT>.               => (ErrorMsg.error yypos ("illegal format character " ^ yytext); continue());
 
@@ -101,7 +102,7 @@ formatchar={whitespace}|{newline};
 <COMMENT>"*/"           => (numComment := !numComment-1;
                             if (!numComment=0)
                             then (YYBEGIN INITIAL; continue())
-                            else (continue()));                   
+                            else (continue()));
 <COMMENT>.              => (continue());
 
 <INITIAL>.       => (ErrorMsg.error yypos ("illegal character:" ^ "|" ^ yytext ^ "|"); continue());
